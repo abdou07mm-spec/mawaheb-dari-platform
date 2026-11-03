@@ -2636,6 +2636,7 @@
                 </div>
             </div>
 
+            <div id="adm-users-notice"></div>
             <div class="stat-grid" id="adm-stats"></div>
 
             <div class="card">
@@ -3075,7 +3076,7 @@
                     <div class="settings-item">
                         <div class="settings-item-info">
                             <h5>إدارة المستخدمين</h5>
-                            <p>عرض وحظر المستخدمين</p>
+                            <p>طلبات صلاحية المدير، منح الصلاحية أو سحبها</p>
                         </div>
                         <div class="settings-item-action">
                             <button class="btn-primary" onclick="manageUsers()">إدارة</button>
@@ -3536,6 +3537,22 @@
     </div>
 </div>
 
+<!-- نافذة إدارة المستخدمين (للمدير) -->
+<div id="usersModal" class="modal" onclick="if (event.target === this) closeModal('usersModal')">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-users-gear"></i> إدارة المستخدمين</h3>
+            <button class="close-modal" onclick="closeModal('usersModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="filter-tabs" id="users-filter-tabs"></div>
+        <div class="search-mini">
+            <i class="fas fa-magnifying-glass"></i>
+            <input type="text" id="users-search" placeholder="ابحث بالاسم، البريد أو الهاتف..." oninput="renderUsersAdmin()">
+        </div>
+        <div id="users-admin-list" class="req-list"></div>
+    </div>
+</div>
+
 <!-- مؤشر التحميل -->
 <div class="loading-overlay" id="loading-overlay">
     <div class="loading-spinner"></div>
@@ -3562,6 +3579,8 @@
     // ==================== متغيرات عامة ====================
     let currentUser = null;
     let selectedRole = '';
+    let loginIntent = ''; // ما اختاره المستخدم في شاشة البداية (للعرض فقط)
+    let placesListening = false;
     let currentLang = 'ar';
     let map = null;
     let mapType = 'street'; // 'street' or 'satellite'
@@ -3631,12 +3650,27 @@
             // الخريطة أُنشئت والتطبيق مخفي، لذا نعيد حساب أبعادها بعد الإظهار
             setTimeout(() => map && map.invalidateSize(), 100);
 
-            // تحديد نوع المستخدم من قاعدة البيانات
+            // الدور يُحدَّد من قاعدة البيانات فقط، وليس من الاختيار في شاشة البداية
+            selectedRole = 'volunteer';
             database.ref('users/' + user.uid).once('value').then((snapshot) => {
                 const userData = snapshot.val();
-                if (userData) {
-                    selectedRole = userData.role;
+                if (userData) applyUserRole(userData);
+            }).catch(error => showToast('❌ خطأ في تحميل بيانات المستخدم: ' + error.message, 'error'));
+
+            loadUserData();
+            loadEvents();
+            loadPlaces();
+            loadPhotos();
+            loadNotifications();
+            loadLeaderboard();
+            loadYouthData();
+        }
+    });
+
+    // تطبيق واجهة الدور (مدير أو متطوع) حسب ما هو مسجل في قاعدة البيانات
+    function applyUserRole(userData) {
                     currentUserData = userData;
+                    selectedRole = userData.role === 'admin' ? 'admin' : 'volunteer';
                     if (selectedRole === 'admin') {
                         // تحديث التبويب السفلي للمدير
                         document.body.classList.add('is-admin');
@@ -3666,34 +3700,35 @@
                         updatePendingCount();
                         filterAdminEvents('pending');
                         loadAdminYouthData();
+                        watchUsersForAdmin();
                     } else {
+                        document.body.classList.remove('is-admin');
                         document.getElementById('volunteer-nav').style.display = 'flex';
                         document.getElementById('admin-nav').style.display = 'none';
+                        if (loginIntent === 'admin') {
+                            showToast(userData.adminRequest
+                                ? '⏳ طلب صلاحية المدير قيد المراجعة، يمكنك استعمال المنصة كمتطوع حالياً'
+                                : 'ℹ️ هذا الحساب مسجل كمتطوع. صلاحية المدير يمنحها المدراء الحاليون', 'info');
+                        }
                     }
+                    loginIntent = '';
                     refreshYouthViews();
-                }
-            }).catch(error => showToast('❌ خطأ في تحميل بيانات المستخدم: ' + error.message, 'error'));
-
-            loadUserData();
-            loadEvents();
-            loadPlaces();
-            loadPhotos();
-            loadNotifications();
-            loadLeaderboard();
-            loadYouthData();
-        }
-    });
+    }
 
     // ==================== دوال المصادقة ====================
     function selectRole(role) {
-        selectedRole = role;
+        // مجرد نية للعرض: الصلاحية الفعلية تأتي من قاعدة البيانات وقواعد الأمان
+        loginIntent = role;
         document.getElementById('role-screen').style.opacity = '0';
         setTimeout(() => {
             document.getElementById('role-screen').style.display = 'none';
             document.getElementById('auth-screen').classList.add('active');
             document.getElementById('auth-icon').className = role === 'volunteer' ? 'fas fa-user-graduate' : 'fas fa-user-tie';
             document.getElementById('auth-title').textContent = role === 'volunteer' ? 'تسجيل دخول المتطوعين' : 'تسجيل دخول المدراء';
-            document.getElementById('signup-role').value = role === 'volunteer' ? 'متطوع' : 'مدير';
+            document.getElementById('auth-subtitle').textContent = role === 'volunteer'
+                ? 'أهلاً بك في منصة مواهب داري'
+                : 'حسابات المدراء الجديدة تُفعَّل بعد موافقة مدير حالي';
+            document.getElementById('signup-role').value = role === 'volunteer' ? 'متطوع' : 'مدير (يتطلب موافقة الإدارة)';
         }, 500);
     }
 
@@ -3766,24 +3801,39 @@
         }
         
         showLoading();
-        
+
+        // كل حساب جديد يُنشأ كمتطوع؛ من اختار «مدير» يُسجَّل له طلب يوافق عليه مدير حالي
+        const wantsAdmin = loginIntent === 'admin';
+        const record = {
+            name, email, phone, wilaya, talents,
+            role: 'volunteer',
+            points: 0,
+            events: 0,
+            hours: 0,
+            createdAt: new Date().toISOString()
+        };
+        if (wantsAdmin) {
+            record.adminRequest = true;
+            record.adminRequestAt = record.createdAt;
+        }
+
         auth.createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
                 return user.updateProfile({ displayName: name }).then(() => {
-                    return database.ref('users/' + user.uid).set({
-                        name, email, phone, wilaya, talents,
-                        role: selectedRole,
-                        points: 0,
-                        events: 0,
-                        hours: 0,
-                        createdAt: new Date().toISOString()
-                    });
+                    return database.ref('users/' + user.uid).set(record);
                 });
             })
             .then(() => {
                 hideLoading();
-                showToast('🎉 تم إنشاء الحساب بنجاح');
+                applyUserRole(record);
+                loadUserData();
+                if (wantsAdmin) {
+                    sendNotificationToAdmins('🛡️ طلب صلاحية مدير', `${name} (${email}) يطلب صلاحية مدير. راجع الطلب من الإعدادات ← إدارة المستخدمين`);
+                    showToast('🎉 تم إنشاء حسابك، وأُرسل طلب صلاحية المدير للمراجعة');
+                } else {
+                    showToast('🎉 تم إنشاء الحساب بنجاح');
+                }
             })
             .catch(error => {
                 hideLoading();
@@ -4043,13 +4093,19 @@
     }
 
     function loadPlaces() {
+        if (placesListening) return; // مستمع واحد يكفي
+        placesListening = true;
         database.ref('places').on('value', (snapshot) => {
             allPlaces = [];
             snapshot.forEach(child => { allPlaces.push({ id: child.key, ...child.val() }); });
             updateMapPlaces();
             updatePlacesList();
             refreshYouthViews();
-        }, error => showToast('❌ خطأ في تحميل الأماكن: ' + error.message, 'error'));
+        }, error => {
+            // قبل تسجيل الدخول قد ترفض القواعد القراءة: نعيد المحاولة بعد الدخول دون إزعاج المستخدم
+            placesListening = false;
+            if (currentUser) showToast('❌ خطأ في تحميل الأماكن: ' + error.message, 'error');
+        });
     }
 
     function updateMapPlaces() {
@@ -5011,8 +5067,8 @@
         if (!confirm('❗ تأكيد نهائي؟ لا يمكن التراجع!')) return;
         
         showLoading();
+        // المستخدمون يُحذفون في الأخير: بعد حذفهم يفقد المدير صلاحيته فترفض القواعد باقي العمليات
         Promise.all([
-            database.ref('users').remove(),
             database.ref('events').remove(),
             database.ref('places').remove(),
             database.ref('photos').remove(),
@@ -5020,17 +5076,13 @@
             database.ref('bookings').remove(),
             database.ref('occupancy').remove(),
             database.ref('memberships').remove()
-        ]).then(() => {
+        ]).then(() => database.ref('users').remove()).then(() => {
             hideLoading();
             showToast('✅ تم إعادة تعيين جميع البيانات');
         }).catch(error => {
             hideLoading();
             showToast('❌ ' + error.message, 'error');
         });
-    }
-
-    function manageUsers() {
-        showToast('👥 إدارة المستخدمين قيد التطوير', 'info');
     }
 
     // ==================== دوال مساعدة ====================
@@ -6423,7 +6475,7 @@
     function updateAdminRequestBadge() {
         const badge = document.getElementById('admin-requests-badge');
         if (!badge) return;
-        const n = allBookings.filter(b => b.status === 'pending').length + allMemberships.filter(m => m.status === 'pending').length;
+        const n = allBookings.filter(b => b.status === 'pending').length + allMemberships.filter(m => m.status === 'pending').length + pendingAdminRequests().length;
         badge.textContent = n;
         badge.style.display = n ? 'flex' : 'none';
     }
@@ -6439,6 +6491,9 @@
             [guestsToday, 'نزيل اليوم', 'fa-bed', '#3b82f6'],
             [allMemberships.filter(m => m.status === 'pending').length, 'انخراطات جديدة', 'fa-masks-theater', '#ec4899']
         ];
+        const adminReqs = pendingAdminRequests().length;
+        document.getElementById('adm-users-notice').innerHTML = adminReqs
+            ? `<div class="notice"><i class="fas fa-user-shield"></i><div><b>${adminReqs === 1 ? 'طلب صلاحية مدير واحد' : adminReqs + ' طلبات صلاحية مدير'}</b> في انتظار المراجعة. <button class="link-btn" onclick="manageUsers()">مراجعة الآن <i class="fas fa-chevron-left"></i></button></div></div>` : '';
         document.getElementById('adm-stats').innerHTML = stats.map(([n, l, i, c]) =>
             `<div class="stat-tile" style="--c:${c}"><i class="fas ${i}"></i><b>${n}</b><span>${l}</span></div>`).join('');
 
@@ -6578,6 +6633,111 @@
         if (selectedRole !== 'admin' || !confirm('⚠️ حذف طلب الانخراط؟')) return;
         database.ref('memberships/' + id).remove().then(() => showToast('✅ تم الحذف'))
             .catch(err => showToast('❌ ' + err.message, 'error'));
+    }
+
+    // ==================== إدارة المستخدمين وصلاحية المدير ====================
+    // ملاحظة: الحماية الفعلية تأتي من قواعد الأمان (database.rules.json) التي تمنع أي مستخدم من ترقية نفسه.
+    let allUsersAdmin = [];
+    let usersFilter = 'requests';
+    let usersWatchLoaded = false;
+
+    function pendingAdminRequests() {
+        return allUsersAdmin.filter(u => u.adminRequest && u.role !== 'admin');
+    }
+
+    function watchUsersForAdmin() {
+        if (usersWatchLoaded || selectedRole !== 'admin') return;
+        usersWatchLoaded = true;
+        database.ref('users').on('value', s => {
+            allUsersAdmin = snapToList(s);
+            updateAdminRequestBadge();
+            if (document.getElementById('usersModal').classList.contains('active')) renderUsersAdmin();
+            if (document.querySelector('.section.active')?.id === 'admin-bookings') renderAdminRequests();
+        }, err => console.warn('users:', err.message));
+    }
+
+    function manageUsers() {
+        if (selectedRole !== 'admin') return;
+        watchUsersForAdmin();
+        usersFilter = pendingAdminRequests().length ? 'requests' : 'all';
+        document.getElementById('users-search').value = '';
+        renderUsersAdmin();
+        document.getElementById('usersModal').classList.add('active');
+    }
+
+    function renderUsersAdmin() {
+        const groups = {
+            requests: ['طلبات المدير', u => u.adminRequest && u.role !== 'admin'],
+            admins: ['المدراء', u => u.role === 'admin'],
+            volunteers: ['المتطوعون', u => u.role !== 'admin'],
+            all: ['الكل', () => true]
+        };
+        document.getElementById('users-filter-tabs').innerHTML = Object.entries(groups).map(([k, [label, fn]]) =>
+            `<span class="filter-tab ${usersFilter === k ? 'active' : ''}" onclick="usersFilter='${k}'; renderUsersAdmin()">${label} <em>${allUsersAdmin.filter(fn).length}</em></span>`
+        ).join('');
+
+        const q = document.getElementById('users-search').value.trim().toLowerCase();
+        const rank = u => (u.adminRequest && u.role !== 'admin') ? 0 : u.role === 'admin' ? 1 : 2;
+        const list = allUsersAdmin
+            .filter(groups[usersFilter][1])
+            .filter(u => !q || [u.name, u.email, u.phone].some(v => String(v || '').toLowerCase().includes(q)))
+            .sort((a, b) => rank(a) - rank(b) || String(a.name || '').localeCompare(String(b.name || ''), 'ar'));
+
+        document.getElementById('users-admin-list').innerHTML = list.length ? list.map(u => {
+            const isMe = currentUser && u.id === currentUser.uid;
+            const requested = u.adminRequest && u.role !== 'admin';
+            const chip = u.role === 'admin'
+                ? '<span class="status-chip s-confirmed"><i class="fas fa-user-shield"></i> مدير</span>'
+                : requested ? '<span class="status-chip s-pending"><i class="fas fa-hourglass-half"></i> يطلب صلاحية مدير</span>'
+                : '<span class="status-chip s-cancelled"><i class="fas fa-user"></i> متطوع</span>';
+            let actions = '';
+            if (isMe) actions = '<small class="muted">هذا حسابك</small>';
+            else if (requested) actions = `
+                <button class="btn btn-success btn-small" onclick="setUserRole('${u.id}', 'admin')"><i class="fas fa-check"></i> قبول كمدير</button>
+                <button class="btn btn-danger btn-small" onclick="rejectAdminRequest('${u.id}')"><i class="fas fa-times"></i> رفض الطلب</button>`;
+            else if (u.role === 'admin') actions = `<button class="btn btn-outline btn-small" onclick="setUserRole('${u.id}', 'volunteer')"><i class="fas fa-user-minus"></i> سحب صلاحية المدير</button>`;
+            else actions = `<button class="btn btn-outline btn-small" onclick="setUserRole('${u.id}', 'admin')"><i class="fas fa-user-shield"></i> ترقية إلى مدير</button>`;
+            return `
+                <div class="req-card">
+                    <div class="req-top">
+                        <div><b>${esc(u.name || 'بدون اسم')}${isMe ? ' (أنت)' : ''}</b><small dir="ltr">${esc(u.email || '')}</small></div>
+                        ${chip}
+                    </div>
+                    <div class="req-meta">
+                        ${u.phone ? `<span><i class="fas fa-phone"></i> <a href="tel:${esc(u.phone)}" dir="ltr">${esc(u.phone)}</a></span>` : ''}
+                        ${u.wilaya ? `<span><i class="fas fa-location-dot"></i> ${esc(getWilayaName(u.wilaya))}</span>` : ''}
+                        ${u.createdAt ? `<span><i class="fas fa-calendar"></i> عضو منذ ${esc(String(u.createdAt).slice(0, 10))}</span>` : ''}
+                        <span><i class="fas fa-star"></i> ${Number(u.points) || 0} نقطة</span>
+                    </div>
+                    <div class="req-actions">${actions}</div>
+                </div>`;
+        }).join('') : emptyState('fa-users', usersFilter === 'requests' ? 'لا توجد طلبات صلاحية مدير' : 'لا يوجد مستخدمون');
+    }
+
+    function setUserRole(uid, role) {
+        if (selectedRole !== 'admin' || (currentUser && uid === currentUser.uid)) return;
+        const u = allUsersAdmin.find(x => x.id === uid);
+        if (!u) return;
+        const msg = role === 'admin'
+            ? `منح صلاحية المدير لـ «${u.name || u.email}»؟ سيتمكن من مراجعة الحجوزات وبيانات المستخدمين وإدارة المرافق.`
+            : `سحب صلاحية المدير من «${u.name || u.email}»؟`;
+        if (!confirm(msg)) return;
+        database.ref('users/' + uid).update({ role, adminRequest: null }).then(() => {
+            showToast(role === 'admin' ? '✅ أصبح المستخدم مديراً' : 'تم سحب صلاحية المدير', role === 'admin' ? 'success' : 'info');
+            sendNotification(uid,
+                role === 'admin' ? '🛡️ تم منحك صلاحية المدير' : 'ℹ️ تم سحب صلاحية المدير',
+                role === 'admin' ? 'أعد فتح المنصة لتظهر لك لوحة الإدارة.' : 'أصبح حسابك حساب متطوع.');
+        }).catch(err => showToast('❌ ' + err.message, 'error'));
+    }
+
+    function rejectAdminRequest(uid) {
+        if (selectedRole !== 'admin') return;
+        const u = allUsersAdmin.find(x => x.id === uid);
+        if (!u || !confirm(`رفض طلب صلاحية المدير لـ «${u.name || u.email}»؟ سيبقى حسابه حساب متطوع.`)) return;
+        database.ref('users/' + uid).update({ adminRequest: null }).then(() => {
+            showToast('تم رفض الطلب', 'info');
+            sendNotification(uid, 'ℹ️ طلب صلاحية المدير', 'لم يُقبل طلبك، ويمكنك مواصلة استعمال المنصة كمتطوع.');
+        }).catch(err => showToast('❌ ' + err.message, 'error'));
     }
 </script>
 
