@@ -1,0 +1,82 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "users": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".indexOn": ["role", "points", "adminRequest"],
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid",
+        "role": {
+          ".validate": "newData.isString() && (newData.val() === 'volunteer' || newData.val() === 'admin') && (newData.val() === 'volunteer' || newData.val() === data.val() || root.child('users').child(auth.uid).child('role').val() === 'admin')"
+        }
+      }
+    },
+
+    "places": {
+      ".read": true,
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'"
+    },
+
+    "events": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$eventId": {
+        ".write": "auth != null && !data.exists() && newData.child('createdBy').val() === auth.uid && newData.child('status').val() === 'pending'",
+        "participants": {
+          "$uid": { ".write": "auth != null && auth.uid === $uid" }
+        },
+        "attendees": {
+          "$uid": { ".write": "auth != null && auth.uid === $uid" }
+        }
+      }
+    },
+
+    "photos": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "notifications": {
+      ".read": "auth != null && ((query.orderByChild === 'userId' && query.equalTo === auth.uid) || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".indexOn": ["userId"],
+      "$id": {
+        ".read": "auth != null && data.child('userId').val() === auth.uid",
+        ".write": "auth != null && newData.exists() && (!data.exists() || (data.child('userId').val() === auth.uid && newData.child('userId').val() === auth.uid))"
+      }
+    },
+
+    "bookings": {
+      ".read": "auth != null && ((query.orderByChild === 'userId' && query.equalTo === auth.uid) || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".indexOn": ["userId"],
+      "$id": {
+        ".read": "auth != null && data.child('userId').val() === auth.uid",
+        ".write": "auth != null && newData.child('userId').val() === auth.uid && ((!data.exists() && newData.child('status').val() === 'pending') || (data.child('userId').val() === auth.uid && newData.child('status').val() === 'cancelled'))"
+      }
+    },
+
+    "occupancy": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$placeId": {
+        "$bookingId": {
+          ".write": "auth != null && newData.parent().parent().parent().child('bookings').child($bookingId).child('userId').val() === auth.uid && newData.child('status').val() === newData.parent().parent().parent().child('bookings').child($bookingId).child('status').val()"
+        }
+      }
+    },
+
+    "memberships": {
+      ".read": "auth != null && ((query.orderByChild === 'userId' && query.equalTo === auth.uid) || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".indexOn": ["userId"],
+      "$id": {
+        ".read": "auth != null && data.child('userId').val() === auth.uid",
+        ".write": "auth != null && !data.exists() && newData.child('userId').val() === auth.uid && newData.child('status').val() === 'pending'"
+      }
+    }
+  }
+}
