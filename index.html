@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مواهب داري - منصة التطوع الجزائرية</title>
-    
+    <title>مواهب داري - منصة دور الشباب والتطوع</title>
+    <meta name="description" content="مواهب داري: دليل دور الشباب، حجز بيوت الشباب، فعاليات ونوادي الشباب والتطوع في الجزائر.">
+    <meta name="theme-color" content="#0a5c3e">
+
     <!-- الخطوط والمكتبات الأساسية -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -12,7 +14,10 @@
     <!-- Leaflet للخريطة -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
+
+    <!-- رمز QR لتذاكر الحجز -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -1623,6 +1628,519 @@
             background: var(--accent);
             border-radius: 3px;
         }
+
+        /* =====================================================================
+           تحديث التصميم 2026 + مكونات دور الشباب والحجز
+           ===================================================================== */
+        :root {
+            --bg-dark: #0b1220;
+            --surface: #111a2e;
+            --surface-2: #17223a;
+            --surface-3: #1f2c49;
+            --border: rgba(148, 163, 184, 0.14);
+            --bg-card: var(--surface);
+            --text: #eef2f7;
+            --text-muted: #93a3b8;
+            --radius: 20px;
+            --shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+            --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.22);
+            --ok: #10b981;
+            --warn: #f59e0b;
+            --off: #ef4444;
+            --hero-a: #0a5c3e;
+            --hero-b: #0e7a55;
+        }
+
+        body.light-mode {
+            --bg-dark: #eef2f6;
+            --surface: #ffffff;
+            --surface-2: #f3f6fa;
+            --surface-3: #e7edf5;
+            --border: rgba(15, 23, 42, 0.10);
+            --bg-card: #ffffff;
+            --text: #0f172a;
+            --text-muted: #5b6b80;
+            --shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+            --shadow-sm: 0 4px 14px rgba(15, 23, 42, 0.06);
+        }
+
+        body {
+            background:
+                radial-gradient(1200px 500px at 100% -10%, rgba(16, 185, 129, 0.10), transparent 60%),
+                radial-gradient(900px 400px at -10% 10%, rgba(244, 180, 27, 0.07), transparent 60%),
+                var(--bg-dark);
+            background-attachment: fixed;
+        }
+
+        #app {
+            max-width: 480px;
+            background: var(--bg-dark);
+            backdrop-filter: none;
+        }
+
+        /* الهيدر */
+        .header {
+            position: relative;
+            background:
+                radial-gradient(400px 200px at 0% 0%, rgba(244, 180, 27, 0.18), transparent 70%),
+                linear-gradient(160deg, var(--hero-a) 0%, #0b4a3b 55%, #0c2f33 100%);
+            border-bottom: none;
+            border-radius: 0 0 28px 28px;
+            padding: 18px 18px 16px;
+            box-shadow: 0 10px 30px rgba(10, 92, 62, 0.25);
+            color: #fff;
+        }
+        .header-top { margin-bottom: 12px; }
+        .logo { font-size: 1.6rem; color: #fff; }
+        .header-icons { gap: 12px; }
+        .header-icons > i, .notification-badge > i {
+            width: 38px; height: 38px; display: grid; place-items: center;
+            background: rgba(255, 255, 255, 0.12); border-radius: 12px; font-size: 17px; color: #fff;
+        }
+        .header-icons i:hover { transform: none; background: rgba(255, 255, 255, 0.2); }
+        .language-selector select { border-color: rgba(255, 255, 255, 0.25); padding: 7px 12px; font-size: 13px; }
+        .location-bar { background: rgba(255, 255, 255, 0.10); border: 1px solid rgba(255, 255, 255, 0.16); padding: 10px 16px; margin-bottom: 10px; color: #fff; }
+        .search-container input { background: rgba(255, 255, 255, 0.95); border: none; color: #0f172a; padding: 12px 46px 12px 15px; border-radius: 16px; }
+        .search-container input::placeholder { color: #64748b; }
+        .search-container i { color: var(--hero-a); left: auto; right: 16px; }
+        .search-container input:focus { box-shadow: 0 0 0 3px rgba(244, 180, 27, 0.5); }
+        .badge { min-width: 18px; width: auto; padding: 0 4px; border-radius: 9px; border: 2px solid var(--hero-a); font-weight: 700; }
+
+        .main-content { padding: 18px 16px 120px; }
+
+        /* البطاقات والعناوين */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: none;
+        }
+        .card-flush { padding: 0; overflow: hidden; }
+        .card-header { margin-bottom: 14px; }
+        .card-title { color: var(--text); font-size: 1.05rem; display: flex; align-items: center; gap: 10px; }
+        .card-title > i {
+            width: 34px; height: 34px; display: grid; place-items: center; flex-shrink: 0;
+            background: rgba(244, 180, 27, 0.14); color: var(--accent); border-radius: 11px; font-size: 15px;
+        }
+        .sub-title { font-size: 0.95rem; margin: 16px 0 10px; color: var(--text); display: flex; gap: 8px; align-items: center; }
+        .sub-title i { color: var(--accent); }
+        .muted { color: var(--text-muted); font-size: 0.88rem; }
+        .muted i { color: var(--accent); margin-left: 4px; }
+        .muted.small { font-size: 0.8rem; }
+        .txt-ok { color: var(--ok); font-weight: 700; }
+        .txt-off { color: var(--off); font-weight: 700; }
+
+        .page-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+        .page-head > .btn { white-space: nowrap; flex-shrink: 0; }
+        .page-head h2 { font-size: 1.3rem; font-weight: 900; display: flex; align-items: center; gap: 10px; }
+        .page-head h2 i { color: var(--accent); }
+        .page-head p { color: var(--text-muted); font-size: 0.88rem; margin-top: 4px; }
+
+        /* الأزرار */
+        .btn {
+            border-radius: 12px; padding: 9px 16px; display: inline-flex; align-items: center; justify-content: center;
+            gap: 6px; text-decoration: none; font-size: 0.9rem; line-height: 1.2;
+        }
+        .btn-small { padding: 7px 12px; font-size: 0.82rem; }
+        .btn:hover { transform: translateY(-1px); box-shadow: none; filter: brightness(1.07); }
+        .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; filter: none; }
+        .btn-outline { border: 1px solid var(--border); color: var(--text); background: var(--surface-2); }
+        .btn-outline i { color: var(--accent); }
+        .btn-outline.fav-on i, .btn-outline.fav-on { color: #ef4444; }
+        .btn-block { width: 100%; margin-top: 12px; }
+        .btn-save { border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-save:disabled { opacity: 0.45; cursor: not-allowed; }
+        .icon-btn {
+            width: 34px; height: 34px; display: inline-grid; place-items: center; border-radius: 10px;
+            border: 1px solid var(--border); background: var(--surface-2); color: var(--text); cursor: pointer;
+            text-decoration: none; font-size: 14px; transition: var(--transition);
+        }
+        .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .link-btn { background: none; border: none; color: var(--accent); font-family: inherit; font-weight: 700; cursor: pointer; font-size: 0.85rem; display: inline-flex; gap: 6px; align-items: center; }
+
+        /* الفلاتر والشرائح */
+        .filter-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; margin-bottom: 14px; }
+        .filter-tabs::-webkit-scrollbar { display: none; }
+        .filter-tab {
+            white-space: nowrap; background: var(--surface); border: 1px solid var(--border); color: var(--text-muted);
+            padding: 8px 14px; font-size: 0.85rem; display: inline-flex; gap: 6px; align-items: center; flex-shrink: 0;
+        }
+        .filter-tab:hover { color: var(--text); }
+        .filter-tab.active { background: var(--accent); color: #111827; border-color: transparent; font-weight: 700; }
+        .filter-tab em { font-style: normal; font-size: 0.75rem; background: rgba(0, 0, 0, 0.12); padding: 0 6px; border-radius: 8px; }
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+        .chip {
+            --c: var(--text-muted);
+            display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 999px;
+            font-size: 0.76rem; font-weight: 600; color: var(--c);
+            background: color-mix(in srgb, var(--c) 14%, transparent); border: 1px solid color-mix(in srgb, var(--c) 28%, transparent);
+            white-space: nowrap;
+        }
+        .chip.ok { --c: var(--ok); }
+        .chip.warn { --c: var(--warn); }
+        .chip.off { --c: var(--off); }
+        .toolbar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+        .toggle-chip {
+            background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); border-radius: 12px;
+            padding: 8px 12px; font-family: inherit; font-size: 0.82rem; cursor: pointer; display: inline-flex; gap: 6px; align-items: center;
+        }
+        .toggle-chip.active { color: var(--accent); border-color: var(--accent); background: rgba(244, 180, 27, 0.10); }
+        #toggle-fav.active { color: #ef4444; border-color: #ef4444; background: rgba(239, 68, 68, 0.10); }
+        .seg { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 3px; gap: 3px; flex-shrink: 0; }
+        .seg button {
+            background: none; border: none; color: var(--text-muted); padding: 7px 12px; border-radius: 9px; cursor: pointer;
+            font-family: inherit; font-weight: 700; font-size: 0.85rem; display: inline-flex; gap: 6px; align-items: center; justify-content: center;
+        }
+        .seg button.active { background: var(--accent); color: #111827; }
+        .seg-wide { display: flex; margin-bottom: 14px; background: var(--surface-2); }
+        .seg-wide button { flex: 1; }
+
+        /* الحقول */
+        .edit-field { margin-bottom: 14px; }
+        .edit-field label { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 6px; }
+        .edit-field input, .edit-field textarea, .edit-field select {
+            background: var(--surface-2); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 0.95rem;
+        }
+        .edit-field input:focus, .edit-field textarea:focus, .edit-field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(244, 180, 27, 0.18); }
+        .edit-field select option { background: var(--surface); color: var(--text); }
+        .edit-field.compact { margin-bottom: 14px; }
+        .edit-form { background: var(--surface); border: 1px solid var(--border); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+        .stepper { display: flex; align-items: stretch; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface-2); }
+        .stepper button { width: 42px; border: none; background: transparent; color: var(--accent); font-size: 20px; cursor: pointer; }
+        .edit-field .stepper input { border: none; border-radius: 0; text-align: center; background: transparent; -moz-appearance: textfield; }
+        .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .check-line { display: flex; gap: 10px; align-items: flex-start; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; margin-top: 6px; }
+        .check-line input { margin-top: 3px; accent-color: var(--accent); width: 18px; height: 18px; flex-shrink: 0; }
+        .search-mini { position: relative; margin-bottom: 12px; }
+        .search-mini i { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .search-mini input {
+            width: 100%; padding: 12px 42px 12px 14px; border-radius: 14px; border: 1px solid var(--border);
+            background: var(--surface); color: var(--text); font-family: inherit; font-size: 0.92rem;
+        }
+        .search-mini input:focus { outline: none; border-color: var(--accent); }
+        .place-extra { border-top: 1px dashed var(--border); margin-top: 6px; padding-top: 4px; }
+
+        /* التنقل السفلي العائم */
+        .bottom-nav {
+            left: 12px; right: 12px; bottom: 12px; max-width: 456px; margin: 0 auto;
+            background: color-mix(in srgb, var(--surface) 92%, transparent);
+            backdrop-filter: blur(14px); border: 1px solid var(--border); border-radius: 22px;
+            padding: 6px; box-shadow: var(--shadow); gap: 2px;
+        }
+        .nav-item { flex: 1; padding: 8px 2px; border-radius: 16px; font-size: 0.7rem; font-weight: 600; text-align: center; }
+        .nav-item i { font-size: 18px; margin-bottom: 4px; }
+        .nav-item.active { color: #111827; background: var(--accent); }
+        .nav-item .badge { top: 2px; right: 50%; margin-right: -22px; border-color: var(--surface); }
+
+        /* النوافذ المنبثقة كأوراق سفلية */
+        .modal { align-items: flex-end; background: rgba(2, 6, 23, 0.62); backdrop-filter: blur(3px); }
+        .modal-content {
+            width: 100%; max-width: 480px; max-height: 92vh; border-radius: 26px 26px 0 0;
+            padding: 20px 18px 28px; background: var(--surface); border: 1px solid var(--border); border-bottom: none;
+            transform: translateY(40px); transition: transform 0.3s ease; box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.35);
+        }
+        .modal.active .modal-content { transform: none; }
+        .modal-title { font-size: 1.15rem; display: flex; gap: 8px; align-items: center; }
+        .sheet-handle { width: 44px; height: 5px; border-radius: 3px; background: var(--border); margin: -8px auto 12px; }
+        @media (min-width: 640px) {
+            .modal { align-items: center; }
+            .modal-content { border-radius: 26px; border-bottom: 1px solid var(--border); }
+        }
+
+        .toast { border-radius: 16px; bottom: 96px; width: max-content; max-width: min(90vw, 420px); text-align: center; font-weight: 600; box-shadow: var(--shadow); padding: 12px 20px; line-height: 1.5; }
+
+        /* الصفحة الرئيسية */
+        .hero {
+            position: relative; overflow: hidden; border-radius: 24px; padding: 20px; margin-bottom: 16px; color: #fff;
+            background:
+                radial-gradient(260px 160px at 10% 110%, rgba(244, 180, 27, 0.35), transparent 70%),
+                linear-gradient(135deg, #0f766e 0%, #0a5c3e 55%, #14532d 100%);
+            box-shadow: 0 14px 34px rgba(10, 92, 62, 0.28);
+        }
+        .hero::after {
+            content: ''; position: absolute; inset: 0; opacity: 0.12; pointer-events: none;
+            background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 16px 16px;
+        }
+        .hero-hello { font-size: 0.9rem; opacity: 0.9; }
+        .hero h2 { font-size: 1.45rem; font-weight: 900; margin: 4px 0 6px; }
+        .hero-sub { font-size: 0.88rem; opacity: 0.88; line-height: 1.6; }
+        .hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; position: relative; z-index: 1; }
+        .hero-stat { background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 14px; padding: 10px 6px; text-align: center; }
+        .hero-stat b { display: block; font-size: 1.3rem; font-weight: 900; color: #ffd966; }
+        .hero-stat span { font-size: 0.72rem; opacity: 0.9; }
+        .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+        .quick-item {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 14px 6px 12px;
+            display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; color: var(--text);
+            font-family: inherit; font-size: 0.8rem; font-weight: 700; transition: var(--transition);
+        }
+        .quick-item:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
+        .qi-icon {
+            --c: var(--accent);
+            width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; font-size: 19px;
+            color: var(--c); background: color-mix(in srgb, var(--c) 16%, transparent);
+        }
+        .mini-list { display: grid; gap: 8px; }
+        .mini-row {
+            display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 14px; cursor: pointer;
+            background: var(--surface-2); border: 1px solid transparent; transition: var(--transition);
+        }
+        .mini-row:hover { border-color: var(--border); }
+        .mini-ico {
+            --c: var(--accent);
+            width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0;
+            color: var(--c); background: color-mix(in srgb, var(--c) 16%, transparent); font-size: 16px;
+        }
+        .mini-ico.big { width: 48px; height: 48px; font-size: 19px; border-radius: 14px; }
+        .mini-info { flex: 1; min-width: 0; }
+        .mini-info b { display: block; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-info small { color: var(--text-muted); font-size: 0.78rem; }
+        .mini-side { color: var(--text-muted); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+        .h-scroll { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; margin: 0 -18px; padding: 2px 18px 4px; scroll-snap-type: x mandatory; }
+        .h-scroll::-webkit-scrollbar { display: none; }
+        .h-scroll .empty-state { width: 100%; }
+        .ev-mini {
+            flex: 0 0 200px; scroll-snap-align: start; background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: 16px; padding: 12px; cursor: pointer; display: flex; flex-direction: column; gap: 6px;
+        }
+        .ev-mini-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
+        .ev-mini h5 { font-size: 0.92rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .ev-mini small { color: var(--text-muted); font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ev-mini small i { color: var(--accent); margin-left: 4px; }
+
+        /* دور الشباب */
+        #fac-map { height: 260px; width: 100%; z-index: 1; }
+        #map { border-radius: 16px; }
+        .map-legend { display: flex; flex-wrap: wrap; gap: 12px; padding: 10px 14px; font-size: 0.75rem; color: var(--text-muted); }
+        .map-legend span { display: inline-flex; align-items: center; gap: 6px; }
+        .map-legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .fac-pin-wrap { background: none; border: none; }
+        .fac-pin {
+            --c: var(--accent);
+            width: 34px; height: 34px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+            background: var(--c); display: grid; place-items: center; border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+        }
+        .fac-pin i { transform: rotate(45deg); color: #fff; font-size: 13px; }
+        .list-count { color: var(--text-muted); font-size: 0.82rem; margin: 4px 2px 10px; }
+        .fac-list { display: grid; gap: 12px; }
+        .fac-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-sm); }
+        .fac-cover {
+            --c: var(--accent);
+            position: relative; height: 92px; cursor: pointer;
+            background:
+                radial-gradient(180px 120px at 15% 120%, rgba(255, 255, 255, 0.25), transparent 70%),
+                linear-gradient(135deg, var(--c), color-mix(in srgb, var(--c) 55%, #0b1220));
+        }
+        .fac-emoji { position: absolute; left: 16px; bottom: -14px; font-size: 54px; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.3)); }
+        .fac-type {
+            position: absolute; right: 12px; top: 12px; background: rgba(0, 0, 0, 0.28); color: #fff; padding: 5px 10px;
+            border-radius: 999px; font-size: 0.75rem; font-weight: 700; display: inline-flex; gap: 6px; align-items: center; backdrop-filter: blur(4px);
+        }
+        .fac-sample { position: absolute; right: 12px; bottom: 10px; background: rgba(255, 255, 255, 0.9); color: #92400e; font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 8px; }
+        .fav-btn {
+            position: absolute; left: 12px; top: 10px; width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+            background: rgba(255, 255, 255, 0.9); color: #94a3b8; font-size: 15px; display: grid; place-items: center;
+        }
+        .fav-btn.on { color: #ef4444; }
+        .fac-body { padding: 14px 16px 16px; }
+        .fac-body h4 { font-size: 1.05rem; margin-bottom: 4px; cursor: pointer; }
+        .fac-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .fac-actions .btn { flex: 1; min-width: max-content; }
+
+        /* تفاصيل المرفق */
+        .fd-cover {
+            --c: var(--accent);
+            position: relative; height: 120px; border-radius: 20px; margin-bottom: 16px;
+            background:
+                radial-gradient(220px 140px at 15% 120%, rgba(255, 255, 255, 0.25), transparent 70%),
+                linear-gradient(135deg, var(--c), color-mix(in srgb, var(--c) 50%, #0b1220));
+        }
+        .fd-emoji { position: absolute; left: 18px; bottom: -16px; font-size: 64px; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.3)); }
+        .fd-close { position: absolute; left: 10px; top: 10px; background: rgba(0, 0, 0, 0.3) !important; color: #fff !important; width: 34px; height: 34px; font-size: 16px !important; display: grid; place-items: center; }
+        .fd-cover .fac-type { top: 12px; }
+        .fd-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 4px; }
+        .fd-desc { margin: 12px 0 0; color: var(--text); opacity: 0.9; line-height: 1.7; font-size: 0.92rem; }
+        .fd-actions { display: flex; gap: 8px; margin: 16px 0 4px; flex-wrap: wrap; }
+        .fd-actions .btn { flex: 1; }
+        .fd-actions .btn-primary { flex: 1 1 100%; }
+        .fd-section { margin-top: 18px; }
+        .fd-section h4 { font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .fd-section h4 small { color: var(--text-muted); font-weight: 500; }
+        .fd-section h4.link { cursor: pointer; }
+        .fd-admin { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; padding-top: 14px; border-top: 1px dashed var(--border); }
+        .info-list { display: grid; gap: 2px; background: var(--surface-2); border-radius: 14px; padding: 6px 12px; }
+        .info-list > div { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 0.88rem; border-bottom: 1px solid var(--border); }
+        .info-list > div:last-child { border-bottom: none; }
+        .info-list i { color: var(--accent); width: 18px; text-align: center; }
+        .info-list span { color: var(--text-muted); }
+        .info-list b { margin-right: auto; font-weight: 700; text-align: left; }
+        .club-list { display: grid; gap: 8px; }
+        .club-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--surface-2); border-radius: 14px; }
+        .club-ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: rgba(236, 72, 153, 0.14); color: #ec4899; flex-shrink: 0; }
+        .club-name { flex: 1; font-weight: 600; font-size: 0.9rem; }
+        .ev-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+        .ev-row:last-child { border-bottom: none; }
+        .ev-row-info { flex: 1; min-width: 0; }
+        .ev-row-info b { display: block; font-size: 0.9rem; }
+        .ev-row-info small { color: var(--text-muted); font-size: 0.78rem; }
+
+        /* الحجز */
+        .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px; }
+        .step { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 10px 6px; text-align: center; font-size: 0.72rem; color: var(--text-muted); line-height: 1.4; }
+        .step span { display: grid; place-items: center; width: 26px; height: 26px; margin: 0 auto 6px; border-radius: 50%; background: rgba(244, 180, 27, 0.15); color: var(--accent); font-weight: 900; font-size: 0.85rem; }
+        .bk-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; background: var(--surface-2); border: 1px solid var(--border); }
+        .bk-card + .bk-card { margin-top: 10px; }
+        .bk-info { flex: 1; min-width: 0; }
+        .bk-info > b { display: block; cursor: pointer; }
+        .bk-info > small { color: var(--text-muted); font-size: 0.78rem; }
+        .bk-info .chips { margin: 8px 0 4px; }
+        .bk-total { font-size: 0.8rem; color: var(--text-muted); }
+        .bk-total b { color: var(--text); }
+        .bk-summary { background: var(--surface-2); border-radius: 16px; padding: 12px 14px; margin: 4px 0 12px; display: grid; gap: 8px; }
+        .bk-summary .notice { margin: 0; }
+        .sum-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; }
+        .sum-row span { color: var(--text-muted); }
+        .sum-row.total { border-top: 1px dashed var(--border); padding-top: 8px; font-size: 1rem; }
+        .sum-row.total b { color: var(--accent); font-size: 1.1rem; }
+        .info-card h4 { font-size: 0.95rem; margin-bottom: 8px; display: flex; gap: 8px; align-items: center; }
+        .info-card h4 i { color: var(--info); }
+        .info-card ul { padding-right: 18px; color: var(--text-muted); font-size: 0.85rem; line-height: 1.9; }
+
+        /* الطلبات */
+        .req-list { display: grid; gap: 10px; }
+        .req-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 16px; padding: 12px 14px; }
+        .req-card.compact { padding: 10px 12px; }
+        .req-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+        .req-top b { display: block; font-size: 0.95rem; }
+        .req-top b i { color: #ec4899; margin-left: 4px; }
+        .req-top small { color: var(--text-muted); font-size: 0.78rem; }
+        .req-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 0.8rem; color: var(--text-muted); }
+        .req-meta i { color: var(--accent); margin-left: 4px; }
+        .req-meta a { color: var(--text); }
+        .req-notes { margin-top: 8px; font-size: 0.82rem; background: var(--surface-3); padding: 8px 10px; border-radius: 10px; }
+        .req-notes.bad { background: rgba(239, 68, 68, 0.10); color: #fca5a5; }
+        body.light-mode .req-notes.bad { color: #b91c1c; }
+        .req-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .req-actions:empty { display: none; }
+        .status-chip {
+            display: inline-flex; gap: 5px; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 0.74rem; font-weight: 700; white-space: nowrap;
+            background: rgba(245, 158, 11, 0.15); color: var(--warn);
+        }
+        .status-chip.s-confirmed, .status-chip.s-accepted { background: rgba(16, 185, 129, 0.15); color: var(--ok); }
+        .status-chip.s-rejected { background: rgba(239, 68, 68, 0.15); color: var(--off); }
+        .status-chip.s-cancelled { background: rgba(148, 163, 184, 0.18); color: var(--text-muted); }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+        .stat-tile { --c: var(--accent); background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 14px; display: grid; gap: 2px; }
+        .stat-tile i { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; color: var(--c); background: color-mix(in srgb, var(--c) 16%, transparent); margin-bottom: 6px; }
+        .stat-tile b { font-size: 1.5rem; font-weight: 900; }
+        .stat-tile span { font-size: 0.78rem; color: var(--text-muted); }
+        .mini-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .mini-stat { background: var(--surface-2); border-radius: 14px; padding: 12px 6px; text-align: center; display: grid; gap: 2px; }
+        .mini-stat i { color: var(--accent); }
+        .mini-stat b { font-size: 1.3rem; font-weight: 900; }
+        .mini-stat span { font-size: 0.72rem; color: var(--text-muted); }
+
+        /* التذكرة */
+        .ticket { border-radius: 20px; overflow: hidden; background: #fff; color: #0f172a; border: 1px solid #e2e8f0; }
+        .ticket-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 16px; color: #fff; background: linear-gradient(135deg, #0f766e, #0a5c3e); }
+        .ticket-head small { opacity: 0.85; font-size: 0.75rem; }
+        .ticket-head h3 { font-size: 1.1rem; margin-top: 2px; }
+        .ticket-head .status-chip { background: rgba(255, 255, 255, 0.9); }
+        .ticket-body { padding: 16px; border-top: 2px dashed #cbd5e1; position: relative; }
+        .ticket-qr { display: flex; justify-content: center; margin-bottom: 8px; }
+        .ticket-qr img, .ticket-qr canvas { border: 6px solid #fff; border-radius: 8px; }
+        .ticket-code { text-align: center; font-family: monospace; font-size: 1.3rem; font-weight: 900; letter-spacing: 3px; margin-bottom: 12px; direction: ltr; }
+        .ticket-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .ticket-grid div { background: #f1f5f9; border-radius: 10px; padding: 8px 10px; }
+        .ticket-grid small { display: block; color: #64748b; font-size: 0.72rem; }
+        .ticket-grid b { font-size: 0.85rem; }
+        .ticket-note { padding: 10px 16px 14px; font-size: 0.8rem; color: #475569; background: #f8fafc; }
+        .ticket-note i { color: #0a5c3e; margin-left: 4px; }
+
+        /* الفعاليات */
+        .ev-list { display: grid; gap: 10px; }
+        .day-head { font-size: 0.9rem; color: var(--text-muted); margin: 10px 2px 2px; display: flex; gap: 8px; align-items: center; }
+        .day-head .rel { background: var(--accent); color: #111827; border-radius: 8px; padding: 1px 8px; font-size: 0.75rem; }
+        .ev-card { display: flex; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 14px; transition: box-shadow 0.4s, border-color 0.4s; }
+        .ev-card.flash { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(244, 180, 27, 0.35); }
+        .date-badge {
+            flex-shrink: 0; width: 54px; height: 60px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: linear-gradient(160deg, rgba(244, 180, 27, 0.22), rgba(244, 180, 27, 0.08)); border: 1px solid rgba(244, 180, 27, 0.3);
+        }
+        .date-badge b { font-size: 1.35rem; font-weight: 900; color: var(--accent); line-height: 1; }
+        .date-badge span { font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; }
+        .date-badge.small { width: 44px; height: 48px; border-radius: 12px; }
+        .date-badge.small b { font-size: 1.1rem; }
+        .ev-body { flex: 1; min-width: 0; }
+        .ev-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .ev-body h4 { font-size: 1rem; margin-bottom: 4px; line-height: 1.45; }
+        .ev-desc { font-size: 0.85rem; color: var(--text-muted); margin: 6px 0; line-height: 1.6; }
+        .ev-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+        .ev-actions .icon-btn { width: 32px; height: 32px; }
+        .ev-card .ev-actions { margin-inline-start: -66px; } /* تمتد أسفل شارة التاريخ */
+        .day-filter { display: flex; justify-content: space-between; align-items: center; background: rgba(244, 180, 27, 0.10); border: 1px solid rgba(244, 180, 27, 0.3); color: var(--accent); border-radius: 14px; padding: 8px 12px; margin-bottom: 12px; font-size: 0.85rem; font-weight: 700; }
+        .day-filter button { background: none; border: none; color: var(--text); font-family: inherit; cursor: pointer; font-size: 0.8rem; }
+        .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .cal-head h4 { font-size: 1rem; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .cal-dow { text-align: center; font-size: 0.75rem; color: var(--text-muted); padding: 4px 0; font-weight: 700; }
+        .cal-day {
+            position: relative; aspect-ratio: 1; border-radius: 12px; border: 1px solid transparent; background: var(--surface-2);
+            color: var(--text); font-family: inherit; font-size: 0.85rem; cursor: pointer; display: grid; place-items: center;
+        }
+        .cal-day.past { opacity: 0.45; }
+        .cal-day.today { border-color: var(--accent); font-weight: 900; }
+        .cal-day.has { background: rgba(16, 185, 129, 0.16); font-weight: 700; }
+        .cal-day.sel { background: var(--accent); color: #111827; }
+        .cal-day i {
+            position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); min-width: 6px; height: 6px; border-radius: 3px;
+            background: var(--ok); font-style: normal; font-size: 0.55rem; line-height: 6px; color: transparent;
+        }
+        .cal-day.sel i { background: #111827; }
+
+        /* إشعارات وحالات فارغة */
+        .notice { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 14px; margin-bottom: 12px; font-size: 0.83rem; line-height: 1.6; background: rgba(59, 130, 246, 0.10); border: 1px solid rgba(59, 130, 246, 0.25); }
+        .notice > i { color: var(--info); margin-top: 3px; }
+        .notice.warn { background: rgba(245, 158, 11, 0.10); border-color: rgba(245, 158, 11, 0.3); }
+        .notice.warn > i { color: var(--warn); }
+        .empty-state { text-align: center; padding: 20px 10px; color: var(--text-muted); display: grid; gap: 8px; justify-items: center; }
+        .empty-state > i { font-size: 30px; opacity: 0.5; }
+        .empty-state p { font-size: 0.9rem; }
+
+        /* عناصر المدير */
+        body:not(.is-admin) .admin-only { display: none !important; }
+
+        /* الوضع الفاتح: تصحيح العناصر ذات الألوان الثابتة */
+        body.light-mode .place-item, body.light-mode .notification-item, body.light-mode .leaderboard-item,
+        body.light-mode .event-card, body.light-mode .stat-item, body.light-mode .info-row {
+            background: var(--surface-2);
+        }
+        body.light-mode .slider { background-color: #cbd5e1; }
+        body.light-mode input:checked + .slider { background-color: var(--accent); }
+        body.light-mode .settings-select, body.light-mode .language-selector select option { background: var(--surface); color: var(--text); }
+        body.light-mode .modal { background: rgba(15, 23, 42, 0.45); }
+
+        .event-card { background: var(--surface-2); border: 1px solid var(--border); }
+        .event-card:hover { transform: none; }
+        .events-grid { display: grid; gap: 12px; }
+
+        @media (max-width: 400px) {
+            .form-row.three { grid-template-columns: 1fr 1fr; }
+            .steps { grid-template-columns: repeat(2, 1fr); }
+            .quick-item { font-size: 0.74rem; }
+        }
+
+        /* طباعة التذكرة فقط */
+        @media print {
+            body * { visibility: hidden !important; }
+            #ticket-print, #ticket-print * { visibility: visible !important; }
+            #ticket-print { position: absolute; top: 0; left: 0; right: 0; }
+            .modal { background: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -1632,7 +2150,7 @@
     <div class="splash-content">
         <i class="fas fa-hands-helping"></i>
         <h1>مواهب داري</h1>
-        <p>منصة التطوع الجزائرية</p>
+        <p>دور الشباب · بيوت الشباب · الفعاليات والتطوع</p>
         <div class="progress-bar">
             <div class="progress-fill"></div>
         </div>
@@ -1868,8 +2386,8 @@
                     </select>
                 </div>
                 <div class="notification-badge">
-                    <i class="fas fa-bell" onclick="switchTab('notifications')"></i>
-                    <span class="badge" id="notification-count">0</span>
+                    <i class="fas fa-bell" onclick="switchTab('notifications')" title="الإشعارات"></i>
+                    <span class="badge" id="notification-count" style="display:none;">0</span>
                 </div>
                 <i class="fas fa-cog" onclick="showSettings()" title="الإعدادات"></i>
             </div>
@@ -1890,6 +2408,62 @@
     <main class="main-content">
         <!-- الصفحة الرئيسية -->
         <section id="home" class="section active">
+            <!-- بطاقة الترحيب -->
+            <div class="hero">
+                <div class="hero-text">
+                    <p class="hero-hello">أهلاً بك، <span id="hero-name">صديقنا</span> 👋</p>
+                    <h2>دارك الثانية في انتظارك</h2>
+                    <p class="hero-sub">اكتشف دور الشباب القريبة منك، احجز إقامتك في بيوت الشباب، وشارك في الفعاليات والنوادي.</p>
+                </div>
+                <div class="hero-stats" id="hero-stats"></div>
+            </div>
+
+            <!-- الوصول السريع -->
+            <div class="quick-grid">
+                <button class="quick-item" onclick="switchTab('houses')">
+                    <span class="qi-icon" style="--c:#10b981"><i class="fas fa-house-chimney-user"></i></span>
+                    <span>دور الشباب</span>
+                </button>
+                <button class="quick-item" onclick="switchTab('booking')">
+                    <span class="qi-icon" style="--c:#3b82f6"><i class="fas fa-bed"></i></span>
+                    <span>احجز إقامة</span>
+                </button>
+                <button class="quick-item" onclick="switchTab('events-page')">
+                    <span class="qi-icon" style="--c:#f4b41b"><i class="fas fa-calendar-days"></i></span>
+                    <span>الفعاليات</span>
+                </button>
+                <button class="quick-item" onclick="openClubsDirectory()">
+                    <span class="qi-icon" style="--c:#ec4899"><i class="fas fa-masks-theater"></i></span>
+                    <span>النوادي والورشات</span>
+                </button>
+                <button class="quick-item" onclick="switchTab('leaderboard')">
+                    <span class="qi-icon" style="--c:#8b5cf6"><i class="fas fa-trophy"></i></span>
+                    <span>لوحة الشرف</span>
+                </button>
+                <button class="quick-item" onclick="showAddEventModal()">
+                    <span class="qi-icon" style="--c:#f97316"><i class="fas fa-calendar-plus"></i></span>
+                    <span>اقترح فعالية</span>
+                </button>
+            </div>
+
+            <!-- أقرب دور الشباب -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-location-crosshairs"></i> دور الشباب القريبة منك</h3>
+                    <button class="link-btn" onclick="switchTab('houses')">عرض الكل <i class="fas fa-chevron-left"></i></button>
+                </div>
+                <div id="home-nearest" class="mini-list"></div>
+            </div>
+
+            <!-- الفعاليات القادمة في دور الشباب -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-calendar-check"></i> قريباً في دور الشباب</h3>
+                    <button class="link-btn" onclick="switchTab('events-page')">التقويم <i class="fas fa-chevron-left"></i></button>
+                </div>
+                <div id="home-upcoming" class="h-scroll"></div>
+            </div>
+
             <!-- الفلاتر -->
             <div class="filter-tabs">
                 <span class="filter-tab active" onclick="filterContent('all')">الكل</span>
@@ -1919,9 +2493,162 @@
             <!-- الفعاليات القادمة -->
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-calendar-alt"></i> الفعاليات القادمة</h3>
+                    <h3 class="card-title"><i class="fas fa-hand-holding-heart"></i> فرص التطوع والفعاليات</h3>
                 </div>
                 <div id="events-container" class="events-grid"></div>
+            </div>
+        </section>
+
+        <!-- صفحة دور الشباب -->
+        <section id="houses" class="section">
+            <div class="page-head">
+                <div>
+                    <h2><i class="fas fa-house-chimney-user"></i> دور ومرافق الشباب</h2>
+                    <p>دور الشباب، بيوت الشباب، المخيمات والمركبات الرياضية</p>
+                </div>
+                <button class="btn btn-primary btn-small admin-only" onclick="openNewFacilityForm()">
+                    <i class="fas fa-plus"></i> إضافة مرفق
+                </button>
+            </div>
+
+            <div id="houses-notice"></div>
+
+            <div class="search-mini">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="text" id="houses-search" placeholder="ابحث باسم الدار، البلدية أو النادي..." oninput="houseFilters.q = this.value; renderHouses()">
+            </div>
+
+            <div class="filter-tabs" id="houses-type-tabs"></div>
+
+            <div class="toolbar">
+                <button class="toggle-chip" id="toggle-near" onclick="toggleHouseNear()"><i class="fas fa-location-crosshairs"></i> الأقرب إليّ</button>
+                <button class="toggle-chip" id="toggle-open" onclick="houseFilters.open = !houseFilters.open; renderHouses()"><i class="fas fa-door-open"></i> مفتوح الآن</button>
+                <button class="toggle-chip" id="toggle-fav" onclick="houseFilters.fav = !houseFilters.fav; renderHouses()"><i class="fas fa-heart"></i> المفضلة</button>
+            </div>
+
+            <div class="card card-flush">
+                <div id="fac-map"></div>
+                <div class="map-legend" id="fac-legend"></div>
+            </div>
+
+            <div id="houses-count" class="list-count"></div>
+            <div id="houses-list" class="fac-list"></div>
+        </section>
+
+        <!-- صفحة الحجز -->
+        <section id="booking" class="section">
+            <div class="page-head">
+                <div>
+                    <h2><i class="fas fa-bed"></i> حجز بيوت الشباب</h2>
+                    <p>احجز سريرك مسبقاً في بيوت الشباب والمخيمات</p>
+                </div>
+            </div>
+
+            <div class="steps">
+                <div class="step"><span>1</span>اختر المرفق والتواريخ</div>
+                <div class="step"><span>2</span>أرسل طلب الحجز</div>
+                <div class="step"><span>3</span>تأكيد من الإدارة</div>
+                <div class="step"><span>4</span>قدّم التذكرة عند الوصول</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-magnifying-glass"></i> تحقق من الأماكن المتاحة</h3>
+                </div>
+                <div class="form-row">
+                    <div class="edit-field">
+                        <label>تاريخ الوصول</label>
+                        <input type="date" id="avail-in" onchange="renderBookingPage()">
+                    </div>
+                    <div class="edit-field">
+                        <label>تاريخ المغادرة</label>
+                        <input type="date" id="avail-out" onchange="renderBookingPage()">
+                    </div>
+                </div>
+                <div class="edit-field">
+                    <label>عدد الأشخاص</label>
+                    <div class="stepper">
+                        <button type="button" onclick="stepGuests('avail-guests', -1); renderBookingPage()">−</button>
+                        <input type="number" id="avail-guests" value="1" min="1" max="30" onchange="renderBookingPage()">
+                        <button type="button" onclick="stepGuests('avail-guests', 1); renderBookingPage()">+</button>
+                    </div>
+                </div>
+                <div id="booking-notice"></div>
+                <div id="booking-facilities" class="fac-list"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-ticket"></i> حجوزاتي</h3>
+                </div>
+                <div id="my-bookings" class="req-list"></div>
+            </div>
+
+            <div class="card info-card">
+                <h4><i class="fas fa-circle-info"></i> قبل أن تحجز</h4>
+                <ul>
+                    <li>بطاقة التعريف الوطنية إلزامية عند الوصول، وترخيص الولي للقُصّر.</li>
+                    <li>الأسعار تقديرية ويتم الدفع مباشرة في بيت الشباب.</li>
+                    <li>يمكنك إلغاء الحجز مجاناً قبل تاريخ الوصول.</li>
+                    <li>احترام النظام الداخلي وأوقات الهدوء داخل المرفق.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- صفحة فعاليات دور الشباب -->
+        <section id="events-page" class="section">
+            <div class="page-head">
+                <div>
+                    <h2><i class="fas fa-calendar-days"></i> فعاليات دور الشباب</h2>
+                    <p>ورشات، مسابقات، دورات ورحلات... لا تفوّت شيئاً</p>
+                </div>
+                <div class="seg" id="ev-view-seg">
+                    <button class="active" data-v="list" onclick="setEventsView('list')"><i class="fas fa-list"></i></button>
+                    <button data-v="calendar" onclick="setEventsView('calendar')"><i class="fas fa-calendar-days"></i></button>
+                </div>
+            </div>
+
+            <div class="filter-tabs" id="ev-cat-tabs"></div>
+
+            <div class="edit-field compact">
+                <select id="ev-facility" onchange="evFilters.facility = this.value; renderEventsPage()"></select>
+            </div>
+
+            <div class="card" id="ev-calendar-card" style="display:none;">
+                <div class="cal-head">
+                    <button class="icon-btn" title="الشهر السابق" onclick="shiftEventsMonth(-1)"><i class="fas fa-chevron-right"></i></button>
+                    <h4 id="cal-title"></h4>
+                    <button class="icon-btn" title="الشهر التالي" onclick="shiftEventsMonth(1)"><i class="fas fa-chevron-left"></i></button>
+                </div>
+                <div class="cal-grid" id="cal-grid"></div>
+            </div>
+
+            <div id="ev-day-filter"></div>
+            <div id="ev-list" class="ev-list"></div>
+        </section>
+
+        <!-- صفحة طلبات الحجز والانخراط (للمدير) -->
+        <section id="admin-bookings" class="section">
+            <div class="page-head">
+                <div>
+                    <h2><i class="fas fa-clipboard-list"></i> الحجوزات والانخراطات</h2>
+                    <p>راجع الطلبات وأكّدها بنقرة واحدة</p>
+                </div>
+            </div>
+
+            <div class="stat-grid" id="adm-stats"></div>
+
+            <div class="card">
+                <div class="seg seg-wide" id="adm-seg">
+                    <button class="active" data-v="bookings" onclick="setAdminReqView('bookings')"><i class="fas fa-bed"></i> الحجوزات</button>
+                    <button data-v="clubs" onclick="setAdminReqView('clubs')"><i class="fas fa-masks-theater"></i> الانخراطات</button>
+                </div>
+                <div class="filter-tabs" id="adm-filter-tabs"></div>
+                <div class="search-mini">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input type="text" id="adm-search" placeholder="ابحث بالاسم، الهاتف أو رمز الحجز..." oninput="renderAdminRequests()">
+                </div>
+                <div id="adm-list" class="req-list"></div>
             </div>
         </section>
 
@@ -2029,6 +2756,16 @@
                         <i class="fas fa-edit"></i> تعديل الملف
                     </button>
                 </div>
+            </div>
+
+            <!-- نشاطي في دور الشباب -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-house-chimney-user"></i> نشاطي في دور الشباب</h3>
+                </div>
+                <div class="mini-stats" id="profile-youth-stats"></div>
+                <h4 class="sub-title">نواديّ وورشاتي</h4>
+                <div id="my-clubs" class="req-list"></div>
             </div>
 
             <!-- نموذج التعديل -->
@@ -2145,8 +2882,8 @@
                     <h4>🎨 المظهر</h4>
                     <div class="settings-item">
                         <div class="settings-item-info">
-                            <h5>الوضع الليلي</h5>
-                            <p>تفعيل الألوان الداكنة للواجهة</p>
+                            <h5>الوضع الفاتح</h5>
+                            <p>تفعيل الألوان الفاتحة للواجهة</p>
                         </div>
                         <div class="settings-item-action">
                             <label class="switch">
@@ -2356,21 +3093,20 @@
 
     <!-- التبويب السفلي (يتم تحديثه حسب الدور عبر JavaScript) -->
     <div class="bottom-nav" id="volunteer-nav">
-        <div class="nav-item active" onclick="switchTab('home')">
+        <div class="nav-item active" data-tab="home" onclick="switchTab('home')">
             <i class="fas fa-home"></i><span>الرئيسية</span>
         </div>
-        <div class="nav-item" onclick="switchTab('notifications')">
-            <i class="fas fa-bell"></i><span>الإشعارات</span>
-            <span class="badge" id="nav-notification-count">0</span>
+        <div class="nav-item" data-tab="houses" onclick="switchTab('houses')">
+            <i class="fas fa-house-chimney-user"></i><span>دور الشباب</span>
         </div>
-        <div class="nav-item" onclick="switchTab('leaderboard')">
-            <i class="fas fa-trophy"></i><span>التنافس</span>
+        <div class="nav-item" data-tab="booking" onclick="switchTab('booking')">
+            <i class="fas fa-bed"></i><span>الحجز</span>
         </div>
-        <div class="nav-item" onclick="switchTab('profile')">
+        <div class="nav-item" data-tab="events-page" onclick="switchTab('events-page')">
+            <i class="fas fa-calendar-days"></i><span>الفعاليات</span>
+        </div>
+        <div class="nav-item" data-tab="profile" onclick="switchTab('profile')">
             <i class="fas fa-user"></i><span>ملفي</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('settings')">
-            <i class="fas fa-cog"></i><span>الإعدادات</span>
         </div>
     </div>
     <div class="bottom-nav" id="admin-nav" style="display: none;"></div>
@@ -2386,9 +3122,20 @@
         
         <div class="edit-field">
             <label>عنوان الفعالية</label>
-            <input type="text" id="eventTitle" placeholder="مثال: موائد إفطار رمضان">
+            <input type="text" id="eventTitle" placeholder="مثال: ورشة الرسم الزيتي">
         </div>
-        
+
+        <div class="form-row">
+            <div class="edit-field">
+                <label>التصنيف</label>
+                <select id="eventCategory"></select>
+            </div>
+            <div class="edit-field">
+                <label>دار الشباب / المرفق</label>
+                <select id="eventFacility" onchange="fillEventFromFacility(this.value)"></select>
+            </div>
+        </div>
+
         <div class="edit-field">
             <label>الولاية</label>
             <select id="eventWilaya">
@@ -2446,8 +3193,11 @@
         <div class="edit-field">
             <label>نوع المكان</label>
             <select id="eventPlaceType">
-                <option value="mosque">🕌 مسجد</option>
                 <option value="youth">🏠 دار شباب</option>
+                <option value="hostel">🛏️ بيت شباب</option>
+                <option value="camp">⛺ مخيم شباب</option>
+                <option value="sport">🏟️ مركب رياضي</option>
+                <option value="mosque">🕌 مسجد</option>
                 <option value="restaurant">🍽️ مائدة إفطار</option>
                 <option value="charity">🤝 جمعية خيرية</option>
                 <option value="school">🏫 مدرسة</option>
@@ -2477,20 +3227,23 @@
 <div id="addPlaceModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 class="modal-title"><i class="fas fa-map-pin"></i> إضافة مكان جديد</h3>
+            <h3 class="modal-title" id="placeModalTitle"><i class="fas fa-map-pin"></i> إضافة مكان جديد</h3>
             <button class="close-modal" onclick="closeModal('addPlaceModal')"><i class="fas fa-times"></i></button>
         </div>
-        
+
         <div class="edit-field">
             <label>اسم المكان</label>
-            <input type="text" id="placeName" placeholder="مثال: مسجد النور">
+            <input type="text" id="placeName" placeholder="مثال: دار الشباب الأمير عبد القادر">
         </div>
-        
+
         <div class="edit-field">
             <label>نوع المكان</label>
-            <select id="placeType">
-                <option value="mosque">🕌 مسجد</option>
+            <select id="placeType" onchange="togglePlaceExtra()">
                 <option value="youth">🏠 دار شباب</option>
+                <option value="hostel">🛏️ بيت شباب (يقبل الحجز)</option>
+                <option value="camp">⛺ مخيم شباب (يقبل الحجز)</option>
+                <option value="sport">🏟️ مركب رياضي جواري</option>
+                <option value="mosque">🕌 مسجد</option>
                 <option value="restaurant">🍽️ مائدة إفطار</option>
                 <option value="charity">🤝 جمعية خيرية</option>
                 <option value="school">🏫 مدرسة</option>
@@ -2507,14 +3260,73 @@
         <div class="edit-field">
             <label>الإحداثيات</label>
             <div style="display: flex; gap: 10px;">
-                <input type="text" id="placeLat" readonly style="flex:1; background: rgba(255,255,255,0.05);">
-                <input type="text" id="placeLng" readonly style="flex:1; background: rgba(255,255,255,0.05);">
+                <input type="text" id="placeLat" placeholder="خط العرض" inputmode="decimal" style="flex:1;">
+                <input type="text" id="placeLng" placeholder="خط الطول" inputmode="decimal" style="flex:1;">
             </div>
+            <button type="button" class="btn btn-outline btn-small" style="margin-top:8px;" onclick="fillPlaceWithMyLocation()">
+                <i class="fas fa-location-crosshairs"></i> استعمل موقعي الحالي
+            </button>
         </div>
-        
+
         <div class="edit-field">
             <label>وصف إضافي (اختياري)</label>
             <textarea id="placeDescription" rows="2" placeholder="أضف معلومات إضافية..."></textarea>
+        </div>
+
+        <!-- تفاصيل مرافق الشباب -->
+        <div id="placeExtra" class="place-extra">
+            <h4 class="sub-title"><i class="fas fa-house-chimney-user"></i> تفاصيل مرفق الشباب</h4>
+            <div class="form-row">
+                <div class="edit-field">
+                    <label>البلدية</label>
+                    <input type="text" id="placeCommune" placeholder="مثال: العلمة">
+                </div>
+                <div class="edit-field">
+                    <label>رقم الهاتف</label>
+                    <input type="tel" id="placePhone" placeholder="036 00 00 00">
+                </div>
+            </div>
+            <div class="edit-field">
+                <label>البريد الإلكتروني</label>
+                <input type="email" id="placeEmail" placeholder="contact@example.dz">
+            </div>
+            <div class="form-row three">
+                <div class="edit-field">
+                    <label>يفتح</label>
+                    <input type="time" id="placeOpen" value="08:00">
+                </div>
+                <div class="edit-field">
+                    <label>يغلق</label>
+                    <input type="time" id="placeClose" value="18:00">
+                </div>
+                <div class="edit-field">
+                    <label>يوم الغلق</label>
+                    <select id="placeClosedDay">
+                        <option value="">لا يوجد</option>
+                        <option value="5">الجمعة</option>
+                        <option value="6">السبت</option>
+                        <option value="0">الأحد</option>
+                    </select>
+                </div>
+            </div>
+            <div class="edit-field">
+                <label>المرافق (افصل بفواصل)</label>
+                <input type="text" id="placeFacilities" placeholder="قاعة إعلام آلي, مكتبة, قاعة رياضة, أنترنت">
+            </div>
+            <div class="edit-field">
+                <label>النوادي والورشات (افصل بفواصل)</label>
+                <input type="text" id="placeClubs" placeholder="نادي المسرح, نادي الشطرنج, ورشة الرسم">
+            </div>
+            <div class="form-row" id="placeBookingFields">
+                <div class="edit-field">
+                    <label>السعة (عدد الأسرّة)</label>
+                    <input type="number" id="placeCapacity" min="1" placeholder="40">
+                </div>
+                <div class="edit-field">
+                    <label>سعر الليلة للشخص (دج)</label>
+                    <input type="number" id="placePrice" min="0" placeholder="400">
+                </div>
+            </div>
         </div>
         
         <div style="display: flex; gap: 10px; margin-top: 20px;">
@@ -2552,6 +3364,174 @@
         <div style="display: flex; gap: 10px; margin-top: 20px;">
             <button onclick="uploadPhoto()" class="btn-save" style="flex:2;">رفع الصورة</button>
             <button onclick="closeModal('uploadPhotoModal')" class="btn btn-danger" style="flex:1;">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة تفاصيل دار الشباب -->
+<div id="facilityModal" class="modal" onclick="if (event.target === this) closeModal('facilityModal')">
+    <div class="modal-content sheet">
+        <div id="facility-detail"></div>
+    </div>
+</div>
+
+<!-- نافذة طلب الحجز -->
+<div id="bookingModal" class="modal" onclick="if (event.target === this) closeModal('bookingModal')">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-bed"></i> طلب حجز مسبق</h3>
+            <button class="close-modal" onclick="closeModal('bookingModal')"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="edit-field">
+            <label>بيت الشباب / المخيم</label>
+            <select id="bk-facility" onchange="updateBookingSummary()"></select>
+        </div>
+
+        <div class="form-row">
+            <div class="edit-field">
+                <label>تاريخ الوصول</label>
+                <input type="date" id="bk-in" onchange="updateBookingSummary()">
+            </div>
+            <div class="edit-field">
+                <label>تاريخ المغادرة</label>
+                <input type="date" id="bk-out" onchange="updateBookingSummary()">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="edit-field">
+                <label>عدد الأشخاص</label>
+                <div class="stepper">
+                    <button type="button" onclick="stepGuests('bk-guests', -1); updateBookingSummary()">−</button>
+                    <input type="number" id="bk-guests" value="1" min="1" max="30" onchange="updateBookingSummary()">
+                    <button type="button" onclick="stepGuests('bk-guests', 1); updateBookingSummary()">+</button>
+                </div>
+            </div>
+            <div class="edit-field">
+                <label>نوع الإقامة</label>
+                <select id="bk-room">
+                    <option value="dorm">سرير في مرقد جماعي</option>
+                    <option value="double">غرفة ثنائية</option>
+                    <option value="family">غرفة عائلية</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="edit-field">
+                <label>الفئة</label>
+                <select id="bk-group">
+                    <option value="male">فرد / ذكور</option>
+                    <option value="female">فرد / إناث</option>
+                    <option value="family">عائلة</option>
+                    <option value="team">فوج أو فريق (جمعية، نادي، مدرسة)</option>
+                </select>
+            </div>
+            <div class="edit-field">
+                <label>سبب الإقامة</label>
+                <select id="bk-purpose">
+                    <option value="tourism">سياحة واستكشاف</option>
+                    <option value="sport">منافسة رياضية</option>
+                    <option value="study">امتحانات أو دراسة</option>
+                    <option value="trip">رحلة مدرسية / جمعوية</option>
+                    <option value="training">تربص أو عمل</option>
+                    <option value="other">أخرى</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="edit-field">
+                <label>الاسم الكامل</label>
+                <input type="text" id="bk-name" placeholder="الاسم واللقب">
+            </div>
+            <div class="edit-field">
+                <label>رقم الهاتف</label>
+                <input type="tel" id="bk-phone" placeholder="0555 00 00 00">
+            </div>
+        </div>
+
+        <div class="edit-field">
+            <label>ملاحظات (اختياري)</label>
+            <textarea id="bk-notes" rows="2" placeholder="وقت الوصول التقريبي، احتياجات خاصة..."></textarea>
+        </div>
+
+        <div id="bk-summary" class="bk-summary"></div>
+
+        <label class="check-line">
+            <input type="checkbox" id="bk-agree">
+            <span>أتعهد بإحضار بطاقة التعريف واحترام النظام الداخلي لبيت الشباب.</span>
+        </label>
+
+        <div style="display: flex; gap: 10px; margin-top: 16px;">
+            <button onclick="submitBooking()" class="btn-save" id="bk-submit" style="flex:2;"><i class="fas fa-paper-plane"></i> إرسال طلب الحجز</button>
+            <button onclick="closeModal('bookingModal')" class="btn btn-outline" style="flex:1;">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة تذكرة الحجز -->
+<div id="ticketModal" class="modal" onclick="if (event.target === this) closeModal('ticketModal')">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-ticket"></i> تذكرة الحجز</h3>
+            <button class="close-modal" onclick="closeModal('ticketModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="ticket-print"></div>
+        <div style="display: flex; gap: 10px; margin-top: 16px;">
+            <button class="btn btn-primary" style="flex:1;" onclick="window.print()"><i class="fas fa-print"></i> طباعة</button>
+            <button class="btn btn-outline" style="flex:1;" onclick="shareTicket()"><i class="fas fa-share-nodes"></i> مشاركة</button>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة الانخراط في نادي -->
+<div id="clubModal" class="modal" onclick="if (event.target === this) closeModal('clubModal')">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-masks-theater"></i> الانخراط في نادي</h3>
+            <button class="close-modal" onclick="closeModal('clubModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="edit-field">
+            <label>دار الشباب</label>
+            <select id="cl-facility" onchange="fillClubOptions()"></select>
+        </div>
+        <div class="edit-field">
+            <label>النادي / الورشة</label>
+            <select id="cl-club"></select>
+        </div>
+        <div class="form-row">
+            <div class="edit-field">
+                <label>الاسم الكامل</label>
+                <input type="text" id="cl-name">
+            </div>
+            <div class="edit-field">
+                <label>السن</label>
+                <input type="number" id="cl-age" min="6" max="60" placeholder="18">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="edit-field">
+                <label>رقم الهاتف</label>
+                <input type="tel" id="cl-phone">
+            </div>
+            <div class="edit-field">
+                <label>المستوى</label>
+                <select id="cl-level">
+                    <option value="مبتدئ">مبتدئ</option>
+                    <option value="متوسط">متوسط</option>
+                    <option value="متقدم">متقدم</option>
+                </select>
+            </div>
+        </div>
+        <div class="edit-field">
+            <label>لماذا تريد الانضمام؟ (اختياري)</label>
+            <textarea id="cl-notes" rows="2"></textarea>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button onclick="submitMembership()" class="btn-save" style="flex:2;"><i class="fas fa-user-plus"></i> إرسال طلب الانخراط</button>
+            <button onclick="closeModal('clubModal')" class="btn btn-outline" style="flex:1;">إلغاء</button>
         </div>
     </div>
 </div>
@@ -2596,6 +3576,10 @@
     let allUsers = [];
     let notifications = [];
     let eventsListeners = []; // لتخزين references المستمعين
+    let currentUserData = null;
+    let userLocated = false;
+    let editingPlaceId = null;
+    let leaderboardLoaded = false;
 
     // ==================== دوال التحميل والإظهار ====================
     function showLoading() {
@@ -2607,6 +3591,7 @@
     }
 
     function showToast(msg, type = 'success') {
+        document.querySelectorAll('.toast').forEach(t => t.remove()); // رسالة واحدة في كل مرة
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         toast.textContent = msg;
@@ -2616,8 +3601,8 @@
 
     function closeModal(id) {
         document.getElementById(id).classList.remove('active');
-        if (tempEventMarker) map.removeLayer(tempEventMarker);
-        if (tempPlaceMarker) map.removeLayer(tempPlaceMarker);
+        if (tempEventMarker) { tempEventMarker.remove(); tempEventMarker = null; }
+        if (tempPlaceMarker) { tempPlaceMarker.remove(); tempPlaceMarker = null; }
     }
 
     // ==================== تهيئة التطبيق ====================
@@ -2631,7 +3616,8 @@
 
         initMap();
         loadSettings();
-        
+        initYouthFeatures();
+
         const savedLang = localStorage.getItem('preferredLang');
         if (savedLang) changeLanguage(savedLang);
     });
@@ -2642,50 +3628,59 @@
             document.getElementById('role-screen').style.display = 'none';
             document.getElementById('auth-screen').classList.remove('active');
             document.getElementById('app').style.display = 'block';
-            
+            // الخريطة أُنشئت والتطبيق مخفي، لذا نعيد حساب أبعادها بعد الإظهار
+            setTimeout(() => map && map.invalidateSize(), 100);
+
             // تحديد نوع المستخدم من قاعدة البيانات
             database.ref('users/' + user.uid).once('value').then((snapshot) => {
                 const userData = snapshot.val();
                 if (userData) {
                     selectedRole = userData.role;
+                    currentUserData = userData;
                     if (selectedRole === 'admin') {
                         // تحديث التبويب السفلي للمدير
+                        document.body.classList.add('is-admin');
                         document.getElementById('volunteer-nav').style.display = 'none';
                         const adminNav = document.getElementById('admin-nav');
                         adminNav.style.display = 'flex';
                         adminNav.innerHTML = `
-                            <div class="nav-item active" onclick="switchTab('home')">
+                            <div class="nav-item active" data-tab="home" onclick="switchTab('home')">
                                 <i class="fas fa-home"></i><span>الرئيسية</span>
                             </div>
-                            <div class="nav-item" onclick="switchTab('admin-events')">
-                                <i class="fas fa-tasks"></i><span>الإدارة</span>
-                                <span class="badge" id="admin-pending-badge">0</span>
+                            <div class="nav-item" data-tab="admin-events" onclick="switchTab('admin-events')">
+                                <i class="fas fa-tasks"></i><span>الفعاليات</span>
+                                <span class="badge" id="admin-pending-badge" style="display:none;">0</span>
                             </div>
-                            <div class="nav-item" onclick="switchTab('notifications')">
-                                <i class="fas fa-bell"></i><span>الإشعارات</span>
-                                <span class="badge" id="admin-nav-notification-count">0</span>
+                            <div class="nav-item" data-tab="admin-bookings" onclick="switchTab('admin-bookings')">
+                                <i class="fas fa-clipboard-list"></i><span>الطلبات</span>
+                                <span class="badge" id="admin-requests-badge" style="display:none;">0</span>
                             </div>
-                            <div class="nav-item" onclick="switchTab('profile')">
+                            <div class="nav-item" data-tab="houses" onclick="switchTab('houses')">
+                                <i class="fas fa-house-chimney-user"></i><span>دور الشباب</span>
+                            </div>
+                            <div class="nav-item" data-tab="profile" onclick="switchTab('profile')">
                                 <i class="fas fa-user"></i><span>ملفي</span>
-                            </div>
-                            <div class="nav-item" onclick="switchTab('settings')">
-                                <i class="fas fa-cog"></i><span>الإعدادات</span>
                             </div>
                         `;
                         document.getElementById('admin-danger-zone').style.display = 'block';
+                        updatePendingCount();
+                        filterAdminEvents('pending');
+                        loadAdminYouthData();
                     } else {
                         document.getElementById('volunteer-nav').style.display = 'flex';
                         document.getElementById('admin-nav').style.display = 'none';
                     }
+                    refreshYouthViews();
                 }
             }).catch(error => showToast('❌ خطأ في تحميل بيانات المستخدم: ' + error.message, 'error'));
-            
+
             loadUserData();
             loadEvents();
             loadPlaces();
             loadPhotos();
             loadNotifications();
             loadLeaderboard();
+            loadYouthData();
         }
     });
 
@@ -2909,10 +3904,8 @@
         storageRef.put(file).then(() => storageRef.getDownloadURL())
             .then(url => {
                 document.getElementById('profile-avatar').src = url;
-                return currentUser.updateProfile({ photoURL: url });
-            })
-            .then(() => {
-                return database.ref('users/' + currentUser.uid + '/photoURL').set(url);
+                return currentUser.updateProfile({ photoURL: url })
+                    .then(() => database.ref('users/' + currentUser.uid + '/photoURL').set(url));
             })
             .then(() => {
                 hideLoading();
@@ -3031,6 +4024,8 @@
                 map.flyTo([currentLocation.lat, currentLocation.lng], 16);
                 document.getElementById('location-text').textContent = 'تم تحديد موقعك';
                 showToast('✅ تم تحديد موقعك بنجاح');
+                userLocated = true;
+                refreshYouthViews();
             },
             (error) => {
                 let message = '❌ تعذر تحديد الموقع';
@@ -3050,9 +4045,10 @@
     function loadPlaces() {
         database.ref('places').on('value', (snapshot) => {
             allPlaces = [];
-            snapshot.forEach(child => allPlaces.push({ id: child.key, ...child.val() }));
+            snapshot.forEach(child => { allPlaces.push({ id: child.key, ...child.val() }); });
             updateMapPlaces();
             updatePlacesList();
+            refreshYouthViews();
         }, error => showToast('❌ خطأ في تحميل الأماكن: ' + error.message, 'error'));
     }
 
@@ -3075,15 +4071,17 @@
                 })
             }).addTo(map);
             
-            const deleteBtn = selectedRole === 'admin' ? 
+            const deleteBtn = selectedRole === 'admin' ?
                 `<button class="btn btn-danger btn-small" onclick="deletePlace('${place.id}')" style="margin-top:5px;"><i class="fas fa-trash"></i> حذف</button>` : '';
-            
+            const detailsBtn = FACILITY_TYPES[place.type] ?
+                `<button class="btn btn-primary btn-small" onclick="openFacility('${place.id}')" style="margin-top:5px;"><i class="fas fa-circle-info"></i> التفاصيل</button>` : '';
+
             marker.bindPopup(`
                 <div style="text-align: center;">
-                    <h4>${place.name}</h4>
-                    <p>${place.address}</p>
-                    <small>أضيف بواسطة: ${place.addedByName || 'مدير'}</small>
-                    ${deleteBtn}
+                    <h4>${esc(place.name)}</h4>
+                    <p>${esc(place.address)}</p>
+                    <small>أضيف بواسطة: ${esc(place.addedByName || 'مدير')}</small>
+                    <div>${detailsBtn} ${deleteBtn}</div>
                 </div>
             `);
         });
@@ -3119,7 +4117,8 @@
     function getPlaceIcon(type) {
         const icons = {
             mosque: '🕌', youth: '🏠', restaurant: '🍽️',
-            charity: '🤝', school: '🏫', hospital: '🏥', other: '📍'
+            charity: '🤝', school: '🏫', hospital: '🏥', other: '📍',
+            hostel: '🛏️', camp: '⛺', sport: '🏟️'
         };
         return icons[type] || '📍';
     }
@@ -3144,10 +4143,10 @@
             });
     }
 
-    function showAddPlacePrompt(latlng) {
+    function showAddPlacePrompt(latlng, targetMap = map) {
         const { lat, lng } = latlng;
-        
-        if (tempPlaceMarker) map.removeLayer(tempPlaceMarker);
+
+        if (tempPlaceMarker) tempPlaceMarker.remove();
         
         const icon = L.divIcon({
             html: `
@@ -3163,26 +4162,37 @@
             iconAnchor: [20, 40]
         });
         
-        tempPlaceMarker = L.marker([lat, lng], { icon: icon }).addTo(map);
+        tempPlaceMarker = L.marker([lat, lng], { icon: icon }).addTo(targetMap);
         tempPlaceMarker.bindPopup(`
             <div style="text-align: center;">
                 <h4>➕ إضافة مكان جديد</h4>
                 <p>${lat.toFixed(6)}<br>${lng.toFixed(6)}</p>
-                <button onclick="openAddPlaceModal(${lat}, ${lng})" class="btn btn-primary btn-small">
+                <button onclick="openAddPlaceModal(${lat}, ${lng}, '${targetMap === map ? '' : 'youth'}')" class="btn btn-primary btn-small">
                     <i class="fas fa-plus"></i> إضافة
                 </button>
-                <button onclick="map.closePopup()" class="btn btn-danger btn-small">
+                <button onclick="tempPlaceMarker && tempPlaceMarker.remove()" class="btn btn-danger btn-small">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
             </div>
         `).openPopup();
     }
 
-    function openAddPlaceModal(lat, lng) {
-        document.getElementById('placeLat').value = lat.toFixed(6);
-        document.getElementById('placeLng').value = lng.toFixed(6);
+    const PLACE_EXTRA_FIELDS = ['placeCommune', 'placePhone', 'placeEmail', 'placeFacilities', 'placeClubs', 'placeCapacity', 'placePrice'];
+
+    function openAddPlaceModal(lat, lng, presetType) {
+        editingPlaceId = null;
+        ['placeName', 'placeAddress', 'placeDescription', ...PLACE_EXTRA_FIELDS].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('placeOpen').value = '08:00';
+        document.getElementById('placeClose').value = '18:00';
+        document.getElementById('placeClosedDay').value = '5';
+        if (presetType) document.getElementById('placeType').value = presetType;
+        document.getElementById('placeLat').value = lat !== undefined ? Number(lat).toFixed(6) : '';
+        document.getElementById('placeLng').value = lng !== undefined ? Number(lng).toFixed(6) : '';
+        document.getElementById('placeModalTitle').innerHTML = '<i class="fas fa-map-pin"></i> إضافة مكان جديد';
+        togglePlaceExtra();
         document.getElementById('addPlaceModal').classList.add('active');
         map.closePopup();
+        if (facMap) facMap.closePopup();
     }
 
     function savePlace() {
@@ -3205,17 +4215,52 @@
         
         showLoading();
         
+        if (isNaN(lat) || isNaN(lng)) {
+            hideLoading();
+            showToast('❌ الرجاء تحديد إحداثيات صحيحة', 'error');
+            return;
+        }
+
         const placeData = {
-            name, type, address, lat, lng, description,
-            addedBy: currentUser?.uid,
-            addedByName: currentUser?.displayName || 'مدير',
-            date: new Date().toISOString()
+            name, type, address, lat, lng, description
         };
-        
-        database.ref('places').push(placeData)
+
+        // حقول إضافية خاصة بمرافق الشباب
+        if (FACILITY_TYPES[type]) {
+            Object.assign(placeData, {
+                commune: document.getElementById('placeCommune').value.trim(),
+                phone: document.getElementById('placePhone').value.trim(),
+                email: document.getElementById('placeEmail').value.trim(),
+                openTime: document.getElementById('placeOpen').value,
+                closeTime: document.getElementById('placeClose').value,
+                closedDay: document.getElementById('placeClosedDay').value,
+                facilities: document.getElementById('placeFacilities').value.trim(),
+                clubs: document.getElementById('placeClubs').value.trim()
+            });
+            if (FACILITY_TYPES[type].bookable) {
+                placeData.capacity = parseInt(document.getElementById('placeCapacity').value) || 0;
+                placeData.price = parseInt(document.getElementById('placePrice').value) || 0;
+            }
+        }
+
+        const isEdit = !!editingPlaceId;
+        if (!isEdit) {
+            Object.assign(placeData, {
+                addedBy: currentUser?.uid,
+                addedByName: currentUser?.displayName || 'مدير',
+                date: new Date().toISOString()
+            });
+        }
+
+        const op = isEdit
+            ? database.ref('places/' + editingPlaceId).update(placeData)
+            : database.ref('places').push(placeData);
+
+        op
             .then(() => {
                 hideLoading();
-                showToast('✅ تم إضافة المكان بنجاح');
+                showToast(isEdit ? '✅ تم تحديث المرفق' : '✅ تم إضافة المكان بنجاح');
+                editingPlaceId = null;
                 closeModal('addPlaceModal');
                 document.getElementById('placeName').value = '';
                 document.getElementById('placeAddress').value = '';
@@ -3231,10 +4276,11 @@
     function loadEvents() {
         database.ref('events').on('value', (snapshot) => {
             allEvents = [];
-            snapshot.forEach(child => allEvents.push({ id: child.key, ...child.val() }));
+            snapshot.forEach(child => { allEvents.push({ id: child.key, ...child.val() }); });
             updateEventsDisplay();
             updatePendingCount();
             if (selectedRole === 'admin') filterAdminEvents('pending');
+            refreshYouthViews();
         }, error => showToast('❌ خطأ في تحميل الفعاليات: ' + error.message, 'error'));
     }
 
@@ -3299,6 +4345,7 @@
             document.getElementById('auth-screen').classList.add('active');
             return;
         }
+        fillEventFormSelects();
         document.getElementById('addEventModal').classList.add('active');
     }
 
@@ -3383,6 +4430,9 @@
             time,
             volunteers: parseInt(document.getElementById('eventVolunteers').value) || 5,
             placeType: document.getElementById('eventPlaceType').value,
+            category: document.getElementById('eventCategory').value || 'culture',
+            placeId: document.getElementById('eventFacility').value || '',
+            placeName: findFacility(document.getElementById('eventFacility').value)?.name || '',
             phone: document.getElementById('eventPhone').value,
             requirements: document.getElementById('eventRequirements').value,
             createdBy: currentUser.uid,
@@ -3578,7 +4628,7 @@
     function loadPhotos() {
         database.ref('photos').on('value', (snapshot) => {
             allPhotos = [];
-            snapshot.forEach(child => allPhotos.push({ id: child.key, ...child.val() }));
+            snapshot.forEach(child => { allPhotos.push({ id: child.key, ...child.val() }); });
             updateGallery();
         }, error => showToast('❌ خطأ في تحميل الصور: ' + error.message, 'error'));
     }
@@ -3723,14 +4773,16 @@
         database.ref('notifications').orderByChild('userId').equalTo(currentUser.uid)
             .on('value', (snapshot) => {
                 notifications = [];
-                snapshot.forEach(child => notifications.push({ id: child.key, ...child.val() }));
+                snapshot.forEach(child => { notifications.push({ id: child.key, ...child.val() }); });
                 
+                notifications.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
                 const unread = notifications.filter(n => !n.read).length;
-                document.getElementById('notification-count').textContent = unread;
-                document.getElementById('nav-notification-count').textContent = unread;
-                if (document.getElementById('admin-nav-notification-count')) {
-                    document.getElementById('admin-nav-notification-count').textContent = unread;
-                }
+                ['notification-count', 'nav-notification-count', 'admin-nav-notification-count'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    el.textContent = unread;
+                    el.style.display = unread > 0 ? 'flex' : 'none';
+                });
                 
                 const container = document.getElementById('notifications-container');
                 if (!container) return;
@@ -3781,9 +4833,11 @@
 
     // ==================== دوال لوحة الشرف ====================
     function loadLeaderboard() {
+        if (leaderboardLoaded) return; // المستمع يبقى فعالاً، لا داعي لتكراره
+        leaderboardLoaded = true;
         database.ref('users').orderByChild('points').limitToLast(20).on('value', (snapshot) => {
             const users = [];
-            snapshot.forEach(child => users.push({ id: child.key, ...child.val() }));
+            snapshot.forEach(child => { users.push({ id: child.key, ...child.val() }); });
             users.sort((a, b) => (b.points || 0) - (a.points || 0));
             
             const container = document.getElementById('leaderboard-container');
@@ -3924,14 +4978,18 @@
             database.ref('events').once('value'),
             database.ref('places').once('value'),
             database.ref('photos').once('value'),
-            database.ref('notifications').once('value')
-        ]).then(([users, events, places, photos, notifications]) => {
+            database.ref('notifications').once('value'),
+            database.ref('bookings').once('value'),
+            database.ref('memberships').once('value')
+        ]).then(([users, events, places, photos, notifications, bookings, memberships]) => {
             const data = {
                 users: users.val(),
                 events: events.val(),
                 places: places.val(),
                 photos: photos.val(),
                 notifications: notifications.val(),
+                bookings: bookings.val(),
+                memberships: memberships.val(),
                 exportedAt: new Date().toISOString()
             };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -3958,7 +5016,10 @@
             database.ref('events').remove(),
             database.ref('places').remove(),
             database.ref('photos').remove(),
-            database.ref('notifications').remove()
+            database.ref('notifications').remove(),
+            database.ref('bookings').remove(),
+            database.ref('occupancy').remove(),
+            database.ref('memberships').remove()
         ]).then(() => {
             hideLoading();
             showToast('✅ تم إعادة تعيين جميع البيانات');
@@ -3974,14 +5035,21 @@
 
     // ==================== دوال مساعدة ====================
     function switchTab(tabId) {
+        const target = document.getElementById(tabId);
+        if (!target) return;
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        if (event?.currentTarget) event.currentTarget.classList.add('active');
-        
+        target.classList.add('active');
+
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.tab === tabId));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
         if (tabId === 'leaderboard') loadLeaderboard();
-        else if (tabId === 'home') updatePlacesList();
+        else if (tabId === 'home') {
+            updatePlacesList();
+            setTimeout(() => map && map.invalidateSize(), 60);
+        }
+        else if (tabId === 'houses') ensureFacMap();
+        refreshYouthViews();
     }
 
     function filterContent(filter) {
@@ -4070,9 +5138,12 @@
             return;
         }
         
-        const placeResults = allPlaces.filter(p => 
-            p.name.toLowerCase().includes(query) || 
-            (p.address && p.address.toLowerCase().includes(query))
+        const searchablePlaces = usingSampleFacilities() ? allPlaces.concat(SAMPLE_FACILITIES) : allPlaces;
+        const placeResults = searchablePlaces.filter(p =>
+            (p.name || '').toLowerCase().includes(query) ||
+            (p.address && p.address.toLowerCase().includes(query)) ||
+            (p.commune && p.commune.toLowerCase().includes(query)) ||
+            (p.clubs && p.clubs.toLowerCase().includes(query))
         );
         
         const eventResults = allEvents.filter(e => 
@@ -4099,11 +5170,11 @@
                     ${places.length > 0 ? `
                         <h4 style="color: var(--accent);">📍 أماكن (${places.length})</h4>
                         ${places.map(p => `
-                            <div class="place-item" onclick="flyToPlace(${p.lat}, ${p.lng}); this.closest('.modal').remove()">
+                            <div class="place-item" onclick="${FACILITY_TYPES[p.type] ? `openFacility('${p.id}')` : `flyToPlace(${p.lat}, ${p.lng})`}; this.closest('.modal').remove()">
                                 <span class="place-icon">${getPlaceIcon(p.type)}</span>
                                 <div class="place-info">
-                                    <div class="place-name">${p.name}</div>
-                                    <div class="place-address">${p.address}</div>
+                                    <div class="place-name">${esc(p.name)}</div>
+                                    <div class="place-address">${esc(p.address)}</div>
                                 </div>
                             </div>
                         `).join('')}
@@ -4127,11 +5198,1388 @@
         document.body.appendChild(modal);
     }
 
-    // ربط البحث بزر الإدخال
-    document.getElementById('search-input').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') searchContent();
-    });
+    // ملاحظة: البحث بزر الإدخال مربوط مباشرة في الحقل (onkeypress)، فلا نضيف مستمعاً ثانياً حتى لا تُفتح النتائج مرتين
+
+    // =====================================================================
+    // ==================== دور الشباب، الحجز، النوادي والفعاليات ====================
+    // =====================================================================
+    const FACILITY_TYPES = {
+        youth:  { label: 'دار شباب',   plural: 'دور الشباب',        icon: 'fa-house-chimney-user', emoji: '🏠', color: '#10b981', bookable: false },
+        hostel: { label: 'بيت شباب',   plural: 'بيوت الشباب',       icon: 'fa-bed',                emoji: '🛏️', color: '#3b82f6', bookable: true },
+        camp:   { label: 'مخيم شباب',  plural: 'المخيمات',          icon: 'fa-campground',         emoji: '⛺', color: '#f59e0b', bookable: true },
+        sport:  { label: 'مركب رياضي', plural: 'المركبات الرياضية', icon: 'fa-futbol',             emoji: '🏟️', color: '#8b5cf6', bookable: false }
+    };
+
+    const EVENT_CATEGORIES = {
+        culture:   { label: 'ثقافي',          icon: 'fa-book-open',          color: '#f4b41b' },
+        sport:     { label: 'رياضي',          icon: 'fa-futbol',             color: '#10b981' },
+        science:   { label: 'علمي وتقني',     icon: 'fa-laptop-code',        color: '#3b82f6' },
+        art:       { label: 'فني',            icon: 'fa-palette',            color: '#ec4899' },
+        fun:       { label: 'ترفيه ورحلات',   icon: 'fa-mountain-sun',       color: '#f97316' },
+        volunteer: { label: 'تطوعي',          icon: 'fa-hand-holding-heart', color: '#8b5cf6' }
+    };
+
+    const ROOM_TYPES = { dorm: 'سرير في مرقد جماعي', double: 'غرفة ثنائية', family: 'غرفة عائلية' };
+    const GROUP_TYPES = { male: 'فرد / ذكور', female: 'فرد / إناث', family: 'عائلة', team: 'فوج أو فريق' };
+    const PURPOSES = { tourism: 'سياحة واستكشاف', sport: 'منافسة رياضية', study: 'امتحانات أو دراسة', trip: 'رحلة مدرسية / جمعوية', training: 'تربص أو عمل', other: 'أخرى' };
+    const REQUEST_STATUS = {
+        pending:   { label: 'قيد المراجعة', icon: 'fa-hourglass-half' },
+        confirmed: { label: 'مؤكد',         icon: 'fa-circle-check' },
+        accepted:  { label: 'مقبول',        icon: 'fa-circle-check' },
+        rejected:  { label: 'مرفوض',        icon: 'fa-circle-xmark' },
+        cancelled: { label: 'ملغى',         icon: 'fa-ban' }
+    };
+    const MONTHS_DZ = ['جانفي', 'فيفري', 'مارس', 'أفريل', 'ماي', 'جوان', 'جويلية', 'أوت', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    const WEEKDAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    const MAX_NIGHTS = 15;
+
+    // مرافق نموذجية للعرض فقط: تظهر ما دامت قاعدة البيانات لا تحتوي على أي مرفق شباب.
+    // الأسماء والإحداثيات تقريبية، ويستبدلها المدير بالمعلومات الحقيقية من «إضافة مرفق».
+    const SAMPLE_FACILITIES = [
+        { id: 'sample-youth-setif', sample: true, type: 'youth', name: 'دار الشباب - سطيف المركز', commune: 'سطيف', address: 'وسط المدينة', lat: 36.1898, lng: 5.4108,
+          openTime: '08:00', closeTime: '20:00', closedDay: '5',
+          facilities: 'قاعة إعلام آلي, مكتبة, قاعة رياضة, قاعة عروض, أنترنت',
+          clubs: 'نادي الإعلام الآلي, نادي المسرح, نادي الشطرنج, نادي الموسيقى',
+          description: 'فضاء مفتوح للشباب يحتضن النوادي العلمية والثقافية والرياضية طوال السنة.' },
+        { id: 'sample-youth-eulma', sample: true, type: 'youth', name: 'دار الشباب - العلمة', commune: 'العلمة', address: 'حي 5 جويلية', lat: 36.1528, lng: 5.6914,
+          openTime: '08:30', closeTime: '19:00', closedDay: '5',
+          facilities: 'قاعة متعددة النشاطات, ورشة فنون, قاعة إعلام آلي',
+          clubs: 'نادي الرسم, نادي الروبوتيك, نادي الكاراتي, نادي القراءة',
+          description: 'ورشات أسبوعية في الفنون والتكنولوجيا ومسابقات بين النوادي.' },
+        { id: 'sample-youth-ainoulmene', sample: true, type: 'youth', name: 'دار الشباب - عين ولمان', commune: 'عين ولمان', address: 'وسط المدينة', lat: 35.9216, lng: 5.2989,
+          openTime: '08:00', closeTime: '18:00', closedDay: '5',
+          facilities: 'مكتبة, قاعة محاضرات, فضاء أنترنت',
+          clubs: 'نادي التصوير, نادي الخط العربي, نادي البيئة' },
+        { id: 'sample-hostel-setif', sample: true, type: 'hostel', name: 'بيت الشباب - سطيف', commune: 'سطيف', address: 'قرب المحطة البرية', lat: 36.1946, lng: 5.4022,
+          openTime: '07:00', closeTime: '23:00', closedDay: '', capacity: 60, price: 400,
+          facilities: 'مراقد جماعية, غرف عائلية, مطعم, أنترنت, حراسة 24/24',
+          description: 'إقامة اقتصادية للشباب والأفواج المسافرة والرياضيين والطلبة.' },
+        { id: 'sample-hostel-bougaa', sample: true, type: 'hostel', name: 'بيت الشباب - بوقاعة', commune: 'بوقاعة', address: 'المدخل الشمالي', lat: 36.3335, lng: 5.0886,
+          openTime: '07:00', closeTime: '22:00', closedDay: '', capacity: 40, price: 350,
+          facilities: 'مراقد جماعية, مطبخ, قاعة جلوس, موقف سيارات' },
+        { id: 'sample-camp-babor', sample: true, type: 'camp', name: 'مخيم الشباب - بابور', commune: 'بابور', address: 'سفوح جبال بابور', lat: 36.4900, lng: 5.5300,
+          openTime: '08:00', closeTime: '22:00', closedDay: '', capacity: 120, price: 300,
+          facilities: 'خيام مجهزة, مطعم, ملاعب, مسارات مشي',
+          clubs: 'ورشة التخييم والكشافة, ورشة المشي الجبلي',
+          description: 'مخيم صيفي في أحضان جبال بابور للرحلات والتخييم والأنشطة الطبيعية.' },
+        { id: 'sample-sport-setif', sample: true, type: 'sport', name: 'المركب الرياضي الجواري - سطيف', commune: 'سطيف', address: 'الحي الجامعي', lat: 36.2010, lng: 5.4250,
+          openTime: '09:00', closeTime: '21:00', closedDay: '',
+          facilities: 'ملعب معشوشب, قاعة متعددة الرياضات, مسبح',
+          clubs: 'مدرسة كرة القدم, نادي السباحة' }
+    ];
+
+    // حالة الواجهة
+    const houseFilters = { type: 'all', q: '', near: false, open: false, fav: false };
+    const evFilters = { category: 'all', facility: 'all', day: null, view: 'list', month: null };
+    let adminReqView = 'bookings';
+    let adminReqFilter = 'pending';
+    let facMap = null;
+    let facMarkersLayer = null;
+    let facUserMarker = null;
+    let myBookings = [];
+    let myMemberships = [];
+    let allBookings = [];
+    let allMemberships = [];
+    let occupancy = {};
+    let lastTicket = null;
+    let youthDataLoaded = false;
+    let adminYouthLoaded = false;
+
+    // ==================== أدوات مساعدة ====================
+    function esc(s) {
+        return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function pad2(n) { return String(n).padStart(2, '0'); }
+    function toDateStr(d) { return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
+    function todayStr() { return toDateStr(new Date()); }
+    function parseDateStr(str) {
+        const [y, m, d] = (str || '').split('-').map(Number);
+        return y && m && d ? { y, m, d } : null;
+    }
+    function addDays(str, n) {
+        const p = parseDateStr(str);
+        return p ? toDateStr(new Date(p.y, p.m - 1, p.d + n)) : str;
+    }
+    function nightsBetween(a, b) {
+        const p1 = parseDateStr(a), p2 = parseDateStr(b);
+        if (!p1 || !p2) return 0;
+        return Math.round((Date.UTC(p2.y, p2.m - 1, p2.d) - Date.UTC(p1.y, p1.m - 1, p1.d)) / 86400000);
+    }
+    function formatDateAr(str) {
+        const p = parseDateStr(str);
+        if (!p) return str || '';
+        const dt = new Date(p.y, p.m - 1, p.d);
+        return `${WEEKDAYS[dt.getDay()]} ${p.d} ${MONTHS_DZ[p.m - 1]}`;
+    }
+    function relativeDay(str) {
+        const diff = nightsBetween(todayStr(), str);
+        return diff === 0 ? 'اليوم' : diff === 1 ? 'غداً' : diff === 2 ? 'بعد غد' : null;
+    }
+    function splitList(s) { return (s || '').split(/[,،]/).map(x => x.trim()).filter(Boolean); }
+    function formatDZD(n) { return Number(n || 0).toLocaleString('fr-FR') + ' دج'; }
+    function plural(n, one, two, few, many) {
+        if (n === 1) return one;
+        if (n === 2) return two;
+        if (n >= 3 && n <= 10) return `${n} ${few}`;
+        return `${n} ${many}`;
+    }
+    const nightsLabel = n => plural(n, 'ليلة واحدة', 'ليلتان', 'ليالٍ', 'ليلة');
+    const personsLabel = n => plural(n, 'شخص واحد', 'شخصان', 'أشخاص', 'شخصاً');
+    function snapToList(snap) {
+        const arr = [];
+        snap.forEach(c => { arr.push({ id: c.key, ...c.val() }); });
+        return arr;
+    }
+    const byNewest = (a, b) => (b.createdAt || '').localeCompare(a.createdAt || '');
+    const byDateTime = (a, b) => ((a.date || '') + (a.time || '')).localeCompare((b.date || '') + (b.time || ''));
+    function statusChip(status) {
+        const s = REQUEST_STATUS[status] || REQUEST_STATUS.pending;
+        return `<span class="status-chip s-${esc(status || 'pending')}"><i class="fas ${s.icon}"></i> ${s.label}</span>`;
+    }
+    function emptyState(icon, text, action = '') {
+        return `<div class="empty-state"><i class="fas ${icon}"></i><p>${text}</p>${action}</div>`;
+    }
+    function requireLogin() {
+        if (currentUser) return true;
+        showToast('❌ يجب تسجيل الدخول أولاً', 'error');
+        return false;
+    }
+    function stepGuests(id, delta) {
+        const input = document.getElementById(id);
+        input.value = Math.min(30, Math.max(1, (parseInt(input.value) || 1) + delta));
+    }
+    function directionsUrl(f) {
+        return `https://www.google.com/maps/dir/?api=1&destination=${f.lat},${f.lng}`;
+    }
+    function shareText(title, text) {
+        if (navigator.share) {
+            navigator.share({ title, text }).catch(() => {});
+        } else if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => showToast('📋 تم نسخ التفاصيل', 'info')).catch(() => showToast(text, 'info'));
+        }
+    }
+
+    // ==================== المرافق ====================
+    function usingSampleFacilities() {
+        return !allPlaces.some(p => FACILITY_TYPES[p.type]);
+    }
+    function getFacilities() {
+        return usingSampleFacilities() ? SAMPLE_FACILITIES : allPlaces.filter(p => FACILITY_TYPES[p.type]);
+    }
+    function findFacility(id) {
+        if (!id) return null;
+        return allPlaces.find(p => p.id === id) || SAMPLE_FACILITIES.find(f => f.id === id) || null;
+    }
+    function isBookable(f) { return !!(f && FACILITY_TYPES[f.type] && FACILITY_TYPES[f.type].bookable); }
+    function facilityDistance(f) {
+        if (!userLocated || f.lat == null) return null;
+        return calculateDistance(currentLocation.lat, currentLocation.lng, f.lat, f.lng);
+    }
+    function formatDistance(km) {
+        return km < 1 ? `${Math.round(km * 1000)} م` : `${km.toFixed(km < 10 ? 1 : 0)} كم`;
+    }
+    function facilityOpenState(f) {
+        if (!f.openTime || !f.closeTime) return null;
+        const now = new Date();
+        if (f.closedDay !== undefined && f.closedDay !== '' && Number(f.closedDay) === now.getDay()) {
+            return { open: false, label: 'مغلق اليوم' };
+        }
+        const mins = now.getHours() * 60 + now.getMinutes();
+        const [oh, om] = f.openTime.split(':').map(Number);
+        const [ch, cm] = f.closeTime.split(':').map(Number);
+        const o = oh * 60 + om, c = ch * 60 + cm;
+        if (mins >= o && mins < c) return { open: true, label: `مفتوح · يغلق ${f.closeTime}` };
+        return { open: false, label: mins < o ? `مغلق · يفتح ${f.openTime}` : 'مغلق الآن' };
+    }
+    function facilityEvents(f) {
+        const t = todayStr();
+        return allEvents.filter(e => e.status === 'approved' && (e.date || '') >= t && (
+            e.placeId === f.id ||
+            (!e.placeId && e.lat != null && f.lat != null && calculateDistance(e.lat, e.lng, f.lat, f.lng) < 0.3)
+        )).sort(byDateTime);
+    }
+    function sortFacilities(list, nearFirst) {
+        const order = Object.keys(FACILITY_TYPES);
+        return list.sort((a, b) => {
+            if (nearFirst && userLocated) return facilityDistance(a) - facilityDistance(b);
+            return order.indexOf(a.type) - order.indexOf(b.type) || (a.name || '').localeCompare(b.name || '', 'ar');
+        });
+    }
+    function clubIcon(name) {
+        const rules = [
+            [/مسرح/, 'fa-masks-theater'], [/شطرنج/, 'fa-chess'], [/موسيق|غناء|إنشاد/, 'fa-music'],
+            [/إعلام|برمج|روبوت|رقمي/, 'fa-laptop-code'], [/رسم|فن|خط/, 'fa-palette'], [/تصوير/, 'fa-camera'],
+            [/قراءة|كتاب|أدب/, 'fa-book'], [/بيئ/, 'fa-leaf'], [/تخييم|كشاف|جبل/, 'fa-campground'],
+            [/كرة|كاراتي|سباحة|رياض|جمباز/, 'fa-futbol']
+        ];
+        const hit = rules.find(([re]) => re.test(name));
+        return hit ? hit[1] : 'fa-star';
+    }
+
+    // المفضلة (تحفظ على هذا الجهاز فقط)
+    function getFavs() {
+        try { return JSON.parse(localStorage.getItem('favFacilities') || '[]'); } catch (e) { return []; }
+    }
+    function isFav(id) { return getFavs().includes(id); }
+    function toggleFav(id, ev) {
+        if (ev) ev.stopPropagation();
+        const favs = getFavs();
+        const i = favs.indexOf(id);
+        if (i >= 0) favs.splice(i, 1); else favs.push(id);
+        try { localStorage.setItem('favFacilities', JSON.stringify(favs)); } catch (e) {}
+        showToast(i >= 0 ? 'أزيل من المفضلة' : '❤️ أضيف إلى المفضلة', 'info');
+        refreshYouthViews();
+        if (document.getElementById('facilityModal').classList.contains('active')) openFacility(id);
+    }
+
+    // ==================== التهيئة وتحميل البيانات ====================
+    function initYouthFeatures() {
+        const t = todayStr();
+        document.getElementById('avail-in').value = addDays(t, 1);
+        document.getElementById('avail-out').value = addDays(t, 3);
+        ['avail-in', 'avail-out', 'bk-in', 'bk-out'].forEach(id => document.getElementById(id).min = t);
+        const now = new Date();
+        evFilters.month = new Date(now.getFullYear(), now.getMonth(), 1);
+        renderTypeTabs();
+        renderCategoryTabs();
+        renderAdminFilterTabs();
+        document.addEventListener('keydown', e => {
+            if (e.key !== 'Escape') return;
+            document.querySelectorAll('.modal.active').forEach(m => m.id ? closeModal(m.id) : m.remove());
+        });
+        refreshYouthViews();
+    }
+
+    function loadYouthData() {
+        if (!currentUser || youthDataLoaded) return;
+        youthDataLoaded = true;
+        // الإشغال: بيانات بدون معلومات شخصية لحساب الأسرّة المتاحة
+        database.ref('occupancy').on('value', s => {
+            occupancy = s.val() || {};
+            refreshYouthViews();
+        }, err => console.warn('occupancy:', err.message));
+        database.ref('bookings').orderByChild('userId').equalTo(currentUser.uid).on('value', s => {
+            myBookings = snapToList(s).sort(byNewest);
+            refreshYouthViews();
+        }, err => console.warn('bookings:', err.message));
+        database.ref('memberships').orderByChild('userId').equalTo(currentUser.uid).on('value', s => {
+            myMemberships = snapToList(s).sort(byNewest);
+            refreshYouthViews();
+        }, err => console.warn('memberships:', err.message));
+    }
+
+    function loadAdminYouthData() {
+        if (adminYouthLoaded) return;
+        adminYouthLoaded = true;
+        database.ref('bookings').on('value', s => {
+            allBookings = snapToList(s).sort(byNewest);
+            refreshYouthViews();
+        }, err => showToast('❌ خطأ في تحميل الحجوزات: ' + err.message, 'error'));
+        database.ref('memberships').on('value', s => {
+            allMemberships = snapToList(s).sort(byNewest);
+            refreshYouthViews();
+        }, err => showToast('❌ خطأ في تحميل الانخراطات: ' + err.message, 'error'));
+    }
+
+    // إعادة رسم ما هو ظاهر فقط
+    function refreshYouthViews() {
+        const active = document.querySelector('.section.active')?.id;
+        if (active === 'home') renderHomeExtras();
+        if (active === 'houses') renderHouses();
+        if (active === 'booking') renderBookingPage();
+        if (active === 'events-page') renderEventsPage();
+        if (active === 'admin-bookings') renderAdminRequests();
+        if (active === 'profile') renderProfileYouth();
+        updateAdminRequestBadge();
+    }
+
+    // ==================== الصفحة الرئيسية ====================
+    function isYouthEvent(e) { return !!(e.placeId || FACILITY_TYPES[e.placeType] || e.category); }
+    function upcomingYouthEvents() {
+        const t = todayStr();
+        return allEvents.filter(e => e.status === 'approved' && (e.date || '') >= t && isYouthEvent(e)).sort(byDateTime);
+    }
+
+    function renderHomeExtras() {
+        const name = (currentUserData?.name || currentUser?.displayName || '').trim().split(' ')[0];
+        document.getElementById('hero-name').textContent = name || 'صديقنا';
+
+        const facs = getFacilities();
+        const upcoming = upcomingYouthEvents();
+        const stats = [
+            [facs.filter(f => f.type === 'youth').length, 'دار شباب'],
+            [facs.filter(isBookable).length, 'مرفق إقامة'],
+            [upcoming.length, 'فعالية قادمة']
+        ];
+        document.getElementById('hero-stats').innerHTML = stats.map(([n, l]) =>
+            `<div class="hero-stat"><b>${n}</b><span>${l}</span></div>`).join('');
+
+        const nearest = sortFacilities(facs.slice(), true).slice(0, 3);
+        document.getElementById('home-nearest').innerHTML = (nearest.length ? nearest.map(miniFacilityRow).join('') : emptyState('fa-house-chimney-user', 'لا توجد مرافق بعد')) +
+            (!userLocated ? `<button class="btn btn-outline btn-small btn-block" onclick="getUserLocation()"><i class="fas fa-location-crosshairs"></i> حدّد موقعي لعرض الأقرب</button>` : '');
+
+        document.getElementById('home-upcoming').innerHTML = upcoming.length
+            ? upcoming.slice(0, 8).map(eventMiniCard).join('')
+            : emptyState('fa-calendar-days', 'لا توجد فعاليات مبرمجة حالياً');
+    }
+
+    function miniFacilityRow(f) {
+        const t = FACILITY_TYPES[f.type];
+        const open = facilityOpenState(f);
+        const dist = facilityDistance(f);
+        return `
+            <div class="mini-row" onclick="openFacility('${f.id}')">
+                <span class="mini-ico" style="--c:${t.color}"><i class="fas ${t.icon}"></i></span>
+                <div class="mini-info">
+                    <b>${esc(f.name)}</b>
+                    <small>${esc(t.label)}${f.commune ? ' · ' + esc(f.commune) : ''}${open ? ` · <span class="${open.open ? 'txt-ok' : 'txt-off'}">${open.open ? 'مفتوح' : 'مغلق'}</span>` : ''}</small>
+                </div>
+                <span class="mini-side">${dist != null ? formatDistance(dist) : '<i class="fas fa-chevron-left"></i>'}</span>
+            </div>`;
+    }
+
+    function eventMiniCard(e) {
+        const cat = EVENT_CATEGORIES[e.category];
+        const p = parseDateStr(e.date);
+        const place = e.placeName || findFacility(e.placeId)?.name || e.address || '';
+        return `
+            <div class="ev-mini" onclick="openEventFromHome('${e.id}')">
+                <div class="ev-mini-top">
+                    <div class="date-badge small"><b>${p ? p.d : ''}</b><span>${p ? MONTHS_DZ[p.m - 1] : ''}</span></div>
+                    ${cat ? `<span class="chip" style="--c:${cat.color}"><i class="fas ${cat.icon}"></i> ${cat.label}</span>` : ''}
+                </div>
+                <h5>${esc(e.title)}</h5>
+                <small><i class="fas fa-clock"></i> ${esc(relativeDay(e.date) || formatDateAr(e.date))} · ${esc(e.time || '')}</small>
+                <small><i class="fas fa-location-dot"></i> ${esc(place)}</small>
+            </div>`;
+    }
+
+    function openEventFromHome(id) {
+        const e = allEvents.find(x => x.id === id);
+        if (!e) return;
+        const p = parseDateStr(e.date);
+        evFilters.day = e.date;
+        evFilters.facility = 'all';
+        evFilters.category = 'all';
+        if (p) evFilters.month = new Date(p.y, p.m - 1, 1);
+        renderCategoryTabs();
+        switchTab('events-page');
+        setTimeout(() => {
+            const el = document.getElementById('ev-' + id);
+            if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('flash'); }
+        }, 350);
+    }
+
+    // ==================== صفحة دور الشباب ====================
+    function renderTypeTabs() {
+        const tabs = [['all', 'الكل', 'fa-layer-group']].concat(Object.entries(FACILITY_TYPES).map(([k, v]) => [k, v.plural, v.icon]));
+        document.getElementById('houses-type-tabs').innerHTML = tabs.map(([k, l, i]) =>
+            `<span class="filter-tab ${houseFilters.type === k ? 'active' : ''}" onclick="houseFilters.type='${k}'; renderTypeTabs(); renderHouses(true)"><i class="fas ${i}"></i> ${l}</span>`
+        ).join('');
+    }
+
+    function toggleHouseNear() {
+        if (!userLocated) {
+            houseFilters.near = true;
+            getUserLocation();
+            return;
+        }
+        houseFilters.near = !houseFilters.near;
+        renderHouses();
+    }
+
+    function filteredFacilities() {
+        const q = houseFilters.q.trim().toLowerCase();
+        const favs = getFavs();
+        const list = getFacilities().filter(f =>
+            (houseFilters.type === 'all' || f.type === houseFilters.type) &&
+            (!q || [f.name, f.commune, f.address, f.clubs, f.facilities].some(v => (v || '').toLowerCase().includes(q))) &&
+            (!houseFilters.open || facilityOpenState(f)?.open) &&
+            (!houseFilters.fav || favs.includes(f.id))
+        );
+        return sortFacilities(list, houseFilters.near);
+    }
+
+    function sampleNotice() {
+        if (!usingSampleFacilities()) return '';
+        return selectedRole === 'admin'
+            ? `<div class="notice"><i class="fas fa-circle-info"></i><div><b>بيانات نموذجية للعرض.</b> لم تُسجَّل أي دار شباب بعد. اضغط «إضافة مرفق»، أو افتح مرفقاً نموذجياً واضغط «حفظ كمرفق حقيقي» بعد تصحيح معلوماته.</div></div>`
+            : `<div class="notice"><i class="fas fa-circle-info"></i><div><b>مرافق نموذجية للعرض.</b> ستظهر دور الشباب الحقيقية فور إضافتها من طرف الإدارة.</div></div>`;
+    }
+
+    function renderHouses(fit) {
+        document.getElementById('toggle-near').classList.toggle('active', houseFilters.near && userLocated);
+        document.getElementById('toggle-open').classList.toggle('active', houseFilters.open);
+        document.getElementById('toggle-fav').classList.toggle('active', houseFilters.fav);
+        document.getElementById('houses-notice').innerHTML = sampleNotice();
+
+        const list = filteredFacilities();
+        document.getElementById('houses-count').textContent = list.length ? plural(list.length, 'مرفق واحد', 'مرفقان', 'مرافق', 'مرفقاً') : '';
+        document.getElementById('houses-list').innerHTML = list.length
+            ? list.map(facilityCard).join('')
+            : emptyState('fa-magnifying-glass', 'لا توجد نتائج مطابقة لبحثك');
+        updateFacMarkers(fit);
+    }
+
+    function facilityCard(f) {
+        const t = FACILITY_TYPES[f.type];
+        const open = facilityOpenState(f);
+        const dist = facilityDistance(f);
+        const clubs = splitList(f.clubs);
+        const evCount = facilityEvents(f).length;
+        return `
+            <article class="fac-card">
+                <div class="fac-cover" style="--c:${t.color}" onclick="openFacility('${f.id}')">
+                    <span class="fac-type"><i class="fas ${t.icon}"></i> ${t.label}</span>
+                    ${f.sample ? '<span class="fac-sample">نموذج</span>' : ''}
+                    <button class="fav-btn ${isFav(f.id) ? 'on' : ''}" title="المفضلة" onclick="toggleFav('${f.id}', event)"><i class="fas fa-heart"></i></button>
+                    <span class="fac-emoji">${t.emoji}</span>
+                </div>
+                <div class="fac-body">
+                    <h4 onclick="openFacility('${f.id}')">${esc(f.name)}</h4>
+                    <p class="muted"><i class="fas fa-location-dot"></i> ${esc([f.commune, f.address].filter(Boolean).join(' · '))}</p>
+                    <div class="chips">
+                        ${open ? `<span class="chip ${open.open ? 'ok' : 'off'}"><i class="fas fa-clock"></i> ${open.label}</span>` : ''}
+                        ${dist != null ? `<span class="chip"><i class="fas fa-route"></i> ${formatDistance(dist)}</span>` : ''}
+                        ${isBookable(f) ? `<span class="chip"><i class="fas fa-bed"></i> ${f.capacity || 0} سرير · ${formatDZD(f.price)}/ليلة</span>` : ''}
+                        ${evCount ? `<span class="chip"><i class="fas fa-calendar-check"></i> ${evCount} فعالية قادمة</span>` : ''}
+                        ${clubs.length ? `<span class="chip"><i class="fas fa-masks-theater"></i> ${clubs.length} نوادي</span>` : ''}
+                    </div>
+                    <div class="fac-actions">
+                        <button class="btn btn-outline btn-small" onclick="openFacility('${f.id}')"><i class="fas fa-circle-info"></i> التفاصيل</button>
+                        <a class="btn btn-outline btn-small" href="${directionsUrl(f)}" target="_blank" rel="noopener"><i class="fas fa-diamond-turn-right"></i> الاتجاهات</a>
+                        ${isBookable(f) ? `<button class="btn btn-primary btn-small" onclick="openBookingModal('${f.id}')"><i class="fas fa-bed"></i> احجز</button>` : ''}
+                    </div>
+                </div>
+            </article>`;
+    }
+
+    function ensureFacMap() {
+        if (!facMap) {
+            facMap = L.map('fac-map').setView([36.19, 5.41], 9);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(facMap);
+            facMarkersLayer = L.layerGroup().addTo(facMap);
+            facMap.on('click', e => { if (selectedRole === 'admin') showAddPlacePrompt(e.latlng, facMap); });
+            document.getElementById('fac-legend').innerHTML = Object.values(FACILITY_TYPES)
+                .map(t => `<span><i style="background:${t.color}"></i>${t.plural}</span>`).join('');
+        }
+        setTimeout(() => { facMap.invalidateSize(); renderHouses(true); }, 80);
+    }
+
+    function updateFacMarkers(fit) {
+        if (!facMap) return;
+        facMarkersLayer.clearLayers();
+        const list = filteredFacilities();
+        list.forEach(f => {
+            const t = FACILITY_TYPES[f.type];
+            const marker = L.marker([f.lat, f.lng], {
+                icon: L.divIcon({
+                    className: 'fac-pin-wrap',
+                    html: `<div class="fac-pin" style="--c:${t.color}"><i class="fas ${t.icon}"></i></div>`,
+                    iconSize: [34, 42], iconAnchor: [17, 42], popupAnchor: [0, -40]
+                })
+            });
+            marker.bindPopup(`<div style="text-align:center;min-width:150px"><b>${esc(f.name)}</b><br><small>${esc(t.label)}${f.commune ? ' · ' + esc(f.commune) : ''}</small><br>
+                <button class="btn btn-primary btn-small" style="margin-top:6px" onclick="openFacility('${f.id}')">التفاصيل</button></div>`);
+            facMarkersLayer.addLayer(marker);
+        });
+        if (facUserMarker) { facUserMarker.remove(); facUserMarker = null; }
+        if (userLocated) {
+            facUserMarker = L.circleMarker([currentLocation.lat, currentLocation.lng], { radius: 8, color: '#fff', weight: 3, fillColor: '#3b82f6', fillOpacity: 1 })
+                .bindTooltip('موقعي').addTo(facMap);
+        }
+        if (fit && list.length) {
+            const pts = list.map(f => [f.lat, f.lng]);
+            if (userLocated && houseFilters.near) pts.push([currentLocation.lat, currentLocation.lng]);
+            facMap.fitBounds(L.latLngBounds(pts).pad(0.25), { maxZoom: 14 });
+        }
+    }
+
+    // ==================== تفاصيل المرفق ====================
+    function openFacility(id) {
+        const f = findFacility(id);
+        if (!f) return;
+        const t = FACILITY_TYPES[f.type] || { label: 'مكان', icon: 'fa-location-dot', color: '#64748b', emoji: '📍' };
+        const open = facilityOpenState(f);
+        const dist = facilityDistance(f);
+        const services = splitList(f.facilities);
+        const clubs = splitList(f.clubs);
+        const evs = facilityEvents(f).slice(0, 5);
+        const isAdmin = selectedRole === 'admin';
+        const closedDayName = f.closedDay !== undefined && f.closedDay !== '' ? WEEKDAYS[Number(f.closedDay)] : '';
+
+        document.getElementById('facility-detail').innerHTML = `
+            <div class="sheet-handle"></div>
+            <div class="fd-cover" style="--c:${t.color}">
+                <button class="close-modal fd-close" onclick="closeModal('facilityModal')"><i class="fas fa-times"></i></button>
+                <span class="fac-type"><i class="fas ${t.icon}"></i> ${t.label}</span>
+                ${f.sample ? '<span class="fac-sample">نموذج للعرض</span>' : ''}
+                <span class="fd-emoji">${t.emoji}</span>
+            </div>
+            <h3 class="fd-title">${esc(f.name)}</h3>
+            <p class="muted"><i class="fas fa-location-dot"></i> ${esc([f.commune, f.address].filter(Boolean).join(' · '))}${dist != null ? ' · ' + formatDistance(dist) : ''}</p>
+            ${open ? `<span class="chip ${open.open ? 'ok' : 'off'}"><i class="fas fa-clock"></i> ${open.label}</span>` : ''}
+            ${f.description ? `<p class="fd-desc">${esc(f.description)}</p>` : ''}
+
+            <div class="fd-actions">
+                ${isBookable(f) ? `<button class="btn btn-primary" onclick="closeModal('facilityModal'); openBookingModal('${f.id}')"><i class="fas fa-bed"></i> احجز الآن</button>` : ''}
+                <a class="btn btn-outline" href="${directionsUrl(f)}" target="_blank" rel="noopener"><i class="fas fa-diamond-turn-right"></i> الاتجاهات</a>
+                ${f.phone ? `<a class="btn btn-outline" href="tel:${esc(String(f.phone).replace(/\s/g, ''))}"><i class="fas fa-phone"></i> اتصال</a>` : ''}
+                <button class="btn btn-outline" title="مشاركة" onclick="shareFacility('${f.id}')"><i class="fas fa-share-nodes"></i></button>
+                <button class="btn btn-outline ${isFav(f.id) ? 'fav-on' : ''}" title="المفضلة" onclick="toggleFav('${f.id}')"><i class="fas fa-heart"></i></button>
+            </div>
+
+            <div class="fd-section">
+                <h4>معلومات عملية</h4>
+                <div class="info-list">
+                    ${f.openTime ? `<div><i class="fas fa-clock"></i><span>أوقات العمل</span><b>${esc(f.openTime)} - ${esc(f.closeTime)}${closedDayName ? ` (مغلق يوم ${closedDayName})` : ''}</b></div>` : ''}
+                    ${f.phone ? `<div><i class="fas fa-phone"></i><span>الهاتف</span><b dir="ltr">${esc(f.phone)}</b></div>` : ''}
+                    ${f.email ? `<div><i class="fas fa-envelope"></i><span>البريد</span><b>${esc(f.email)}</b></div>` : ''}
+                    ${isBookable(f) ? `<div><i class="fas fa-bed"></i><span>السعة</span><b>${f.capacity || 0} سرير</b></div>
+                    <div><i class="fas fa-coins"></i><span>سعر الليلة</span><b>${formatDZD(f.price)} للشخص</b></div>` : ''}
+                </div>
+            </div>
+
+            ${services.length ? `<div class="fd-section"><h4>المرافق والخدمات</h4><div class="chips">${services.map(x => `<span class="chip"><i class="fas fa-circle-check"></i> ${esc(x)}</span>`).join('')}</div></div>` : ''}
+
+            ${clubs.length ? `<div class="fd-section"><h4>النوادي والورشات</h4><div class="club-list">${clubs.map((c, i) => clubRow(f, c, i)).join('')}</div></div>` : ''}
+
+            <div class="fd-section">
+                <h4>الفعاليات القادمة</h4>
+                ${evs.length ? evs.map(eventRow).join('') : '<p class="muted">لا توجد فعاليات قادمة مبرمجة حالياً.</p>'}
+            </div>
+
+            ${isAdmin ? `
+            <div class="fd-admin">
+                <button class="btn btn-secondary btn-small" onclick="editFacility('${f.id}')"><i class="fas fa-pen-to-square"></i> ${f.sample ? 'حفظ كمرفق حقيقي' : 'تعديل'}</button>
+                <button class="btn btn-outline btn-small" onclick="openNewEventAt('${f.id}')"><i class="fas fa-calendar-plus"></i> فعالية هنا</button>
+                ${!f.sample ? `<button class="btn btn-danger btn-small" onclick="closeModal('facilityModal'); deletePlace('${f.id}')"><i class="fas fa-trash"></i> حذف</button>` : ''}
+            </div>` : `
+            <button class="btn btn-outline btn-block" onclick="openNewEventAt('${f.id}')"><i class="fas fa-calendar-plus"></i> اقترح فعالية في هذا المرفق</button>`}
+        `;
+        document.getElementById('facilityModal').classList.add('active');
+        document.querySelector('#facilityModal .modal-content').scrollTop = 0;
+    }
+
+    function clubRow(f, club, index) {
+        const m = myMemberships.find(x => x.placeId === f.id && x.club === club && x.status !== 'cancelled');
+        return `
+            <div class="club-row">
+                <span class="club-ico"><i class="fas ${clubIcon(club)}"></i></span>
+                <span class="club-name">${esc(club)}</span>
+                ${m && m.status !== 'rejected' ? statusChip(m.status) :
+                    `<button class="btn btn-primary btn-small" onclick="openClubModal('${f.id}', ${index})"><i class="fas fa-user-plus"></i> انخرط</button>`}
+            </div>`;
+    }
+
+    function eventRow(e) {
+        const p = parseDateStr(e.date);
+        const going = currentUser && e.attendees && e.attendees[currentUser.uid];
+        return `
+            <div class="ev-row">
+                <div class="date-badge small"><b>${p ? p.d : ''}</b><span>${p ? MONTHS_DZ[p.m - 1] : ''}</span></div>
+                <div class="ev-row-info"><b>${esc(e.title)}</b><small>${esc(relativeDay(e.date) || formatDateAr(e.date))} · ${esc(e.time || '')}</small></div>
+                <button class="btn ${going ? 'btn-success' : 'btn-outline'} btn-small" onclick="toggleAttend('${e.id}', true)">${going ? '✓ سأحضر' : 'سأحضر'}</button>
+            </div>`;
+    }
+
+    function shareFacility(id) {
+        const f = findFacility(id);
+        if (!f) return;
+        const t = FACILITY_TYPES[f.type];
+        shareText(f.name, `${t ? t.emoji + ' ' : ''}${f.name}\n📍 ${[f.commune, f.address].filter(Boolean).join(' - ')}${f.phone ? '\n📞 ' + f.phone : ''}\n🗺️ ${directionsUrl(f)}\n— عبر منصة مواهب داري`);
+    }
+
+    // ==================== إدارة المرافق (للمدير) ====================
+    function togglePlaceExtra() {
+        const type = document.getElementById('placeType').value;
+        document.getElementById('placeExtra').style.display = FACILITY_TYPES[type] ? 'block' : 'none';
+        document.getElementById('placeBookingFields').style.display = isBookable({ type }) ? 'grid' : 'none';
+    }
+
+    function openNewFacilityForm() {
+        if (selectedRole !== 'admin') return;
+        const c = facMap ? facMap.getCenter() : currentLocation;
+        openAddPlaceModal(c.lat, c.lng, 'youth');
+        showToast('📍 عدّل الإحداثيات أو انقر على خريطة دور الشباب لتحديد الموقع', 'info');
+    }
+
+    function editFacility(id) {
+        const f = findFacility(id);
+        if (!f || selectedRole !== 'admin') return;
+        closeModal('facilityModal');
+        openAddPlaceModal(f.lat, f.lng, f.type);
+        editingPlaceId = f.sample ? null : f.id;
+        const set = (elId, v) => { document.getElementById(elId).value = v ?? ''; };
+        set('placeName', f.name);
+        set('placeAddress', f.address);
+        set('placeDescription', f.description);
+        set('placeCommune', f.commune);
+        set('placePhone', f.phone);
+        set('placeEmail', f.email);
+        set('placeOpen', f.openTime || '08:00');
+        set('placeClose', f.closeTime || '18:00');
+        set('placeClosedDay', f.closedDay ?? '');
+        set('placeFacilities', f.facilities);
+        set('placeClubs', f.clubs);
+        set('placeCapacity', f.capacity);
+        set('placePrice', f.price);
+        document.getElementById('placeModalTitle').innerHTML = f.sample
+            ? '<i class="fas fa-pen-to-square"></i> حفظ المرفق النموذجي كمرفق حقيقي'
+            : '<i class="fas fa-pen-to-square"></i> تعديل المرفق';
+    }
+
+    function fillPlaceWithMyLocation() {
+        if (!navigator.geolocation) return showToast('❌ المتصفح لا يدعم تحديد الموقع', 'error');
+        navigator.geolocation.getCurrentPosition(pos => {
+            document.getElementById('placeLat').value = pos.coords.latitude.toFixed(6);
+            document.getElementById('placeLng').value = pos.coords.longitude.toFixed(6);
+            showToast('✅ تم تحديد موقعك');
+        }, () => showToast('❌ تعذر تحديد الموقع', 'error'));
+    }
+
+    // ==================== ربط الفعاليات بالمرافق ====================
+    function fillEventFormSelects() {
+        const catSel = document.getElementById('eventCategory');
+        const prevCat = catSel.value;
+        catSel.innerHTML = Object.entries(EVENT_CATEGORIES).map(([k, c]) => `<option value="${k}">${c.label}</option>`).join('');
+        if (prevCat) catSel.value = prevCat;
+        const facSel = document.getElementById('eventFacility');
+        const prevFac = facSel.value;
+        facSel.innerHTML = '<option value="">— بدون / مكان آخر —</option>' +
+            getFacilities().map(f => `<option value="${f.id}">${FACILITY_TYPES[f.type].emoji} ${esc(f.name)}</option>`).join('');
+        facSel.value = prevFac && findFacility(prevFac) ? prevFac : '';
+    }
+
+    function fillEventFromFacility(id) {
+        const f = findFacility(id);
+        if (!f) return;
+        document.getElementById('eventAddress').value = [f.name, f.commune, f.address].filter(Boolean).join(' - ');
+        document.getElementById('eventLat').value = Number(f.lat).toFixed(6);
+        document.getElementById('eventLng').value = Number(f.lng).toFixed(6);
+        document.getElementById('eventPlaceType').value = f.type;
+        if (f.phone && !document.getElementById('eventPhone').value) document.getElementById('eventPhone').value = f.phone;
+    }
+
+    function openNewEventAt(facId) {
+        closeModal('facilityModal');
+        showAddEventModal();
+        if (!currentUser) return;
+        document.getElementById('eventFacility').value = facId;
+        fillEventFromFacility(facId);
+    }
+
+    // ==================== الحجز ====================
+    function bedsTaken(placeId, inD, outD, excludeId) {
+        const occ = Object.entries(occupancy[placeId] || {})
+            .filter(([id, o]) => id !== excludeId && o && (o.status === 'pending' || o.status === 'confirmed'))
+            .map(([, o]) => o);
+        const nights = nightsBetween(inD, outD);
+        if (nights <= 0 || nights > 62) return 0;
+        let max = 0;
+        for (let d = inD; d < outD; d = addDays(d, 1)) {
+            const sum = occ.reduce((s, o) => (o.checkIn <= d && o.checkOut > d) ? s + (Number(o.guests) || 0) : s, 0);
+            if (sum > max) max = sum;
+        }
+        return max;
+    }
+
+    function availabilityFor(f, inD, outD, excludeId) {
+        const cap = Number(f.capacity) || 0;
+        if (!cap) return null;
+        const taken = bedsTaken(f.id, inD, outD, excludeId);
+        return { cap, taken, free: Math.max(0, cap - taken), over: taken > cap };
+    }
+
+    function availabilityChip(av, guests) {
+        if (!av) return '<span class="chip"><i class="fas fa-circle-info"></i> السعة غير محددة</span>';
+        if (av.free < guests) return `<span class="chip off"><i class="fas fa-circle-xmark"></i> ${av.free ? `متبقٍ ${av.free} فقط` : 'ممتلئ'}</span>`;
+        const cls = av.free <= Math.max(3, av.cap * 0.2) ? 'warn' : 'ok';
+        return `<span class="chip ${cls}"><i class="fas fa-bed"></i> ${av.free} سرير متاح</span>`;
+    }
+
+    function readAvailInputs() {
+        const inD = document.getElementById('avail-in').value;
+        const outD = document.getElementById('avail-out').value;
+        const guests = Math.max(1, parseInt(document.getElementById('avail-guests').value) || 1);
+        const nights = nightsBetween(inD, outD);
+        return { inD, outD, guests, nights, valid: !!inD && !!outD && nights > 0 && inD >= todayStr() && nights <= MAX_NIGHTS };
+    }
+
+    function renderBookingPage() {
+        const { inD, outD, guests, nights, valid } = readAvailInputs();
+        let notice = sampleNotice();
+        if (!valid) {
+            notice += `<div class="notice warn"><i class="fas fa-triangle-exclamation"></i><div>${
+                !inD || !outD ? 'اختر تاريخي الوصول والمغادرة.' :
+                inD < todayStr() ? 'تاريخ الوصول لا يمكن أن يكون في الماضي.' :
+                nights <= 0 ? 'تاريخ المغادرة يجب أن يكون بعد تاريخ الوصول.' :
+                `مدة الإقامة القصوى ${MAX_NIGHTS} ليلة.`}</div></div>`;
+        }
+        document.getElementById('booking-notice').innerHTML = notice;
+
+        const list = sortFacilities(getFacilities().filter(isBookable), true);
+        document.getElementById('booking-facilities').innerHTML = list.length ? list.map(f => {
+            const t = FACILITY_TYPES[f.type];
+            const av = valid ? availabilityFor(f, inD, outD) : null;
+            const full = av && av.free < guests;
+            const total = (Number(f.price) || 0) * guests * Math.max(nights, 0);
+            const dist = facilityDistance(f);
+            return `
+                <div class="bk-card">
+                    <span class="mini-ico big" style="--c:${t.color}"><i class="fas ${t.icon}"></i></span>
+                    <div class="bk-info">
+                        <b onclick="openFacility('${f.id}')">${esc(f.name)}</b>
+                        <small>${t.label}${f.commune ? ' · ' + esc(f.commune) : ''}${dist != null ? ' · ' + formatDistance(dist) : ''}</small>
+                        <div class="chips">
+                            ${valid ? availabilityChip(av, guests) : ''}
+                            <span class="chip"><i class="fas fa-coins"></i> ${formatDZD(f.price)} / ليلة</span>
+                        </div>
+                        ${valid ? `<div class="bk-total">${nightsLabel(nights)} × ${personsLabel(guests)}: <b>${formatDZD(total)}</b></div>` : ''}
+                    </div>
+                    <button class="btn btn-primary btn-small" ${full ? 'disabled' : ''} onclick="openBookingModal('${f.id}')">احجز</button>
+                </div>`;
+        }).join('') : emptyState('fa-bed', 'لا توجد بيوت شباب أو مخيمات متاحة للحجز حالياً');
+
+        renderMyBookings();
+    }
+
+    function renderMyBookings() {
+        const box = document.getElementById('my-bookings');
+        if (!currentUser) { box.innerHTML = ''; return; }
+        box.innerHTML = myBookings.length ? myBookings.map(b => {
+            const canCancel = (b.status === 'pending' || b.status === 'confirmed') && b.checkIn >= todayStr();
+            return `
+                <div class="req-card">
+                    <div class="req-top">
+                        <div><b>${esc(b.placeName)}</b><small><i class="fas fa-hashtag"></i> ${esc(b.code)}</small></div>
+                        ${statusChip(b.status)}
+                    </div>
+                    <div class="req-meta">
+                        <span><i class="fas fa-calendar"></i> ${formatDateAr(b.checkIn)} ← ${formatDateAr(b.checkOut)}</span>
+                        <span><i class="fas fa-moon"></i> ${nightsLabel(b.nights || nightsBetween(b.checkIn, b.checkOut))}</span>
+                        <span><i class="fas fa-users"></i> ${personsLabel(Number(b.guests) || 1)}</span>
+                        <span><i class="fas fa-coins"></i> ${formatDZD(b.total)}</span>
+                    </div>
+                    ${b.rejectReason ? `<p class="req-notes bad"><i class="fas fa-circle-info"></i> ${esc(b.rejectReason)}</p>` : ''}
+                    <div class="req-actions">
+                        ${b.status !== 'rejected' && b.status !== 'cancelled' ? `<button class="btn btn-primary btn-small" onclick="showTicket('${b.id}')"><i class="fas fa-qrcode"></i> التذكرة</button>` : ''}
+                        ${canCancel ? `<button class="btn btn-outline btn-small" onclick="cancelBooking('${b.id}')"><i class="fas fa-ban"></i> إلغاء الحجز</button>` : ''}
+                    </div>
+                </div>`;
+        }).join('') : emptyState('fa-ticket', 'لم تقم بأي حجز بعد', '<small>اختر بيت شباب من القائمة أعلاه واضغط «احجز».</small>');
+    }
+
+    function openBookingModal(facId) {
+        if (!requireLogin()) return;
+        const bookables = getFacilities().filter(isBookable);
+        if (!bookables.length) return showToast('لا توجد مرافق متاحة للحجز حالياً', 'info');
+        const sel = document.getElementById('bk-facility');
+        sel.innerHTML = bookables.map(f => `<option value="${f.id}">${FACILITY_TYPES[f.type].emoji} ${esc(f.name)}</option>`).join('');
+        sel.value = facId && bookables.some(f => f.id === facId) ? facId : bookables[0].id;
+
+        const a = readAvailInputs();
+        const t = todayStr();
+        document.getElementById('bk-in').value = a.inD && a.inD >= t ? a.inD : addDays(t, 1);
+        document.getElementById('bk-out').value = a.outD && a.outD > document.getElementById('bk-in').value ? a.outD : addDays(document.getElementById('bk-in').value, 2);
+        document.getElementById('bk-guests').value = a.guests;
+        document.getElementById('bk-name').value = currentUserData?.name || currentUser.displayName || '';
+        document.getElementById('bk-phone').value = currentUserData?.phone || '';
+        document.getElementById('bk-notes').value = '';
+        document.getElementById('bk-agree').checked = false;
+        updateBookingSummary();
+        document.getElementById('bookingModal').classList.add('active');
+    }
+
+    function updateBookingSummary() {
+        const f = findFacility(document.getElementById('bk-facility').value);
+        const inD = document.getElementById('bk-in').value;
+        const outD = document.getElementById('bk-out').value;
+        const guests = Math.max(1, parseInt(document.getElementById('bk-guests').value) || 1);
+        const nights = nightsBetween(inD, outD);
+        let error = '';
+        if (!f) error = 'اختر بيت الشباب';
+        else if (!inD || !outD) error = 'اختر تاريخي الوصول والمغادرة';
+        else if (inD < todayStr()) error = 'تاريخ الوصول لا يمكن أن يكون في الماضي';
+        else if (nights <= 0) error = 'تاريخ المغادرة يجب أن يكون بعد تاريخ الوصول';
+        else if (nights > MAX_NIGHTS) error = `مدة الإقامة القصوى ${MAX_NIGHTS} ليلة`;
+
+        const av = !error ? availabilityFor(f, inD, outD) : null;
+        if (!error && av && av.free < guests) error = av.free ? `يتبقى ${av.free} سرير فقط في هذه الفترة` : 'المرفق ممتلئ في هذه الفترة، جرّب تواريخ أخرى';
+
+        const total = f ? (Number(f.price) || 0) * guests * Math.max(nights, 0) : 0;
+        document.getElementById('bk-summary').innerHTML = error
+            ? `<div class="notice warn"><i class="fas fa-triangle-exclamation"></i><div>${error}</div></div>`
+            : `<div class="sum-row"><span>المدة</span><b>${nightsLabel(nights)}</b></div>
+               <div class="sum-row"><span>الأشخاص</span><b>${personsLabel(guests)}</b></div>
+               <div class="sum-row"><span>سعر الليلة للشخص</span><b>${formatDZD(f.price)}</b></div>
+               <div class="sum-row"><span>التوفر</span>${availabilityChip(av, guests)}</div>
+               <div class="sum-row total"><span>المجموع التقديري</span><b>${formatDZD(total)}</b></div>
+               <small class="muted">الدفع يتم مباشرة في بيت الشباب عند الوصول.</small>`;
+        document.getElementById('bk-submit').disabled = !!error;
+        return { error, f, inD, outD, guests, nights, total };
+    }
+
+    function generateBookingCode() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        const rnd = new Uint32Array(6);
+        (window.crypto || window.msCrypto).getRandomValues(rnd);
+        return 'MD-' + Array.from(rnd, n => chars[n % chars.length]).join('');
+    }
+
+    function submitBooking() {
+        if (!requireLogin()) return;
+        const s = updateBookingSummary();
+        if (s.error) return showToast('❌ ' + s.error, 'error');
+        const name = document.getElementById('bk-name').value.trim();
+        const phone = document.getElementById('bk-phone').value.replace(/[\s.-]/g, '');
+        if (name.length < 3) return showToast('❌ أدخل الاسم الكامل', 'error');
+        if (!/^0\d{8,9}$/.test(phone)) return showToast('❌ رقم الهاتف غير صحيح (مثال: 0555123456)', 'error');
+        if (!document.getElementById('bk-agree').checked) return showToast('❌ يجب الموافقة على شروط الإقامة', 'error');
+        const overlap = myBookings.find(b => b.placeId === s.f.id && (b.status === 'pending' || b.status === 'confirmed') && b.checkIn < s.outD && b.checkOut > s.inD);
+        if (overlap) return showToast(`❌ لديك حجز في نفس الفترة (${overlap.code})`, 'error');
+
+        const key = database.ref('bookings').push().key;
+        const data = {
+            code: generateBookingCode(),
+            placeId: s.f.id,
+            placeName: s.f.name,
+            placeType: s.f.type,
+            userId: currentUser.uid,
+            userName: name,
+            phone,
+            checkIn: s.inD,
+            checkOut: s.outD,
+            nights: s.nights,
+            guests: s.guests,
+            roomType: document.getElementById('bk-room').value,
+            group: document.getElementById('bk-group').value,
+            purpose: document.getElementById('bk-purpose').value,
+            notes: document.getElementById('bk-notes').value.trim(),
+            pricePerNight: Number(s.f.price) || 0,
+            total: s.total,
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        };
+        const updates = {};
+        updates['bookings/' + key] = data;
+        updates[`occupancy/${s.f.id}/${key}`] = { checkIn: s.inD, checkOut: s.outD, guests: s.guests, status: 'pending' };
+
+        showLoading();
+        database.ref().update(updates).then(() => {
+            hideLoading();
+            closeModal('bookingModal');
+            showToast('✅ تم إرسال طلب الحجز، سيصلك إشعار عند التأكيد');
+            sendNotificationToAdmins('🛏️ طلب حجز جديد', `${name} - ${s.f.name} (${formatDateAr(s.inD)} ← ${formatDateAr(s.outD)}) - ${personsLabel(s.guests)}`);
+            sendNotification(currentUser.uid, '🛏️ استلمنا طلب حجزك', `رمز الحجز ${data.code} - ${s.f.name}. سنعلمك فور تأكيده.`);
+            showTicket({ id: key, ...data });
+        }).catch(err => {
+            hideLoading();
+            showToast('❌ ' + err.message, 'error');
+        });
+    }
+
+    function cancelBooking(id) {
+        const b = myBookings.find(x => x.id === id);
+        if (!b || !confirm('هل تريد إلغاء هذا الحجز؟')) return;
+        const updates = {};
+        updates[`bookings/${id}/status`] = 'cancelled';
+        updates[`bookings/${id}/cancelledAt`] = new Date().toISOString();
+        updates[`occupancy/${b.placeId}/${id}/status`] = 'cancelled';
+        database.ref().update(updates).then(() => {
+            showToast('تم إلغاء الحجز', 'info');
+            sendNotificationToAdmins('🚫 إلغاء حجز', `${b.userName} ألغى الحجز ${b.code} - ${b.placeName}`);
+        }).catch(err => showToast('❌ ' + err.message, 'error'));
+    }
+
+    function showTicket(bOrId) {
+        const b = typeof bOrId === 'string' ? myBookings.concat(allBookings).find(x => x.id === bOrId) : bOrId;
+        if (!b) return;
+        lastTicket = b;
+        document.getElementById('ticket-print').innerHTML = `
+            <div class="ticket">
+                <div class="ticket-head">
+                    <div><small>مواهب داري · تذكرة حجز</small><h3>${esc(b.placeName)}</h3></div>
+                    ${statusChip(b.status)}
+                </div>
+                <div class="ticket-body">
+                    <div class="ticket-qr" id="ticket-qr"></div>
+                    <div class="ticket-code">${esc(b.code)}</div>
+                    <div class="ticket-grid">
+                        <div><small>الوصول</small><b>${formatDateAr(b.checkIn)}</b></div>
+                        <div><small>المغادرة</small><b>${formatDateAr(b.checkOut)}</b></div>
+                        <div><small>الأشخاص</small><b>${personsLabel(Number(b.guests) || 1)}</b></div>
+                        <div><small>الإقامة</small><b>${ROOM_TYPES[b.roomType] || '-'}</b></div>
+                        <div><small>الاسم</small><b>${esc(b.userName)}</b></div>
+                        <div><small>المجموع التقديري</small><b>${formatDZD(b.total)}</b></div>
+                    </div>
+                </div>
+                <p class="ticket-note"><i class="fas fa-id-card"></i> قدّم هذه التذكرة مع بطاقة التعريف عند الوصول.${b.status === 'pending' ? ' الحجز في انتظار تأكيد الإدارة.' : ''}</p>
+            </div>`;
+        if (window.QRCode) {
+            new QRCode(document.getElementById('ticket-qr'), {
+                text: `MAWAHEB-DARI|${b.code}|${b.placeId}|${b.checkIn}|${b.checkOut}|${b.guests}`,
+                width: 148, height: 148, colorDark: '#0b1220', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+        document.getElementById('ticketModal').classList.add('active');
+    }
+
+    function shareTicket() {
+        const b = lastTicket;
+        if (!b) return;
+        shareText('تذكرة حجز', `🛏️ حجز ${b.code}\n🏠 ${b.placeName}\n📅 ${formatDateAr(b.checkIn)} ← ${formatDateAr(b.checkOut)}\n👥 ${personsLabel(Number(b.guests) || 1)}\nالحالة: ${(REQUEST_STATUS[b.status] || REQUEST_STATUS.pending).label}`);
+    }
+
+    // ==================== النوادي والانخراط ====================
+    function openClubsDirectory() {
+        const facs = getFacilities().filter(f => splitList(f.clubs).length);
+        document.getElementById('facility-detail').innerHTML = `
+            <div class="sheet-handle"></div>
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-masks-theater"></i> النوادي والورشات</h3>
+                <button class="close-modal" onclick="closeModal('facilityModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <p class="muted" style="margin-bottom:12px;">انضم إلى نادٍ في دار الشباب الأقرب إليك وطوّر موهبتك مع شباب يشاركونك نفس الشغف.</p>
+            ${facs.length ? sortFacilities(facs, true).map(f => `
+                <div class="fd-section">
+                    <h4 class="link" onclick="openFacility('${f.id}')">${FACILITY_TYPES[f.type].emoji} ${esc(f.name)} <small>${esc(f.commune || '')}</small></h4>
+                    <div class="club-list">${splitList(f.clubs).map((c, i) => clubRow(f, c, i)).join('')}</div>
+                </div>`).join('') : emptyState('fa-masks-theater', 'لا توجد نوادي مسجلة بعد')}
+        `;
+        document.getElementById('facilityModal').classList.add('active');
+        document.querySelector('#facilityModal .modal-content').scrollTop = 0;
+    }
+
+    function openClubModal(facId, clubIndex) {
+        if (!requireLogin()) return;
+        const facs = getFacilities().filter(f => splitList(f.clubs).length);
+        const sel = document.getElementById('cl-facility');
+        sel.innerHTML = facs.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('');
+        sel.value = facId;
+        fillClubOptions();
+        if (clubIndex !== undefined) document.getElementById('cl-club').selectedIndex = clubIndex;
+        document.getElementById('cl-name').value = currentUserData?.name || currentUser.displayName || '';
+        document.getElementById('cl-phone').value = currentUserData?.phone || '';
+        document.getElementById('cl-notes').value = '';
+        closeModal('facilityModal');
+        document.getElementById('clubModal').classList.add('active');
+    }
+
+    function fillClubOptions() {
+        const f = findFacility(document.getElementById('cl-facility').value);
+        document.getElementById('cl-club').innerHTML = splitList(f?.clubs).map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+    }
+
+    function submitMembership() {
+        if (!requireLogin()) return;
+        const f = findFacility(document.getElementById('cl-facility').value);
+        const club = document.getElementById('cl-club').value;
+        const name = document.getElementById('cl-name').value.trim();
+        const phone = document.getElementById('cl-phone').value.replace(/[\s.-]/g, '');
+        const age = parseInt(document.getElementById('cl-age').value);
+        if (!f || !club) return showToast('❌ اختر النادي', 'error');
+        if (name.length < 3) return showToast('❌ أدخل الاسم الكامل', 'error');
+        if (!(age >= 6 && age <= 60)) return showToast('❌ أدخل سناً صحيحاً', 'error');
+        if (!/^0\d{8,9}$/.test(phone)) return showToast('❌ رقم الهاتف غير صحيح', 'error');
+        if (myMemberships.some(m => m.placeId === f.id && m.club === club && (m.status === 'pending' || m.status === 'accepted'))) {
+            return showToast('لديك طلب انخراط سابق في هذا النادي', 'info');
+        }
+        showLoading();
+        database.ref('memberships').push({
+            placeId: f.id, placeName: f.name, club,
+            userId: currentUser.uid, userName: name, phone, age,
+            level: document.getElementById('cl-level').value,
+            notes: document.getElementById('cl-notes').value.trim(),
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        }).then(() => {
+            hideLoading();
+            closeModal('clubModal');
+            showToast('✅ تم إرسال طلب الانخراط');
+            sendNotificationToAdmins('🎭 طلب انخراط جديد', `${name} (${age} سنة) يريد الانضمام إلى ${club} - ${f.name}`);
+        }).catch(err => {
+            hideLoading();
+            showToast('❌ ' + err.message, 'error');
+        });
+    }
+
+    // ==================== صفحة الفعاليات ====================
+    function renderCategoryTabs() {
+        const tabs = [['all', 'الكل', 'fa-layer-group']].concat(Object.entries(EVENT_CATEGORIES).map(([k, c]) => [k, c.label, c.icon]));
+        document.getElementById('ev-cat-tabs').innerHTML = tabs.map(([k, l, i]) =>
+            `<span class="filter-tab ${evFilters.category === k ? 'active' : ''}" onclick="evFilters.category='${k}'; renderCategoryTabs(); renderEventsPage()"><i class="fas ${i}"></i> ${l}</span>`
+        ).join('');
+    }
+
+    function setEventsView(v) {
+        evFilters.view = v;
+        if (v === 'list') evFilters.day = null;
+        document.querySelectorAll('#ev-view-seg button').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+        renderEventsPage();
+    }
+
+    function shiftEventsMonth(delta) {
+        const m = evFilters.month;
+        evFilters.month = new Date(m.getFullYear(), m.getMonth() + delta, 1);
+        renderEventsPage();
+    }
+
+    function selectEventsDay(day) {
+        evFilters.day = evFilters.day === day ? null : day;
+        renderEventsPage();
+    }
+
+    function eventsForFilters() {
+        let list = allEvents.filter(e => e.status === 'approved' && e.date);
+        if (evFilters.facility === 'all') list = list.filter(isYouthEvent);
+        else if (evFilters.facility !== 'any') {
+            const f = findFacility(evFilters.facility);
+            list = f ? list.filter(e => e.placeId === f.id || (!e.placeId && e.lat != null && calculateDistance(e.lat, e.lng, f.lat, f.lng) < 0.3)) : [];
+        }
+        if (evFilters.category !== 'all') list = list.filter(e => e.category === evFilters.category);
+        return list.sort(byDateTime);
+    }
+
+    function renderEventsPage() {
+        if (!evFilters.month) return;
+        const sel = document.getElementById('ev-facility');
+        sel.innerHTML = `<option value="all">🏠 كل فعاليات دور ومرافق الشباب</option><option value="any">📋 جميع الفعاليات (بما فيها التطوعية)</option>` +
+            getFacilities().map(f => `<option value="${f.id}">${FACILITY_TYPES[f.type].emoji} ${esc(f.name)}</option>`).join('');
+        sel.value = [...sel.options].some(o => o.value === evFilters.facility) ? evFilters.facility : 'all';
+        evFilters.facility = sel.value;
+
+        const list = eventsForFilters();
+        const calCard = document.getElementById('ev-calendar-card');
+        calCard.style.display = evFilters.view === 'calendar' ? 'block' : 'none';
+        if (evFilters.view === 'calendar') renderCalendar(list);
+
+        const t = todayStr();
+        const shown = evFilters.day ? list.filter(e => e.date === evFilters.day) : list.filter(e => e.date >= t);
+        document.getElementById('ev-day-filter').innerHTML = evFilters.day
+            ? `<div class="day-filter"><span><i class="fas fa-calendar-day"></i> فعاليات ${formatDateAr(evFilters.day)}</span><button onclick="selectEventsDay(null)"><i class="fas fa-xmark"></i> عرض الكل</button></div>` : '';
+
+        if (!shown.length) {
+            document.getElementById('ev-list').innerHTML = emptyState('fa-calendar-xmark', evFilters.day ? 'لا توجد فعاليات في هذا اليوم' : 'لا توجد فعاليات قادمة بهذه المعايير',
+                `<button class="btn btn-primary btn-small" onclick="showAddEventModal()"><i class="fas fa-calendar-plus"></i> اقترح فعالية</button>`);
+            return;
+        }
+        let html = '', lastDate = '';
+        shown.forEach(e => {
+            if (e.date !== lastDate) {
+                lastDate = e.date;
+                const rel = relativeDay(e.date);
+                html += `<h4 class="day-head">${rel ? `<span class="rel">${rel}</span>` : ''}${formatDateAr(e.date)}</h4>`;
+            }
+            html += eventCard(e);
+        });
+        document.getElementById('ev-list').innerHTML = html;
+    }
+
+    function renderCalendar(list) {
+        const m = evFilters.month;
+        const y = m.getFullYear(), mo = m.getMonth();
+        document.getElementById('cal-title').textContent = `${MONTHS_DZ[mo]} ${y}`;
+        const counts = {};
+        list.forEach(e => { counts[e.date] = (counts[e.date] || 0) + 1; });
+        const offset = (new Date(y, mo, 1).getDay() + 1) % 7; // الأسبوع يبدأ يوم السبت
+        const days = new Date(y, mo + 1, 0).getDate();
+        const t = todayStr();
+        let html = ['س', 'ح', 'ن', 'ث', 'ر', 'خ', 'ج'].map(d => `<div class="cal-dow">${d}</div>`).join('');
+        for (let i = 0; i < offset; i++) html += '<div></div>';
+        for (let d = 1; d <= days; d++) {
+            const ds = `${y}-${pad2(mo + 1)}-${pad2(d)}`;
+            const n = counts[ds] || 0;
+            html += `<button class="cal-day ${ds === t ? 'today' : ''} ${n ? 'has' : ''} ${evFilters.day === ds ? 'sel' : ''} ${ds < t ? 'past' : ''}" onclick="selectEventsDay('${ds}')">
+                <span>${d}</span>${n ? `<i>${n > 1 ? n : ''}</i>` : ''}</button>`;
+        }
+        document.getElementById('cal-grid').innerHTML = html;
+    }
+
+    function eventCard(e) {
+        const cat = EVENT_CATEGORIES[e.category];
+        const p = parseDateStr(e.date);
+        const going = currentUser && e.attendees && e.attendees[currentUser.uid];
+        const attendCount = e.attendees ? Object.keys(e.attendees).length : 0;
+        const volunteered = currentUser && e.participants && e.participants[currentUser.uid];
+        const fac = findFacility(e.placeId);
+        const placeLabel = e.placeName || fac?.name || e.address || '';
+        return `
+            <article class="ev-card" id="ev-${e.id}">
+                <div class="date-badge"><b>${p ? p.d : ''}</b><span>${p ? MONTHS_DZ[p.m - 1] : ''}</span></div>
+                <div class="ev-body">
+                    <div class="ev-top">
+                        ${cat ? `<span class="chip" style="--c:${cat.color}"><i class="fas ${cat.icon}"></i> ${cat.label}</span>` : ''}
+                        <span class="muted"><i class="fas fa-clock"></i> ${esc(e.time || '')}</span>
+                    </div>
+                    <h4>${esc(e.title)}</h4>
+                    <p class="muted"><i class="fas fa-location-dot"></i> ${esc(placeLabel)}</p>
+                    ${e.description ? `<p class="ev-desc">${esc(e.description)}</p>` : ''}
+                    <p class="muted small"><i class="fas fa-user-group"></i> ${attendCount ? `${attendCount} سيحضرون` : 'كن أول من يسجل حضوره'}${e.volunteers ? ` · نحتاج ${esc(e.volunteers)} متطوعين` : ''}</p>
+                    <div class="ev-actions">
+                        <button class="btn ${going ? 'btn-success' : 'btn-primary'} btn-small" onclick="toggleAttend('${e.id}')"><i class="fas ${going ? 'fa-circle-check' : 'fa-calendar-check'}"></i> ${going ? 'مسجّل' : 'سأحضر'}</button>
+                        <button class="btn btn-outline btn-small" ${volunteered ? 'disabled' : ''} onclick="volunteerForEvent('${e.id}')"><i class="fas fa-hand-paper"></i> ${volunteered ? 'متطوع ✓' : 'تطوع'}</button>
+                        <button class="icon-btn" title="أضف إلى تقويم الهاتف" onclick="downloadICS('${e.id}')"><i class="fas fa-calendar-plus"></i></button>
+                        <button class="icon-btn" title="مشاركة" onclick="shareEvent('${e.id}')"><i class="fas fa-share-nodes"></i></button>
+                        ${fac ? `<button class="icon-btn" title="المرفق" onclick="openFacility('${fac.id}')"><i class="fas fa-house-chimney-user"></i></button>`
+                              : (e.lat != null ? `<a class="icon-btn" title="الاتجاهات" href="${directionsUrl(e)}" target="_blank" rel="noopener"><i class="fas fa-diamond-turn-right"></i></a>` : '')}
+                    </div>
+                </div>
+            </article>`;
+    }
+
+    function toggleAttend(id, fromFacility) {
+        if (!requireLogin()) return;
+        const e = allEvents.find(x => x.id === id);
+        if (!e) return;
+        const going = e.attendees && e.attendees[currentUser.uid];
+        const ref = database.ref(`events/${id}/attendees/${currentUser.uid}`);
+        (going ? ref.remove() : ref.set({ name: currentUser.displayName || '', at: new Date().toISOString() }))
+            .then(() => {
+                showToast(going ? 'تم إلغاء تسجيل حضورك' : '🎉 سجلنا حضورك! أضف الموعد إلى تقويمك حتى لا تنساه', going ? 'info' : 'success');
+                if (fromFacility) {
+                    const facId = e.placeId || getFacilities().find(f => facilityEvents(f).some(x => x.id === id))?.id;
+                    setTimeout(() => facId && openFacility(facId), 150);
+                }
+            })
+            .catch(err => showToast('❌ ' + err.message, 'error'));
+    }
+
+    function downloadICS(id) {
+        const e = allEvents.find(x => x.id === id);
+        if (!e || !e.date) return;
+        const p = parseDateStr(e.date);
+        const [hh, mm] = (e.time || '09:00').split(':').map(Number);
+        const start = new Date(p.y, p.m - 1, p.d, hh || 0, mm || 0);
+        const end = new Date(start.getTime() + 2 * 3600 * 1000);
+        const fmt = d => `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}T${pad2(d.getHours())}${pad2(d.getMinutes())}00`;
+        const icsEsc = s => String(s || '').replace(/\\/g, '\\\\').replace(/[,;]/g, m => '\\' + m).replace(/\n/g, '\\n');
+        const now = new Date();
+        const stamp = `${now.getUTCFullYear()}${pad2(now.getUTCMonth() + 1)}${pad2(now.getUTCDate())}T${pad2(now.getUTCHours())}${pad2(now.getUTCMinutes())}00Z`;
+        const ics = [
+            'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Mawaheb Dari//AR', 'CALSCALE:GREGORIAN',
+            'BEGIN:VEVENT',
+            `UID:${id}@mawaheb-dari`,
+            `DTSTAMP:${stamp}`,
+            `DTSTART:${fmt(start)}`,
+            `DTEND:${fmt(end)}`,
+            `SUMMARY:${icsEsc(e.title)}`,
+            `LOCATION:${icsEsc(e.placeName || e.address)}`,
+            `DESCRIPTION:${icsEsc(e.description || 'فعالية عبر منصة مواهب داري')}`,
+            'BEGIN:VALARM', 'TRIGGER:-PT2H', 'ACTION:DISPLAY', `DESCRIPTION:${icsEsc(e.title)}`, 'END:VALARM',
+            'END:VEVENT', 'END:VCALENDAR'
+        ].join('\r\n');
+        const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mawaheb-dari-${e.date}.ics`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast('📅 تم تنزيل الموعد، افتحه لإضافته إلى تقويمك', 'info');
+    }
+
+    // ==================== الملف الشخصي ====================
+    function renderProfileYouth() {
+        if (!currentUser) return;
+        const t = todayStr();
+        const attending = allEvents.filter(e => e.attendees && e.attendees[currentUser.uid] && (e.date || '') >= t).length;
+        const stats = [
+            [myBookings.filter(b => b.status === 'pending' || b.status === 'confirmed').length, 'حجوزات نشطة', 'fa-bed'],
+            [myMemberships.filter(m => m.status === 'accepted').length, 'نوادي', 'fa-masks-theater'],
+            [attending, 'فعاليات سأحضرها', 'fa-calendar-check']
+        ];
+        document.getElementById('profile-youth-stats').innerHTML = stats.map(([n, l, i]) =>
+            `<div class="mini-stat"><i class="fas ${i}"></i><b>${n}</b><span>${l}</span></div>`).join('');
+        document.getElementById('my-clubs').innerHTML = myMemberships.length ? myMemberships.map(m => `
+            <div class="req-card compact">
+                <div class="req-top">
+                    <div><b><i class="fas ${clubIcon(m.club)}"></i> ${esc(m.club)}</b><small>${esc(m.placeName)}</small></div>
+                    ${statusChip(m.status)}
+                </div>
+                ${m.rejectReason ? `<p class="req-notes bad">${esc(m.rejectReason)}</p>` : ''}
+            </div>`).join('')
+            : emptyState('fa-masks-theater', 'لم تنخرط في أي نادٍ بعد', `<button class="btn btn-primary btn-small" onclick="openClubsDirectory()">اكتشف النوادي</button>`);
+    }
+
+    // ==================== طلبات الحجز والانخراط (للمدير) ====================
+    function setAdminReqView(v) {
+        adminReqView = v;
+        adminReqFilter = 'pending';
+        document.querySelectorAll('#adm-seg button').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+        renderAdminRequests();
+    }
+
+    function renderAdminFilterTabs() {
+        const source = adminReqView === 'bookings' ? allBookings : allMemberships;
+        const opts = adminReqView === 'bookings'
+            ? [['pending', 'قيد المراجعة'], ['confirmed', 'مؤكدة'], ['rejected', 'مرفوضة'], ['cancelled', 'ملغاة'], ['all', 'الكل']]
+            : [['pending', 'قيد المراجعة'], ['accepted', 'مقبولة'], ['rejected', 'مرفوضة'], ['all', 'الكل']];
+        document.getElementById('adm-filter-tabs').innerHTML = opts.map(([k, l]) => {
+            const n = k === 'all' ? source.length : source.filter(x => x.status === k).length;
+            return `<span class="filter-tab ${adminReqFilter === k ? 'active' : ''}" onclick="adminReqFilter='${k}'; renderAdminRequests()">${l} <em>${n}</em></span>`;
+        }).join('');
+    }
+
+    function updateAdminRequestBadge() {
+        const badge = document.getElementById('admin-requests-badge');
+        if (!badge) return;
+        const n = allBookings.filter(b => b.status === 'pending').length + allMemberships.filter(m => m.status === 'pending').length;
+        badge.textContent = n;
+        badge.style.display = n ? 'flex' : 'none';
+    }
+
+    function renderAdminRequests() {
+        if (selectedRole !== 'admin') return;
+        const t = todayStr();
+        const guestsToday = allBookings.filter(b => b.status === 'confirmed' && b.checkIn <= t && b.checkOut > t)
+            .reduce((s, b) => s + (Number(b.guests) || 0), 0);
+        const stats = [
+            [allBookings.filter(b => b.status === 'pending').length, 'حجوزات جديدة', 'fa-hourglass-half', '#f59e0b'],
+            [allBookings.filter(b => b.status === 'confirmed' && b.checkOut > t).length, 'حجوزات مؤكدة قادمة', 'fa-circle-check', '#10b981'],
+            [guestsToday, 'نزيل اليوم', 'fa-bed', '#3b82f6'],
+            [allMemberships.filter(m => m.status === 'pending').length, 'انخراطات جديدة', 'fa-masks-theater', '#ec4899']
+        ];
+        document.getElementById('adm-stats').innerHTML = stats.map(([n, l, i, c]) =>
+            `<div class="stat-tile" style="--c:${c}"><i class="fas ${i}"></i><b>${n}</b><span>${l}</span></div>`).join('');
+
+        renderAdminFilterTabs();
+        const q = document.getElementById('adm-search').value.trim().toLowerCase();
+        const source = adminReqView === 'bookings' ? allBookings : allMemberships;
+        const list = source.filter(x =>
+            (adminReqFilter === 'all' || x.status === adminReqFilter) &&
+            (!q || [x.userName, x.phone, x.code, x.placeName, x.club].some(v => String(v || '').toLowerCase().includes(q)))
+        );
+        document.getElementById('adm-list').innerHTML = list.length
+            ? list.map(adminReqView === 'bookings' ? adminBookingCard : adminMembershipCard).join('')
+            : emptyState('fa-inbox', 'لا توجد طلبات هنا');
+    }
+
+    function adminBookingCard(b) {
+        const f = findFacility(b.placeId);
+        const av = f ? availabilityFor(f, b.checkIn, b.checkOut) : null;
+        return `
+            <div class="req-card">
+                <div class="req-top">
+                    <div><b>${esc(b.userName)}</b><small>${esc(b.placeName)}</small></div>
+                    ${statusChip(b.status)}
+                </div>
+                <div class="req-meta">
+                    <span><i class="fas fa-calendar"></i> ${formatDateAr(b.checkIn)} ← ${formatDateAr(b.checkOut)} (${nightsLabel(b.nights || nightsBetween(b.checkIn, b.checkOut))})</span>
+                    <span><i class="fas fa-users"></i> ${personsLabel(Number(b.guests) || 1)} · ${GROUP_TYPES[b.group] || ''}</span>
+                    <span><i class="fas fa-bed"></i> ${ROOM_TYPES[b.roomType] || ''}</span>
+                    <span><i class="fas fa-bullseye"></i> ${PURPOSES[b.purpose] || ''}</span>
+                    <span><i class="fas fa-phone"></i> <a href="tel:${esc(b.phone)}" dir="ltr">${esc(b.phone)}</a></span>
+                    <span><i class="fas fa-hashtag"></i> ${esc(b.code)}</span>
+                    <span><i class="fas fa-coins"></i> ${formatDZD(b.total)}</span>
+                </div>
+                ${b.notes ? `<p class="req-notes"><i class="fas fa-note-sticky"></i> ${esc(b.notes)}</p>` : ''}
+                ${b.status === 'pending' && av && av.over ? `<p class="req-notes bad"><i class="fas fa-triangle-exclamation"></i> تجاوز السعة في هذه الفترة (${av.taken}/${av.cap} سرير).</p>` : ''}
+                ${b.rejectReason ? `<p class="req-notes bad"><i class="fas fa-circle-info"></i> ${esc(b.rejectReason)}</p>` : ''}
+                <div class="req-actions">
+                    ${b.status === 'pending' ? `
+                        <button class="btn btn-success btn-small" onclick="decideBooking('${b.id}', 'confirmed')"><i class="fas fa-check"></i> تأكيد</button>
+                        <button class="btn btn-danger btn-small" onclick="decideBooking('${b.id}', 'rejected')"><i class="fas fa-times"></i> رفض</button>` : ''}
+                    ${b.status === 'confirmed' ? `<button class="btn btn-outline btn-small" onclick="decideBooking('${b.id}', 'cancelled')"><i class="fas fa-ban"></i> إلغاء</button>` : ''}
+                    <button class="btn btn-outline btn-small" onclick="showTicket('${b.id}')"><i class="fas fa-qrcode"></i></button>
+                    <button class="btn btn-outline btn-small" title="حذف" onclick="deleteBooking('${b.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>`;
+    }
+
+    function adminMembershipCard(m) {
+        return `
+            <div class="req-card">
+                <div class="req-top">
+                    <div><b>${esc(m.userName)}</b><small><i class="fas ${clubIcon(m.club)}"></i> ${esc(m.club)} · ${esc(m.placeName)}</small></div>
+                    ${statusChip(m.status)}
+                </div>
+                <div class="req-meta">
+                    <span><i class="fas fa-cake-candles"></i> ${esc(m.age)} سنة</span>
+                    <span><i class="fas fa-signal"></i> ${esc(m.level)}</span>
+                    <span><i class="fas fa-phone"></i> <a href="tel:${esc(m.phone)}" dir="ltr">${esc(m.phone)}</a></span>
+                </div>
+                ${m.notes ? `<p class="req-notes"><i class="fas fa-note-sticky"></i> ${esc(m.notes)}</p>` : ''}
+                ${m.rejectReason ? `<p class="req-notes bad"><i class="fas fa-circle-info"></i> ${esc(m.rejectReason)}</p>` : ''}
+                <div class="req-actions">
+                    ${m.status === 'pending' ? `
+                        <button class="btn btn-success btn-small" onclick="decideMembership('${m.id}', 'accepted')"><i class="fas fa-check"></i> قبول</button>
+                        <button class="btn btn-danger btn-small" onclick="decideMembership('${m.id}', 'rejected')"><i class="fas fa-times"></i> رفض</button>` : ''}
+                    <button class="btn btn-outline btn-small" title="حذف" onclick="deleteMembership('${m.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>`;
+    }
+
+    function decideBooking(id, status) {
+        if (selectedRole !== 'admin') return;
+        const b = allBookings.find(x => x.id === id);
+        if (!b) return;
+        let reason = '';
+        if (status === 'rejected' || status === 'cancelled') {
+            reason = prompt(status === 'rejected' ? 'سبب الرفض (سيصل إلى صاحب الطلب):' : 'سبب الإلغاء (سيصل إلى صاحب الطلب):');
+            if (reason === null) return;
+            reason = reason.trim();
+        }
+        const updates = {};
+        updates[`bookings/${id}/status`] = status;
+        updates[`bookings/${id}/decidedAt`] = new Date().toISOString();
+        updates[`bookings/${id}/decidedBy`] = currentUser.uid;
+        if (reason) updates[`bookings/${id}/rejectReason`] = reason;
+        updates[`occupancy/${b.placeId}/${id}`] = { checkIn: b.checkIn, checkOut: b.checkOut, guests: b.guests, status };
+        showLoading();
+        database.ref().update(updates).then(() => {
+            hideLoading();
+            const msgs = {
+                confirmed: ['✅ تم تأكيد حجزك', `حجزك ${b.code} في ${b.placeName} مؤكد من ${formatDateAr(b.checkIn)} إلى ${formatDateAr(b.checkOut)}. لا تنس بطاقة التعريف.`],
+                rejected: ['❌ تعذر قبول طلب الحجز', `طلبك ${b.code} في ${b.placeName} لم يُقبل${reason ? ': ' + reason : ''}`],
+                cancelled: ['🚫 تم إلغاء حجزك', `أُلغي حجزك ${b.code} في ${b.placeName}${reason ? ': ' + reason : ''}`]
+            };
+            showToast(status === 'confirmed' ? '✅ تم تأكيد الحجز' : 'تم تحديث الحجز', status === 'confirmed' ? 'success' : 'info');
+            if (b.userId) sendNotification(b.userId, ...msgs[status]);
+        }).catch(err => {
+            hideLoading();
+            showToast('❌ ' + err.message, 'error');
+        });
+    }
+
+    function deleteBooking(id) {
+        if (selectedRole !== 'admin') return;
+        const b = allBookings.find(x => x.id === id);
+        if (!b || !confirm('⚠️ حذف هذا الحجز نهائياً؟')) return;
+        const updates = {};
+        updates['bookings/' + id] = null;
+        updates[`occupancy/${b.placeId}/${id}`] = null;
+        database.ref().update(updates).then(() => showToast('✅ تم حذف الحجز'))
+            .catch(err => showToast('❌ ' + err.message, 'error'));
+    }
+
+    function decideMembership(id, status) {
+        if (selectedRole !== 'admin') return;
+        const m = allMemberships.find(x => x.id === id);
+        if (!m) return;
+        let reason = '';
+        if (status === 'rejected') {
+            reason = prompt('سبب الرفض (اختياري):');
+            if (reason === null) return;
+            reason = reason.trim();
+        }
+        const upd = { status, decidedAt: new Date().toISOString() };
+        if (reason) upd.rejectReason = reason;
+        database.ref('memberships/' + id).update(upd).then(() => {
+            showToast(status === 'accepted' ? '✅ تم قبول الانخراط' : 'تم رفض الطلب', status === 'accepted' ? 'success' : 'info');
+            if (m.userId) {
+                sendNotification(m.userId,
+                    status === 'accepted' ? '🎉 مرحباً بك في النادي' : '❌ طلب الانخراط لم يُقبل',
+                    status === 'accepted' ? `تم قبول انخراطك في ${m.club} - ${m.placeName}. تواصل مع الدار لمعرفة مواعيد الحصص.` : `طلبك للانضمام إلى ${m.club}${reason ? ': ' + reason : ''}`);
+            }
+        }).catch(err => showToast('❌ ' + err.message, 'error'));
+    }
+
+    function deleteMembership(id) {
+        if (selectedRole !== 'admin' || !confirm('⚠️ حذف طلب الانخراط؟')) return;
+        database.ref('memberships/' + id).remove().then(() => showToast('✅ تم الحذف'))
+            .catch(err => showToast('❌ ' + err.message, 'error'));
+    }
 </script>
 
 </body>
-</html>
+</html>
