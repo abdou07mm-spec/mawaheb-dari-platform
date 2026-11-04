@@ -2,7 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="author" content="آية عابر">
     <title>مواهب داري - منصة دور الشباب والتطوع</title>
     <meta name="description" content="مواهب داري: دليل دور الشباب، حجز بيوت الشباب، فعاليات ونوادي الشباب والتطوع في الجزائر.">
     <meta name="theme-color" content="#0a5c3e">
@@ -2232,6 +2233,70 @@
             #adm-list.req-list, #admin-events-list.events-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             #notifications.section.active, #settings.section.active { max-width: 880px; }
         }
+
+        /* =====================================================================
+           شاشة الترحيب، التصفية حسب الولاية، الإسناد، وتحسينات الهواتف
+           ===================================================================== */
+        #role-screen {
+            background:
+                radial-gradient(600px 400px at 85% 10%, rgba(244, 180, 27, 0.20), transparent 70%),
+                radial-gradient(700px 500px at 10% 100%, rgba(16, 185, 129, 0.22), transparent 70%),
+                linear-gradient(160deg, #0a5c3e 0%, #0b3b33 45%, #0b1220 100%);
+            padding: 20px;
+        }
+        #role-screen::before {
+            content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.14;
+            background-image: radial-gradient(#ffffff 1px, transparent 1.2px); background-size: 22px 22px;
+        }
+        .role-overlay { position: relative; background: rgba(11, 18, 32, 0.82); border: 1px solid rgba(255, 255, 255, 0.12); padding: 44px 34px; text-align: center; }
+        .role-brand { font-family: 'Reem Kufi', 'Tajawal', sans-serif; font-size: 2.6rem; font-weight: 900; color: #fff; margin-bottom: 6px; }
+        .role-brand span { color: var(--accent); }
+        .role-overlay p.role-tag { color: #cfe3d9; font-size: 0.95rem; line-height: 1.7; margin-bottom: 26px; }
+        .role-overlay h1 { font-size: 1.7rem; margin-bottom: 6px; }
+        .role-overlay > p { margin-bottom: 22px; }
+        .role-btn { font-size: 1.1rem; padding: 18px; margin: 10px 0; border-radius: 16px; }
+        .role-overlay p.role-credit { margin: 22px 0 0; font-size: 0.9rem; color: #a8bdb4; }
+        .role-overlay p.role-credit b { color: var(--accent); }
+
+        /* نموذج التسجيل: يبدأ من الأعلى ويتمرر عندما يكون أطول من الشاشة */
+        #auth-screen.active { align-items: flex-start; }
+        .auth-container { margin: auto; }
+
+        /* التصفية حسب الولاية */
+        .wilaya-pick {
+            display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 12px;
+            background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); font-size: 0.82rem;
+        }
+        .wilaya-pick i { color: var(--accent); }
+        .wilaya-pick select { background: transparent; border: none; color: var(--text); font-family: inherit; font-size: 0.85rem; padding: 8px 0; outline: none; max-width: 220px; }
+        .wilaya-pick select option, .wilaya-pick select optgroup { background: var(--surface); color: var(--text); }
+        .edit-field select optgroup { background: var(--surface); color: var(--accent); }
+
+        /* الإسناد */
+        .nav-credit { display: none; }
+        .about-box p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.8; }
+        .about-box p b { color: var(--text); }
+        .about-box .about-credit { margin-top: 8px; }
+        .about-box .about-credit b { color: var(--accent); }
+
+        /* الهواتف: المساحة الآمنة لشريط iPhone، وحقول 16px حتى لا يكبّر Safari الصفحة عند الكتابة */
+        .bottom-nav { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+        .main-content { padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+        .toast { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+        .modal-content { max-height: 92vh; max-height: 92dvh; padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+        @media (max-width: 1023px) {
+            input, select, textarea { font-size: 16px !important; }
+            .language-selector select { padding: 5px 10px; }
+            .wilaya-pick select { max-width: 170px; }
+        }
+        @media (min-width: 1024px) {
+            .bottom-nav { bottom: auto; }
+            .main-content { padding-bottom: 40px; }
+            .toast { bottom: 32px; }
+            .nav-credit { display: block; margin-top: 14px; padding: 12px 16px 4px; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--text-muted); text-align: right; }
+            .nav-credit b { color: var(--accent); }
+            .role-overlay { max-width: 520px; padding: 52px 44px; }
+        }
     </style>
 </head>
 <body>
@@ -2251,7 +2316,9 @@
 <!-- شاشة اختيار الدور -->
 <div id="role-screen">
     <div class="role-overlay">
-        <h1>🌙 مرحباً بك</h1>
+        <div class="role-brand"><span>مواهب</span> داري</div>
+        <p class="role-tag">منصة دور الشباب في الجزائر: الدليل، الحجز، الفعاليات والتطوع</p>
+        <h1>مرحباً بك 👋</h1>
         <p>اختر نوع المستخدم</p>
         
         <button class="role-btn volunteer" onclick="selectRole('volunteer')">
@@ -2260,6 +2327,7 @@
         <button class="role-btn admin" onclick="selectRole('admin')">
             <i class="fas fa-user-tie"></i> مدير - مسير دار شباب
         </button>
+        <p class="role-credit">إعداد: <b>آية عابر</b></p>
     </div>
 </div>
 
@@ -2504,7 +2572,7 @@
                 <div class="hero-text">
                     <p class="hero-hello">أهلاً بك، <span id="hero-name">صديقنا</span> 👋</p>
                     <h2>دارك الثانية في انتظارك</h2>
-                    <p class="hero-sub">اكتشف دور الشباب القريبة منك، احجز إقامتك في بيوت الشباب، وشارك في الفعاليات والنوادي.</p>
+                    <p class="hero-sub">اكتشف دور الشباب في ولايتك وفي كل ولايات الوطن، احجز إقامتك في بيوت الشباب، وشارك في الفعاليات والنوادي.</p>
                 </div>
                 <div class="hero-stats" id="hero-stats"></div>
             </div>
@@ -2615,6 +2683,9 @@
                 <button class="toggle-chip" id="toggle-near" onclick="toggleHouseNear()"><i class="fas fa-location-crosshairs"></i> الأقرب إليّ</button>
                 <button class="toggle-chip" id="toggle-open" onclick="houseFilters.open = !houseFilters.open; renderHouses()"><i class="fas fa-door-open"></i> مفتوح الآن</button>
                 <button class="toggle-chip" id="toggle-fav" onclick="houseFilters.fav = !houseFilters.fav; renderHouses()"><i class="fas fa-heart"></i> المفضلة</button>
+                <label class="wilaya-pick"><i class="fas fa-location-dot"></i>
+                    <select id="houses-wilaya" onchange="houseFilters.wilaya = this.value; renderHouses(true)"></select>
+                </label>
             </div>
 
             <div class="card card-flush">
@@ -2663,6 +2734,10 @@
                         <input type="number" id="avail-guests" value="1" min="1" max="30" onchange="renderBookingPage()">
                         <button type="button" onclick="stepGuests('avail-guests', 1); renderBookingPage()">+</button>
                     </div>
+                </div>
+                <div class="edit-field">
+                    <label>الولاية</label>
+                    <select id="avail-wilaya" onchange="renderBookingPage()"></select>
                 </div>
                 <div id="booking-notice"></div>
                 <div id="booking-facilities" class="fac-list"></div>
@@ -3175,6 +3250,13 @@
                     </div>
                 </div>
 
+                <!-- حول المنصة -->
+                <div class="settings-section about-box">
+                    <h4>ℹ️ حول المنصة</h4>
+                    <p><b>مواهب داري</b>: منصة رقمية تجمع شباب الجزائر بدور الشباب وخدماتها، من الدليل والحجز المسبق إلى الفعاليات والنوادي والتطوع.</p>
+                    <p class="about-credit">إعداد: <b>آية عابر</b></p>
+                </div>
+
                 <!-- حفظ الإعدادات -->
                 <button class="btn-save" onclick="saveAllSettings()" style="margin-top: 20px;">
                     <i class="fas fa-save"></i> حفظ جميع الإعدادات
@@ -3210,6 +3292,7 @@
         <div class="nav-item desk-only" data-tab="settings" onclick="switchTab('settings')">
             <i class="fas fa-cog"></i><span>الإعدادات</span>
         </div>
+        <p class="nav-credit">إعداد: <b>آية عابر</b></p>
     </div>
     <div class="bottom-nav" id="admin-nav" style="display: none;"></div>
 </div>
@@ -3240,13 +3323,7 @@
 
         <div class="edit-field">
             <label>الولاية</label>
-            <select id="eventWilaya">
-                <option value="16">الجزائر</option>
-                <option value="19">سطيف</option>
-                <option value="31">وهران</option>
-                <option value="25">قسنطينة</option>
-                <option value="23">عنابة</option>
-            </select>
+            <select id="eventWilaya"></select>
         </div>
         
         <div class="edit-field">
@@ -3354,6 +3431,11 @@
             </select>
         </div>
         
+        <div class="edit-field">
+            <label>الولاية</label>
+            <select id="placeWilaya"></select>
+        </div>
+
         <div class="edit-field">
             <label>العنوان</label>
             <input type="text" id="placeAddress" placeholder="العنوان الكامل">
@@ -3685,7 +3767,8 @@
     let currentLang = 'ar';
     let map = null;
     let mapType = 'street'; // 'street' or 'satellite'
-    let currentLocation = { lat: 36.1885, lng: 5.4130 };
+    let currentLocation = { lat: 36.7538, lng: 3.0588 }; // احتياطي: الجزائر العاصمة (المسافات تُحسب فقط بعد تحديد الموقع)
+    const ALGERIA_BOUNDS = [[19.0, -8.7], [37.1, 12.0]];
     let userMarker = null;
     let locationCircle = null;
     let tempEventMarker = null;
@@ -3749,7 +3832,7 @@
             document.getElementById('auth-screen').classList.remove('active');
             document.getElementById('app').classList.add('ready');
             // الخريطة أُنشئت والتطبيق مخفي، لذا نعيد حساب أبعادها بعد الإظهار
-            setTimeout(() => map && map.invalidateSize(), 100);
+            setTimeout(() => { if (!map) return; map.invalidateSize(); if (!userLocated) map.fitBounds(ALGERIA_BOUNDS); }, 100);
 
             // الدور يُحدَّد من قاعدة البيانات فقط، وليس من الاختيار في شاشة البداية
             selectedRole = 'volunteer';
@@ -3806,6 +3889,7 @@
                             <div class="nav-item desk-only" data-tab="settings" onclick="switchTab('settings')">
                                 <i class="fas fa-cog"></i><span>الإعدادات</span>
                             </div>
+                            <p class="nav-credit">إعداد: <b>آية عابر</b></p>
                         `;
                         updateNotifBadges();
                         document.getElementById('admin-danger-zone').style.display = 'block';
@@ -3899,6 +3983,11 @@
         
         if (!name || !email || !phone || !password) {
             showToast('❌ الرجاء ملء جميع الحقول', 'error');
+            return;
+        }
+        
+        if (!wilaya) {
+            showToast('❌ اختر ولايتك', 'error');
             return;
         }
         
@@ -4079,27 +4168,32 @@
             });
     }
 
+    // الولايات الـ58 (بما فيها الولايات الجديدة 49 إلى 58)
+    const WILAYAS = {
+        "1": "أدرار", "2": "الشلف", "3": "الأغواط", "4": "أم البواقي",
+        "5": "باتنة", "6": "بجاية", "7": "بسكرة", "8": "بشار",
+        "9": "البليدة", "10": "البويرة", "11": "تمنراست", "12": "تبسة",
+        "13": "تلمسان", "14": "تيارت", "15": "تيزي وزو", "16": "الجزائر",
+        "17": "الجلفة", "18": "جيجل", "19": "سطيف", "20": "سعيدة",
+        "21": "سكيكدة", "22": "سيدي بلعباس", "23": "عنابة", "24": "قالمة",
+        "25": "قسنطينة", "26": "المدية", "27": "مستغانم", "28": "المسيلة",
+        "29": "معسكر", "30": "ورقلة", "31": "وهران", "32": "البيض",
+        "33": "إليزي", "34": "برج بوعريريج", "35": "بومرداس", "36": "الطارف",
+        "37": "تندوف", "38": "تيسمسيلت", "39": "الوادي", "40": "خنشلة",
+        "41": "سوق أهراس", "42": "تيبازة", "43": "ميلة", "44": "عين الدفلى",
+        "45": "النعامة", "46": "عين تموشنت", "47": "غرداية", "48": "غليزان",
+        "49": "تيميمون", "50": "برج باجي مختار", "51": "أولاد جلال", "52": "بني عباس",
+        "53": "عين صالح", "54": "عين قزام", "55": "تقرت", "56": "جانت",
+        "57": "المغير", "58": "المنيعة"
+    };
+
     function getWilayaName(id) {
-        const names = {
-            "1": "أدرار", "2": "الشلف", "3": "الأغواط", "4": "أم البواقي",
-            "5": "باتنة", "6": "بجاية", "7": "بسكرة", "8": "بشار",
-            "9": "البليدة", "10": "البويرة", "11": "تمنراست", "12": "تبسة",
-            "13": "تلمسان", "14": "تيارت", "15": "تيزي وزو", "16": "الجزائر",
-            "17": "الجلفة", "18": "جيجل", "19": "سطيف", "20": "سعيدة",
-            "21": "سكيكدة", "22": "سيدي بلعباس", "23": "عنابة", "24": "قالمة",
-            "25": "قسنطينة", "26": "المدية", "27": "مستغانم", "28": "المسيلة",
-            "29": "معسكر", "30": "ورقلة", "31": "وهران", "32": "البيض",
-            "33": "إليزي", "34": "برج بوعريريج", "35": "بومرداس", "36": "الطارف",
-            "37": "تندوف", "38": "تيسمسيلت", "39": "الوادي", "40": "خنشلة",
-            "41": "سوق أهراس", "42": "تيبازة", "43": "ميلة", "44": "عين الدفلى",
-            "45": "النعامة", "46": "عين تموشنت", "47": "غرداية", "48": "غليزان"
-        };
-        return names[id] || 'غير محدد';
+        return WILAYAS[String(id)] || 'غير محدد';
     }
 
     // ==================== دوال الخريطة ====================
     function initMap() {
-        map = L.map('map').setView([currentLocation.lat, currentLocation.lng], 13);
+        map = L.map('map', { zoomSnap: 0.25 }).setView([28.2, 2.6], 4.5); // كامل التراب الوطني
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
@@ -4354,6 +4448,7 @@
         document.getElementById('placeClose').value = '18:00';
         document.getElementById('placeClosedDay').value = '5';
         if (presetType) document.getElementById('placeType').value = presetType;
+        document.getElementById('placeWilaya').value = currentUserData?.wilaya || '16';
         document.getElementById('placeLat').value = lat !== undefined ? Number(lat).toFixed(6) : '';
         document.getElementById('placeLng').value = lng !== undefined ? Number(lng).toFixed(6) : '';
         document.getElementById('placeModalTitle').innerHTML = '<i class="fas fa-map-pin"></i> إضافة مكان جديد';
@@ -4390,7 +4485,8 @@
         }
 
         const placeData = {
-            name, type, address, lat, lng, description
+            name, type, address, lat, lng, description,
+            wilaya: document.getElementById('placeWilaya').value
         };
 
         // حقول إضافية خاصة بمرافق الشباب
@@ -5239,8 +5335,9 @@
             document.getElementById('places-list').scrollIntoView({ behavior: 'smooth' });
             return;
         } else if (filter === 'nearby') {
-            if (!currentLocation) {
+            if (!userLocated) {
                 showToast('📍 حدد موقعك أولاً', 'info');
+                getUserLocation();
                 return;
             }
             filtered = filtered.filter(e => {
@@ -5313,6 +5410,7 @@
             (p.name || '').toLowerCase().includes(query) ||
             (p.address && p.address.toLowerCase().includes(query)) ||
             (p.commune && p.commune.toLowerCase().includes(query)) ||
+            (p.wilaya && getWilayaName(p.wilaya).includes(query)) ||
             (p.clubs && p.clubs.toLowerCase().includes(query))
         );
         
@@ -5406,40 +5504,52 @@
     // مرافق نموذجية للعرض فقط: تظهر ما دامت قاعدة البيانات لا تحتوي على أي مرفق شباب.
     // الأسماء والإحداثيات تقريبية، ويستبدلها المدير بالمعلومات الحقيقية من «إضافة مرفق».
     const SAMPLE_FACILITIES = [
-        { id: 'sample-youth-setif', sample: true, type: 'youth', name: 'دار الشباب - سطيف المركز', commune: 'سطيف', address: 'وسط المدينة', lat: 36.1898, lng: 5.4108,
+        { id: 'sample-youth-alger', sample: true, type: 'youth', wilaya: '16', name: 'دار الشباب - الجزائر الوسطى', commune: 'الجزائر الوسطى', address: 'وسط العاصمة', lat: 36.7753, lng: 3.0602,
           openTime: '08:00', closeTime: '20:00', closedDay: '5',
-          facilities: 'قاعة إعلام آلي, مكتبة, قاعة رياضة, قاعة عروض, أنترنت',
+          facilities: 'قاعة إعلام آلي, مكتبة, قاعة عروض, أنترنت',
           clubs: 'نادي الإعلام الآلي, نادي المسرح, نادي الشطرنج, نادي الموسيقى',
           description: 'فضاء مفتوح للشباب يحتضن النوادي العلمية والثقافية والرياضية طوال السنة.' },
-        { id: 'sample-youth-eulma', sample: true, type: 'youth', name: 'دار الشباب - العلمة', commune: 'العلمة', address: 'حي 5 جويلية', lat: 36.1528, lng: 5.6914,
+        { id: 'sample-youth-setif', sample: true, type: 'youth', wilaya: '19', name: 'دار الشباب - سطيف المركز', commune: 'سطيف', address: 'وسط المدينة', lat: 36.1898, lng: 5.4108,
+          openTime: '08:00', closeTime: '20:00', closedDay: '5',
+          facilities: 'قاعة إعلام آلي, مكتبة, قاعة رياضة, أنترنت',
+          clubs: 'نادي الروبوتيك, نادي الرسم, نادي القراءة' },
+        { id: 'sample-youth-constantine', sample: true, type: 'youth', wilaya: '25', name: 'دار الشباب - قسنطينة', commune: 'قسنطينة', address: 'وسط المدينة', lat: 36.3650, lng: 6.6147,
           openTime: '08:30', closeTime: '19:00', closedDay: '5',
           facilities: 'قاعة متعددة النشاطات, ورشة فنون, قاعة إعلام آلي',
-          clubs: 'نادي الرسم, نادي الروبوتيك, نادي الكاراتي, نادي القراءة',
+          clubs: 'نادي الخط العربي, نادي التصوير, نادي الكاراتي',
           description: 'ورشات أسبوعية في الفنون والتكنولوجيا ومسابقات بين النوادي.' },
-        { id: 'sample-youth-ainoulmene', sample: true, type: 'youth', name: 'دار الشباب - عين ولمان', commune: 'عين ولمان', address: 'وسط المدينة', lat: 35.9216, lng: 5.2989,
+        { id: 'sample-youth-tlemcen', sample: true, type: 'youth', wilaya: '13', name: 'دار الشباب - تلمسان', commune: 'تلمسان', address: 'وسط المدينة', lat: 34.8828, lng: -1.3167,
           openTime: '08:00', closeTime: '18:00', closedDay: '5',
           facilities: 'مكتبة, قاعة محاضرات, فضاء أنترنت',
-          clubs: 'نادي التصوير, نادي الخط العربي, نادي البيئة' },
-        { id: 'sample-hostel-setif', sample: true, type: 'hostel', name: 'بيت الشباب - سطيف', commune: 'سطيف', address: 'قرب المحطة البرية', lat: 36.1946, lng: 5.4022,
-          openTime: '07:00', closeTime: '23:00', closedDay: '', capacity: 60, price: 400,
+          clubs: 'نادي الموسيقى الأندلسية, نادي المسرح, نادي البيئة' },
+        { id: 'sample-youth-tamanrasset', sample: true, type: 'youth', wilaya: '11', name: 'دار الشباب - تمنراست', commune: 'تمنراست', address: 'وسط المدينة', lat: 22.7850, lng: 5.5228,
+          openTime: '08:00', closeTime: '18:00', closedDay: '5',
+          facilities: 'قاعة نشاطات, مكتبة, ملعب جواري',
+          clubs: 'نادي التراث, نادي التصوير, نادي كرة القدم' },
+        { id: 'sample-hostel-oran', sample: true, type: 'hostel', wilaya: '31', name: 'بيت الشباب - وهران', commune: 'وهران', address: 'قرب الواجهة البحرية', lat: 35.6971, lng: -0.6308,
+          openTime: '07:00', closeTime: '23:00', closedDay: '', capacity: 80, price: 450,
           facilities: 'مراقد جماعية, غرف عائلية, مطعم, أنترنت, حراسة 24/24',
           description: 'إقامة اقتصادية للشباب والأفواج المسافرة والرياضيين والطلبة.' },
-        { id: 'sample-hostel-bougaa', sample: true, type: 'hostel', name: 'بيت الشباب - بوقاعة', commune: 'بوقاعة', address: 'المدخل الشمالي', lat: 36.3335, lng: 5.0886,
-          openTime: '07:00', closeTime: '22:00', closedDay: '', capacity: 40, price: 350,
-          facilities: 'مراقد جماعية, مطبخ, قاعة جلوس, موقف سيارات' },
-        { id: 'sample-camp-babor', sample: true, type: 'camp', name: 'مخيم الشباب - بابور', commune: 'بابور', address: 'سفوح جبال بابور', lat: 36.4900, lng: 5.5300,
-          openTime: '08:00', closeTime: '22:00', closedDay: '', capacity: 120, price: 300,
-          facilities: 'خيام مجهزة, مطعم, ملاعب, مسارات مشي',
-          clubs: 'ورشة التخييم والكشافة, ورشة المشي الجبلي',
-          description: 'مخيم صيفي في أحضان جبال بابور للرحلات والتخييم والأنشطة الطبيعية.' },
-        { id: 'sample-sport-setif', sample: true, type: 'sport', name: 'المركب الرياضي الجواري - سطيف', commune: 'سطيف', address: 'الحي الجامعي', lat: 36.2010, lng: 5.4250,
+        { id: 'sample-hostel-setif', sample: true, type: 'hostel', wilaya: '19', name: 'بيت الشباب - سطيف', commune: 'سطيف', address: 'قرب المحطة البرية', lat: 36.1946, lng: 5.4022,
+          openTime: '07:00', closeTime: '23:00', closedDay: '', capacity: 60, price: 400,
+          facilities: 'مراقد جماعية, غرف عائلية, مطعم, أنترنت' },
+        { id: 'sample-hostel-ghardaia', sample: true, type: 'hostel', wilaya: '47', name: 'بيت الشباب - غرداية', commune: 'غرداية', address: 'مدخل المدينة', lat: 32.4909, lng: 3.6735,
+          openTime: '07:00', closeTime: '22:00', closedDay: '', capacity: 50, price: 400,
+          facilities: 'مراقد جماعية, مطبخ, قاعة جلوس, موقف سيارات',
+          description: 'محطة للرحلات السياحية والثقافية نحو وادي ميزاب والجنوب.' },
+        { id: 'sample-camp-bejaia', sample: true, type: 'camp', wilaya: '6', name: 'مخيم الشباب - بجاية', commune: 'بجاية', address: 'الساحل الشرقي', lat: 36.7000, lng: 5.1500,
+          openTime: '08:00', closeTime: '22:00', closedDay: '', capacity: 150, price: 350,
+          facilities: 'خيام مجهزة, مطعم, ملاعب, شاطئ قريب',
+          clubs: 'ورشة التخييم والكشافة, ورشة السباحة',
+          description: 'مخيم صيفي على الساحل للرحلات والتخييم والأنشطة البحرية.' },
+        { id: 'sample-sport-annaba', sample: true, type: 'sport', wilaya: '23', name: 'المركب الرياضي الجواري - عنابة', commune: 'عنابة', address: 'الحي الجامعي', lat: 36.9000, lng: 7.7667,
           openTime: '09:00', closeTime: '21:00', closedDay: '',
           facilities: 'ملعب معشوشب, قاعة متعددة الرياضات, مسبح',
           clubs: 'مدرسة كرة القدم, نادي السباحة' }
     ];
 
     // حالة الواجهة
-    const houseFilters = { type: 'all', q: '', near: false, open: false, fav: false };
+    const houseFilters = { type: 'all', q: '', near: false, open: false, fav: false, wilaya: 'all' };
     const evFilters = { category: 'all', facility: 'all', day: null, view: 'list', month: null };
     let adminReqView = 'bookings';
     let adminReqFilter = 'pending';
@@ -5577,6 +5687,53 @@
             return order.indexOf(a.type) - order.indexOf(b.type) || (a.name || '').localeCompare(b.name || '', 'ar');
         });
     }
+    // «البلدية · ولاية X · العنوان» بدون تكرار اسم الولاية إذا كان هو نفسه اسم البلدية
+    function placeLine(f, withAddress = true) {
+        const w = f.wilaya ? getWilayaName(f.wilaya) : '';
+        const parts = [f.commune];
+        if (w && w !== 'غير محدد' && w !== f.commune) parts.push('ولاية ' + w);
+        if (withAddress) parts.push(f.address);
+        return parts.filter(Boolean).join(' · ');
+    }
+    function wilayaLabel(f) {
+        const w = f.wilaya ? getWilayaName(f.wilaya) : '';
+        return w && w !== 'غير محدد' ? 'ولاية ' + w : (f.commune || '');
+    }
+    // خيارات المرافق في القوائم المنسدلة، مجمّعة حسب الولاية
+    function facilityOptions(list) {
+        const groups = {};
+        list.forEach(f => { const k = f.wilaya || ''; (groups[k] = groups[k] || []).push(f); });
+        const keys = Object.keys(groups).sort((a, b) => (+a || 99) - (+b || 99));
+        const opt = f => `<option value="${f.id}">${FACILITY_TYPES[f.type] ? FACILITY_TYPES[f.type].emoji + ' ' : ''}${esc(f.name)}</option>`;
+        if (keys.length < 2) return list.map(opt).join('');
+        return keys.map(k => `<optgroup label="${esc(k ? 'ولاية ' + getWilayaName(k) : 'ولاية غير محددة')}">${groups[k].map(opt).join('')}</optgroup>`).join('');
+    }
+    // قائمة ولايات للتصفية: «كل الولايات» ثم الولايات التي فيها مرافق فقط
+    function fillWilayaFilter(sel, list, current) {
+        const counts = {};
+        list.forEach(f => { if (f.wilaya) counts[f.wilaya] = (counts[f.wilaya] || 0) + 1; });
+        const codes = Object.keys(counts).sort((a, b) => +a - +b);
+        sel.innerHTML = `<option value="all">كل الولايات (${list.length})</option>` +
+            codes.map(c => `<option value="${c}">${String(c).padStart(2, '0')} - ${esc(getWilayaName(c))} (${counts[c]})</option>`).join('');
+        sel.value = current === 'all' || counts[current] ? current : 'all';
+        return sel.value;
+    }
+    function fillWilayaSelect(id, placeholder) {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        const prev = sel.value;
+        sel.innerHTML = (placeholder ? `<option value="">${placeholder}</option>` : '') +
+            Object.keys(WILAYAS).map(c => `<option value="${c}">${c.padStart(2, '0')} - ${WILAYAS[c]}</option>`).join('');
+        if (prev && WILAYAS[prev]) sel.value = prev;
+    }
+    function initWilayaSelects() {
+        fillWilayaSelect('signup-wilaya', 'اختر ولايتك');
+        document.getElementById('signup-wilaya').value = ''; // يختار المستخدم ولايته بنفسه
+        fillWilayaSelect('edit-wilaya');
+        fillWilayaSelect('eventWilaya');
+        fillWilayaSelect('placeWilaya');
+    }
+
     function clubIcon(name) {
         const rules = [
             [/مسرح/, 'fa-masks-theater'], [/شطرنج/, 'fa-chess'], [/موسيق|غناء|إنشاد/, 'fa-music'],
@@ -5605,6 +5762,8 @@
     }
 
     // ==================== التهيئة وتحميل البيانات ====================
+    initWilayaSelects(); // الحقول موجودة مسبقاً (السكربت في آخر الصفحة)
+
     function initYouthFeatures() {
         const t = todayStr();
         document.getElementById('avail-in').value = addDays(t, 1);
@@ -5710,7 +5869,7 @@
                 <span class="mini-ico" style="--c:${t.color}"><i class="fas ${t.icon}"></i></span>
                 <div class="mini-info">
                     <b>${esc(f.name)}</b>
-                    <small>${esc(t.label)}${f.commune ? ' · ' + esc(f.commune) : ''}${open ? ` · <span class="${open.open ? 'txt-ok' : 'txt-off'}">${open.open ? 'مفتوح' : 'مغلق'}</span>` : ''}</small>
+                    <small>${esc(t.label)} · ${esc(wilayaLabel(f))}${open ? ` · <span class="${open.open ? 'txt-ok' : 'txt-off'}">${open.open ? 'مفتوح' : 'مغلق'}</span>` : ''}</small>
                 </div>
                 <span class="mini-side">${dist != null ? formatDistance(dist) : '<i class="fas fa-chevron-left"></i>'}</span>
             </div>`;
@@ -5771,7 +5930,8 @@
         const favs = getFavs();
         const list = getFacilities().filter(f =>
             (houseFilters.type === 'all' || f.type === houseFilters.type) &&
-            (!q || [f.name, f.commune, f.address, f.clubs, f.facilities].some(v => (v || '').toLowerCase().includes(q))) &&
+            (houseFilters.wilaya === 'all' || String(f.wilaya) === houseFilters.wilaya) &&
+            (!q || [f.name, f.commune, f.address, f.clubs, f.facilities, f.wilaya ? getWilayaName(f.wilaya) : ''].some(v => (v || '').toLowerCase().includes(q))) &&
             (!houseFilters.open || facilityOpenState(f)?.open) &&
             (!houseFilters.fav || favs.includes(f.id))
         );
@@ -5790,6 +5950,7 @@
         document.getElementById('toggle-open').classList.toggle('active', houseFilters.open);
         document.getElementById('toggle-fav').classList.toggle('active', houseFilters.fav);
         document.getElementById('houses-notice').innerHTML = sampleNotice();
+        houseFilters.wilaya = fillWilayaFilter(document.getElementById('houses-wilaya'), getFacilities(), houseFilters.wilaya);
 
         const list = filteredFacilities();
         document.getElementById('houses-count').textContent = list.length ? plural(list.length, 'مرفق واحد', 'مرفقان', 'مرافق', 'مرفقاً') : '';
@@ -5815,7 +5976,7 @@
                 </div>
                 <div class="fac-body">
                     <h4 onclick="openFacility('${f.id}')">${esc(f.name)}</h4>
-                    <p class="muted"><i class="fas fa-location-dot"></i> ${esc([f.commune, f.address].filter(Boolean).join(' · '))}</p>
+                    <p class="muted"><i class="fas fa-location-dot"></i> ${esc(placeLine(f))}</p>
                     <div class="chips">
                         ${open ? `<span class="chip ${open.open ? 'ok' : 'off'}"><i class="fas fa-clock"></i> ${open.label}</span>` : ''}
                         ${dist != null ? `<span class="chip"><i class="fas fa-route"></i> ${formatDistance(dist)}</span>` : ''}
@@ -5834,7 +5995,7 @@
 
     function ensureFacMap() {
         if (!facMap) {
-            facMap = L.map('fac-map').setView([36.19, 5.41], 9);
+            facMap = L.map('fac-map', { zoomSnap: 0.25 }).setView([28.2, 2.6], 4.5);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(facMap);
             facMarkersLayer = L.layerGroup().addTo(facMap);
             facMap.on('click', e => { if (selectedRole === 'admin') showAddPlacePrompt(e.latlng, facMap); });
@@ -5857,7 +6018,7 @@
                     iconSize: [34, 42], iconAnchor: [17, 42], popupAnchor: [0, -40]
                 })
             });
-            marker.bindPopup(`<div style="text-align:center;min-width:150px"><b>${esc(f.name)}</b><br><small>${esc(t.label)}${f.commune ? ' · ' + esc(f.commune) : ''}</small><br>
+            marker.bindPopup(`<div style="text-align:center;min-width:150px"><b>${esc(f.name)}</b><br><small>${esc(t.label)} · ${esc(wilayaLabel(f))}</small><br>
                 <button class="btn btn-primary btn-small" style="margin-top:6px" onclick="openFacility('${f.id}')">التفاصيل</button></div>`);
             facMarkersLayer.addLayer(marker);
         });
@@ -5869,7 +6030,8 @@
         if (fit && list.length) {
             const pts = list.map(f => [f.lat, f.lng]);
             if (userLocated && houseFilters.near) pts.push([currentLocation.lat, currentLocation.lng]);
-            facMap.fitBounds(L.latLngBounds(pts).pad(0.25), { maxZoom: 14 });
+            // هامش علوي بارتفاع العلامة (ترسم فوق نقطتها) حتى لا تُقص علامات الساحل
+            facMap.fitBounds(L.latLngBounds(pts), { paddingTopLeft: [28, 56], paddingBottomRight: [28, 18], maxZoom: 14 });
         }
     }
 
@@ -5895,7 +6057,7 @@
                 <span class="fd-emoji">${t.emoji}</span>
             </div>
             <h3 class="fd-title">${esc(f.name)}</h3>
-            <p class="muted"><i class="fas fa-location-dot"></i> ${esc([f.commune, f.address].filter(Boolean).join(' · '))}${dist != null ? ' · ' + formatDistance(dist) : ''}</p>
+            <p class="muted"><i class="fas fa-location-dot"></i> ${esc(placeLine(f))}${dist != null ? ' · ' + formatDistance(dist) : ''}</p>
             ${open ? `<span class="chip ${open.open ? 'ok' : 'off'}"><i class="fas fa-clock"></i> ${open.label}</span>` : ''}
             ${f.description ? `<p class="fd-desc">${esc(f.description)}</p>` : ''}
 
@@ -5990,6 +6152,7 @@
         editingPlaceId = f.sample ? null : f.id;
         const set = (elId, v) => { document.getElementById(elId).value = v ?? ''; };
         set('placeName', f.name);
+        set('placeWilaya', f.wilaya || currentUserData?.wilaya || '16');
         set('placeAddress', f.address);
         set('placeDescription', f.description);
         set('placeCommune', f.commune);
@@ -6024,8 +6187,9 @@
         if (prevCat) catSel.value = prevCat;
         const facSel = document.getElementById('eventFacility');
         const prevFac = facSel.value;
-        facSel.innerHTML = '<option value="">— بدون / مكان آخر —</option>' +
-            getFacilities().map(f => `<option value="${f.id}">${FACILITY_TYPES[f.type].emoji} ${esc(f.name)}</option>`).join('');
+        facSel.innerHTML = '<option value="">— بدون / مكان آخر —</option>' + facilityOptions(getFacilities());
+        const wSel = document.getElementById('eventWilaya');
+        if (!wSel.dataset.touched) wSel.value = currentUserData?.wilaya || '16';
         facSel.value = prevFac && findFacility(prevFac) ? prevFac : '';
     }
 
@@ -6036,6 +6200,7 @@
         document.getElementById('eventLat').value = Number(f.lat).toFixed(6);
         document.getElementById('eventLng').value = Number(f.lng).toFixed(6);
         document.getElementById('eventPlaceType').value = f.type;
+        if (f.wilaya) document.getElementById('eventWilaya').value = f.wilaya;
         if (f.phone && !document.getElementById('eventPhone').value) document.getElementById('eventPhone').value = f.phone;
     }
 
@@ -6096,7 +6261,10 @@
         }
         document.getElementById('booking-notice').innerHTML = notice;
 
-        const list = sortFacilities(getFacilities().filter(isBookable), true);
+        const wSel = document.getElementById('avail-wilaya');
+        const bookableAll = getFacilities().filter(isBookable);
+        const wFilter = fillWilayaFilter(wSel, bookableAll, wSel.value || 'all');
+        const list = sortFacilities(bookableAll.filter(f => wFilter === 'all' || String(f.wilaya) === wFilter), true);
         document.getElementById('booking-facilities').innerHTML = list.length ? list.map(f => {
             const t = FACILITY_TYPES[f.type];
             const av = valid ? availabilityFor(f, inD, outD) : null;
@@ -6108,7 +6276,7 @@
                     <span class="mini-ico big" style="--c:${t.color}"><i class="fas ${t.icon}"></i></span>
                     <div class="bk-info">
                         <b onclick="openFacility('${f.id}')">${esc(f.name)}</b>
-                        <small>${t.label}${f.commune ? ' · ' + esc(f.commune) : ''}${dist != null ? ' · ' + formatDistance(dist) : ''}</small>
+                        <small>${t.label} · ${esc(wilayaLabel(f))}${dist != null ? ' · ' + formatDistance(dist) : ''}</small>
                         <div class="chips">
                             ${valid ? availabilityChip(av, guests) : ''}
                             <span class="chip"><i class="fas fa-coins"></i> ${formatDZD(f.price)} / ليلة</span>
@@ -6153,7 +6321,7 @@
         const bookables = getFacilities().filter(isBookable);
         if (!bookables.length) return showToast('لا توجد مرافق متاحة للحجز حالياً', 'info');
         const sel = document.getElementById('bk-facility');
-        sel.innerHTML = bookables.map(f => `<option value="${f.id}">${FACILITY_TYPES[f.type].emoji} ${esc(f.name)}</option>`).join('');
+        sel.innerHTML = facilityOptions(bookables);
         sel.value = facId && bookables.some(f => f.id === facId) ? facId : bookables[0].id;
 
         const a = readAvailInputs();
@@ -6321,7 +6489,7 @@
             <p class="muted" style="margin-bottom:12px;">انضم إلى نادٍ في دار الشباب الأقرب إليك وطوّر موهبتك مع شباب يشاركونك نفس الشغف.</p>
             ${facs.length ? sortFacilities(facs, true).map(f => `
                 <div class="fd-section">
-                    <h4 class="link" onclick="openFacility('${f.id}')">${FACILITY_TYPES[f.type].emoji} ${esc(f.name)} <small>${esc(f.commune || '')}</small></h4>
+                    <h4 class="link" onclick="openFacility('${f.id}')">${FACILITY_TYPES[f.type].emoji} ${esc(f.name)} <small>${esc(wilayaLabel(f))}</small></h4>
                     <div class="club-list">${splitList(f.clubs).map((c, i) => clubRow(f, c, i)).join('')}</div>
                 </div>`).join('') : emptyState('fa-masks-theater', 'لا توجد نوادي مسجلة بعد')}
         `;
@@ -6333,7 +6501,7 @@
         if (!requireLogin()) return;
         const facs = getFacilities().filter(f => splitList(f.clubs).length);
         const sel = document.getElementById('cl-facility');
-        sel.innerHTML = facs.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('');
+        sel.innerHTML = facilityOptions(facs);
         sel.value = facId;
         fillClubOptions();
         if (clubIndex !== undefined) document.getElementById('cl-club').selectedIndex = clubIndex;
@@ -6423,7 +6591,7 @@
         if (!evFilters.month) return;
         const sel = document.getElementById('ev-facility');
         sel.innerHTML = `<option value="all">🏠 كل فعاليات دور ومرافق الشباب</option><option value="any">📋 جميع الفعاليات (بما فيها التطوعية)</option>` +
-            getFacilities().map(f => `<option value="${f.id}">${FACILITY_TYPES[f.type].emoji} ${esc(f.name)}</option>`).join('');
+            facilityOptions(getFacilities());
         sel.value = [...sel.options].some(o => o.value === evFilters.facility) ? evFilters.facility : 'all';
         evFilters.facility = sel.value;
 
