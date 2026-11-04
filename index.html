@@ -2141,6 +2141,97 @@
             #ticket-print { position: absolute; top: 0; left: 0; right: 0; }
             .modal { background: none !important; }
         }
+
+        /* =====================================================================
+           التجاوب مع الأجهزة: الهاتف (افتراضي) ← اللوحي ← الحاسوب
+           ===================================================================== */
+        #app.ready { display: block; }
+        .nav-item.desk-only { display: none; }
+        .fac-list > .bk-card + .bk-card { margin-top: 0; }
+
+        /* اللوحي */
+        @media (min-width: 768px) {
+            #app { max-width: 820px; }
+            .main-content { padding: 22px 24px 120px; }
+            .quick-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+            .fac-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .stat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .gallery-grid { grid-template-columns: repeat(4, 1fr); }
+            #map, #fac-map { height: 380px; }
+            .bottom-nav { max-width: 640px; }
+            .hero { padding: 26px 28px; }
+        }
+
+        /* الحاسوب: شريط جانبي للتنقل وهيدر عريض */
+        @media (min-width: 1024px) {
+            #app { max-width: 1360px; padding: 24px 28px 48px; background: transparent; box-shadow: none; }
+            #app.ready { display: grid; grid-template-columns: 232px minmax(0, 1fr); column-gap: 28px; align-items: start; }
+
+            .header {
+                grid-column: 1 / -1; grid-row: 1;
+                display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 14px 18px; align-items: center;
+                border-radius: 26px; padding: 18px 24px; margin-bottom: 24px;
+            }
+            .header-top { grid-column: 1 / -1; margin-bottom: 0; }
+            .location-bar { margin-bottom: 0; }
+            .main-content { grid-column: 2; grid-row: 2; padding: 0 0 40px; min-width: 0; }
+
+            .bottom-nav {
+                grid-column: 1; grid-row: 2;
+                position: sticky; top: 24px; left: auto; right: auto; bottom: auto;
+                max-width: none; margin: 0;
+                flex-direction: column; align-items: stretch; gap: 4px;
+                padding: 12px; border-radius: 22px;
+            }
+            .nav-item, .nav-item.desk-only {
+                display: flex; flex: none; flex-direction: row; align-items: center; justify-content: flex-start;
+                gap: 12px; padding: 12px 16px; font-size: 0.95rem; border-radius: 14px; text-align: right;
+            }
+            .nav-item:not(.active):hover { background: var(--surface-2); color: var(--text); }
+            .nav-item i { margin-bottom: 0; width: 24px; text-align: center; font-size: 18px; }
+            .nav-item .badge { position: static; margin: 0 auto 0 0; }
+            .nav-item:not(.desk-only) + .nav-item.desk-only { margin-top: 13px; }
+            .nav-item:not(.desk-only) + .nav-item.desk-only::before {
+                content: ''; position: absolute; top: -8px; left: 12px; right: 12px; height: 1px; background: var(--border);
+            }
+
+            .toast { bottom: 32px; }
+            .modal-content { max-width: 560px; }
+            #facilityModal .modal-content, #usersModal .modal-content { max-width: 760px; }
+            #bookingModal .modal-content { max-width: 640px; }
+
+            #map, #fac-map { height: 440px; }
+            .fac-list { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+        }
+
+        /* الشاشات العريضة: محتوى على عمودين */
+        @media (min-width: 1180px) {
+            #home.section.active { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; align-items: start; }
+            #home > .hero, #home > .quick-grid, #home > .filter-tabs { grid-column: 1 / -1; }
+            .hero { display: grid; grid-template-columns: minmax(0, 1fr) 440px; align-items: center; gap: 32px; padding: 32px 36px; }
+            .hero h2 { font-size: 1.9rem; }
+            .hero-stats { margin-top: 0; }
+
+            #booking.section.active { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); grid-template-rows: auto auto auto 1fr; column-gap: 24px; align-items: start; }
+            #booking > .page-head, #booking > .steps { grid-column: 1 / -1; }
+            #booking > .bk-avail { grid-column: 1; grid-row: 3 / span 2; }
+            #booking > .bk-mine, #booking > .info-card { grid-column: 2; }
+            #booking-facilities.fac-list { grid-template-columns: 1fr; }
+
+            #events-page.section.active { display: grid; grid-template-columns: minmax(0, 1fr) 400px; grid-template-rows: auto auto auto auto 1fr; column-gap: 24px; align-items: start; }
+            #events-page > .page-head, #ev-cat-tabs, #events-page > .edit-field { grid-column: 1 / -1; }
+            #events-page > .edit-field { max-width: 520px; }
+            #ev-view-seg { display: none; }
+            #ev-calendar-card { grid-column: 2; grid-row: 4 / span 2; position: sticky; top: 24px; }
+            #ev-day-filter { grid-column: 1; grid-row: 4; }
+            #ev-list { grid-column: 1; grid-row: 5; }
+
+            #profile.section.active, #leaderboard.section.active { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; align-items: start; }
+            #profile > .edit-form { grid-column: 1 / -1; }
+
+            #adm-list.req-list, #admin-events-list.events-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            #notifications.section.active, #settings.section.active { max-width: 880px; }
+        }
     </style>
 </head>
 <body>
@@ -2551,7 +2642,7 @@
                 <div class="step"><span>4</span>قدّم التذكرة عند الوصول</div>
             </div>
 
-            <div class="card">
+            <div class="card bk-avail">
                 <div class="card-header">
                     <h3 class="card-title"><i class="fas fa-magnifying-glass"></i> تحقق من الأماكن المتاحة</h3>
                 </div>
@@ -2577,7 +2668,7 @@
                 <div id="booking-facilities" class="fac-list"></div>
             </div>
 
-            <div class="card">
+            <div class="card bk-mine">
                 <div class="card-header">
                     <h3 class="card-title"><i class="fas fa-ticket"></i> حجوزاتي</h3>
                 </div>
@@ -3108,6 +3199,16 @@
         </div>
         <div class="nav-item" data-tab="profile" onclick="switchTab('profile')">
             <i class="fas fa-user"></i><span>ملفي</span>
+        </div>
+        <div class="nav-item desk-only" data-tab="notifications" onclick="switchTab('notifications')">
+            <i class="fas fa-bell"></i><span>الإشعارات</span>
+            <span class="badge" id="nav-notification-count" style="display:none;">0</span>
+        </div>
+        <div class="nav-item desk-only" data-tab="leaderboard" onclick="switchTab('leaderboard')">
+            <i class="fas fa-trophy"></i><span>لوحة الشرف</span>
+        </div>
+        <div class="nav-item desk-only" data-tab="settings" onclick="switchTab('settings')">
+            <i class="fas fa-cog"></i><span>الإعدادات</span>
         </div>
     </div>
     <div class="bottom-nav" id="admin-nav" style="display: none;"></div>
@@ -3646,7 +3747,7 @@
         if (user) {
             document.getElementById('role-screen').style.display = 'none';
             document.getElementById('auth-screen').classList.remove('active');
-            document.getElementById('app').style.display = 'block';
+            document.getElementById('app').classList.add('ready');
             // الخريطة أُنشئت والتطبيق مخفي، لذا نعيد حساب أبعادها بعد الإظهار
             setTimeout(() => map && map.invalidateSize(), 100);
 
@@ -3695,7 +3796,18 @@
                             <div class="nav-item" data-tab="profile" onclick="switchTab('profile')">
                                 <i class="fas fa-user"></i><span>ملفي</span>
                             </div>
+                            <div class="nav-item desk-only" data-tab="notifications" onclick="switchTab('notifications')">
+                                <i class="fas fa-bell"></i><span>الإشعارات</span>
+                                <span class="badge" id="admin-nav-notification-count" style="display:none;">0</span>
+                            </div>
+                            <div class="nav-item desk-only" data-tab="leaderboard" onclick="switchTab('leaderboard')">
+                                <i class="fas fa-trophy"></i><span>لوحة الشرف</span>
+                            </div>
+                            <div class="nav-item desk-only" data-tab="settings" onclick="switchTab('settings')">
+                                <i class="fas fa-cog"></i><span>الإعدادات</span>
+                            </div>
                         `;
+                        updateNotifBadges();
                         document.getElementById('admin-danger-zone').style.display = 'block';
                         updatePendingCount();
                         filterAdminEvents('pending');
@@ -4832,13 +4944,8 @@
                 snapshot.forEach(child => { notifications.push({ id: child.key, ...child.val() }); });
                 
                 notifications.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
-                const unread = notifications.filter(n => !n.read).length;
-                ['notification-count', 'nav-notification-count', 'admin-nav-notification-count'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (!el) return;
-                    el.textContent = unread;
-                    el.style.display = unread > 0 ? 'flex' : 'none';
-                });
+                lastUnreadCount = notifications.filter(n => !n.read).length;
+                updateNotifBadges();
                 
                 const container = document.getElementById('notifications-container');
                 if (!container) return;
@@ -4858,6 +4965,17 @@
                     </div>
                 `).join('');
             }, error => showToast('❌ خطأ في تحميل الإشعارات: ' + error.message, 'error'));
+    }
+
+    // شارات عدد الإشعارات غير المقروءة (الهيدر والشريط الجانبي)
+    let lastUnreadCount = 0;
+    function updateNotifBadges() {
+        ['notification-count', 'nav-notification-count', 'admin-nav-notification-count'].forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = lastUnreadCount;
+            el.style.display = lastUnreadCount > 0 ? 'flex' : 'none';
+        });
     }
 
     function sendNotification(userId, title, message) {
@@ -5335,6 +5453,8 @@
     let occupancy = {};
     let lastTicket = null;
     let youthDataLoaded = false;
+    // الشاشات العريضة (الحاسوب): تخطيط متعدد الأعمدة والتقويم بجانب قائمة الفعاليات
+    const WIDE_SCREEN = window.matchMedia('(min-width: 1180px)');
     let adminYouthLoaded = false;
 
     // ==================== أدوات مساعدة ====================
@@ -5495,6 +5615,12 @@
         renderTypeTabs();
         renderCategoryTabs();
         renderAdminFilterTabs();
+        const onLayoutChange = () => {
+            refreshYouthViews();
+            setTimeout(() => { if (map) map.invalidateSize(); if (facMap) facMap.invalidateSize(); }, 150);
+        };
+        if (WIDE_SCREEN.addEventListener) WIDE_SCREEN.addEventListener('change', onLayoutChange);
+        else if (WIDE_SCREEN.addListener) WIDE_SCREEN.addListener(onLayoutChange);
         document.addEventListener('keydown', e => {
             if (e.key !== 'Escape') return;
             document.querySelectorAll('.modal.active').forEach(m => m.id ? closeModal(m.id) : m.remove());
@@ -6303,8 +6429,9 @@
 
         const list = eventsForFilters();
         const calCard = document.getElementById('ev-calendar-card');
-        calCard.style.display = evFilters.view === 'calendar' ? 'block' : 'none';
-        if (evFilters.view === 'calendar') renderCalendar(list);
+        const showCalendar = evFilters.view === 'calendar' || WIDE_SCREEN.matches;
+        calCard.style.display = showCalendar ? 'block' : 'none';
+        if (showCalendar) renderCalendar(list);
 
         const t = todayStr();
         const shown = evFilters.day ? list.filter(e => e.date === evFilters.day) : list.filter(e => e.date >= t);
