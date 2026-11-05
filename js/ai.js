@@ -147,7 +147,7 @@ function aiParseActions(text) {
         if (kind === 'ask') { if (arg && arg.trim()) asks.push(arg.trim()); }
         else actions.push({ kind, arg: (arg || '').trim() });
         return '';
-    }).replace(/[ \t]+$/gm, '').trim();
+    }).replace(/[ \t]+([.،,؟?!:])/g, '$1').replace(/[ \t]+$/gm, '').trim();
     return { text: clean, actions: actions.slice(0, 3), asks: asks.slice(0, 3) };
 }
 
