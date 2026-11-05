@@ -474,6 +474,15 @@ body { background-attachment: scroll; }
 .ai-mode.live { background: rgba(16, 185, 129, 0.16); color: #34d399; }
 .ai-mode.local { background: rgba(148, 163, 184, 0.16); color: var(--text-muted); }
 .bubble.ai { border-color: rgba(167, 139, 250, 0.35); }
+.bubble.ai { max-width: 92%; }
+.ai-text p { margin: 0 0 6px; }
+.ai-text p:last-child { margin-bottom: 0; }
+.ai-text b { color: var(--accent); font-weight: 800; }
+.ai-ul, .ai-ol { margin: 4px 0 8px; padding-inline-start: 20px; display: grid; gap: 4px; }
+.ai-ul li::marker { color: var(--accent); }
+.ai-ol li::marker { color: var(--accent); font-weight: 800; }
+.ai-head-tools { display: flex; gap: 6px; align-items: center; }
+.ai-head-tools .icon-btn { width: 34px; height: 34px; }
 .ai-acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .ai-acts .chip-btn { white-space: normal; text-align: right; }
 .b-tools { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
