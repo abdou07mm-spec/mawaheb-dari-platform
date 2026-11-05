@@ -1,18 +1,26 @@
 {
-  "name": "مواهب داري - منصة دور الشباب في الجزائر",
+  "id": "./?mode=app",
+  "name": "مواهب داري - تطبيق شباب الجزائر",
   "short_name": "مواهب داري",
-  "description": "دليل دور الشباب، حجز بيوت الشباب، الفعاليات والنوادي والتطوع لشباب الجزائر.",
+  "description": "تطبيق شباب الجزائر: دور الشباب في 58 ولاية، الحجز في بيوت الشباب، الفعاليات، التطوع والأعمال الخيرية، معرض المواهب، جواز المواهب، النجوم والمكافآت، والمراسلة مع دور الشباب.",
   "lang": "ar",
   "dir": "rtl",
-  "start_url": "./",
+  "start_url": "./?mode=app&source=pwa",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0b1220",
   "theme_color": "#0a5c3e",
+  "categories": ["social", "education", "lifestyle"],
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "المساعد الذكي", "short_name": "المساعد", "url": "./?mode=app&open=assistant", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "احجز إقامة", "short_name": "الحجز", "url": "./?mode=app#booking", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "فرص التطوع", "short_name": "التطوع", "url": "./?mode=app#volunteer", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "الرسائل", "short_name": "الرسائل", "url": "./?mode=app#messages", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
   ]
 }
