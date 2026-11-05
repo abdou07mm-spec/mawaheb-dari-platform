@@ -482,6 +482,14 @@ body { background-attachment: scroll; }
 .ai-ul li::marker { color: var(--accent); }
 .ai-ol li::marker { color: var(--accent); font-weight: 800; }
 .ai-head-tools { display: flex; gap: 6px; align-items: center; }
+.ai-mode { cursor: pointer; }
+.ai-status { display: flex; gap: 10px; align-items: center; margin: 0 14px 8px; padding: 10px 12px; border-radius: 14px; background: rgba(245, 158, 11, 0.10); border: 1px solid rgba(245, 158, 11, 0.32); font-size: 0.8rem; }
+.ai-status[hidden] { display: none; }
+.ai-status > i { color: var(--warn); }
+.ai-status > div { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.ai-status span { color: var(--text); line-height: 1.5; }
+.ai-status small { color: var(--text-muted); font-size: 0.66rem; word-break: break-all; }
+.ai-status .btn { white-space: nowrap; }
 .ai-head-tools .icon-btn { width: 34px; height: 34px; }
 .ai-acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .ai-acts .chip-btn { white-space: normal; text-align: right; }

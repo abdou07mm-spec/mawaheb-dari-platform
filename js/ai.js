@@ -36,39 +36,75 @@ function aiInit() {
     return AI.loading;
 }
 
+// تصنيف أخطاء Gemini: سبب واضح للمستخدم، وهل نعيد المحاولة أو نتوقف مؤقتاً
+function aiClassify(msg) {
+    const m = String(msg || '');
+    if (/location is not supported|user location|not available in your (country|region)|unsupported (country|region|location)/i.test(m)) return { kind: 'location', off: true, reason: 'Gemini غير متاح من موقعك الحالي. إن كنت تستعمل VPN فأوقفه ثم أعد المحاولة.' };
+    if (/app.?check|attestation/i.test(m)) return { kind: 'appcheck', off: true, reason: 'App Check يرفض الطلب: أوقف «الإلزام» في Firebase أو أضف App Check إلى التطبيق.' };
+    if (/api key not valid|invalid api key|API_KEY_INVALID|referer|referrer|API_KEY_HTTP_REFERRER_BLOCKED|API_KEY_SERVICE_BLOCKED/i.test(m)) return { kind: 'key', off: true, reason: 'مفتاح Firebase لا يسمح بخدمة الذكاء الاصطناعي من هذا الموقع (قيود المفتاح في Google Cloud).' };
+    if (/api.?not.?enabled|has not been used|SERVICE_DISABLED|is disabled/i.test(m)) return { kind: 'disabled', off: true, reason: 'خدمة Firebase AI Logic غير مفعّلة في المشروع.' };
+    if (/PERMISSION_DENIED|\b403\b/i.test(m)) return { kind: 'denied', off: true, reason: 'رُفض الطلب (403): تحقق من تفعيل AI Logic ومن قيود المفتاح.' };
+    if (/\b429\b|RESOURCE_EXHAUSTED|quota|rate.?limit/i.test(m)) return { kind: 'quota', pause: 60000, reason: 'تجاوز مؤقت لحد الاستعمال المجاني، يعود Gemini بعد دقيقة.' };
+    if (/not.?found|\b404\b|unsupported model|is not supported for/i.test(m)) return { kind: 'model', next: true, reason: 'النموذج غير متاح.' };
+    if (/timeout|timed out|aborted|ai-timeout/i.test(m)) return { kind: 'timeout', retry: true, reason: 'انتهت مهلة الاتصال بـ Gemini (الشبكة بطيئة).' };
+    if (/failed to fetch|network|load failed|fetch-error|ERR_|offline/i.test(m)) return { kind: 'network', retry: true, reason: 'تعذّر الوصول إلى خادم Gemini (الإنترنت أو الـ VPN).' };
+    if (/\b5\d\d\b|internal|unavailable|overloaded|backend/i.test(m)) return { kind: 'server', retry: true, reason: 'خادم Gemini مشغول حالياً.' };
+    if (/safety|SAFETY|recitation|blocked/i.test(m)) return { kind: 'safety', reason: 'لم يُجب Gemini على هذا السؤال تحديداً.' };
+    return { kind: 'other', reason: 'تعذّر الحصول على رد من Gemini.' };
+}
+
+function aiWithTimeout(p, ms) {
+    return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('ai-timeout')), ms))]);
+}
+
 async function aiGenerate(prompt, { system = '', history = [], temperature = 0.6, maxTokens = 900 } = {}) {
     if (!(await aiInit())) throw new Error('ai-off');
+    if (Date.now() < (AI.pauseUntil || 0)) throw new Error('ai-paused');
     const names = AI.modelName ? [AI.modelName] : AI_MODELS;
-    for (const name of names) {
-        try {
-            const model = AI.mod.getGenerativeModel(AI.ai, {
-                model: name,
-                systemInstruction: system || undefined,
-                generationConfig: { temperature, maxOutputTokens: maxTokens }
-            });
-            let res;
-            if (history.length) {
-                const chat = model.startChat({ history: history.map(h => ({ role: h.role, parts: [{ text: h.text }] })) });
-                res = await chat.sendMessage(prompt);
-            } else {
-                res = await model.generateContent(prompt);
+    let lastErr = null;
+    AI.busy = true; updateAiBadge();
+    try {
+        for (const name of names) {
+            for (let attempt = 0; attempt < 2; attempt++) {
+                try {
+                    const model = AI.mod.getGenerativeModel(AI.ai, {
+                        model: name,
+                        systemInstruction: system || undefined,
+                        generationConfig: { temperature, maxOutputTokens: maxTokens }
+                    });
+                    const call = history.length
+                        ? model.startChat({ history: history.map(h => ({ role: h.role, parts: [{ text: h.text }] })) }).sendMessage(prompt)
+                        : model.generateContent(prompt);
+                    const res = await aiWithTimeout(call, 25000);
+                    const text = res.response.text();
+                    if (!String(text || '').trim()) throw new Error('empty response (safety)');
+                    AI.modelName = name;
+                    AI.lastOk = true;
+                    AI.reason = '';
+                    return text;
+                } catch (e) {
+                    lastErr = e;
+                    const msg = String(e && e.message || e);
+                    const c = aiClassify(msg);
+                    AI.lastError = msg;
+                    AI.lastKind = c.kind;
+                    if (c.next && !AI.modelName) break;                       // جرّب النموذج التالي
+                    if (c.retry && attempt === 0) { await new Promise(r => setTimeout(r, 1200)); continue; }
+                    AI.lastOk = false;
+                    AI.reason = c.reason;
+                    if (c.off) AI.state = 'off';
+                    if (c.pause) AI.pauseUntil = Date.now() + c.pause;
+                    throw e;
+                }
             }
-            const text = res.response.text();
-            AI.modelName = name;
-            updateAiBadge();
-            return text;
-        } catch (e) {
-            const msg = String(e && e.message || e);
-            AI.lastError = msg;
-            if (/not.?found|404|not supported|unsupported model/i.test(msg) && !AI.modelName) continue;
-            if (/api.?not.?enabled|has not been used|PERMISSION_DENIED|403|billing|disabled|invalid api key|api key not valid/i.test(msg)) AI.state = 'off';
-            updateAiBadge();
-            throw e;
         }
+        AI.lastOk = false;
+        AI.reason = 'لم يتوفر أي نموذج من نماذج Gemini.';
+        throw lastErr || new Error('no-model');
+    } finally {
+        AI.busy = false;
+        updateAiBadge();
     }
-    AI.state = 'off';
-    updateAiBadge();
-    throw new Error('no-model');
 }
 
 // نص نظيف لحقول الكتابة (بدون وسوم الأزرار)
@@ -76,13 +112,37 @@ async function aiText(prompt, opts) {
     return String(await aiGenerate(prompt, opts)).replace(/\[\[[^\]]*\]\]/g, '').replace(/\*\*(.+?)\*\*/g, '$1').trim();
 }
 
-function aiIsLive() { return AI.state === 'ready' && !!AI.modelName; }
+function aiIsLive() { return AI.state === 'ready' && !!AI.modelName && AI.lastOk !== false; }
 function updateAiBadge() {
     const b = document.getElementById('ai-mode');
-    if (!b) return;
-    if (aiIsLive()) { b.className = 'ai-mode live'; b.innerHTML = '<i class="fas fa-bolt"></i> Gemini'; b.title = 'مدعوم بـ Gemini عبر Firebase AI Logic'; }
-    else if (AI.state === 'off') { b.className = 'ai-mode local'; b.innerHTML = '<i class="fas fa-microchip"></i> المساعد المحلي'; b.title = 'يجيب من بيانات المنصة. فعّل Firebase AI Logic لتشغيل Gemini'; }
-    else { b.className = 'ai-mode'; b.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>'; }
+    const st = document.getElementById('ai-status');
+    if (b) {
+        if (AI.busy || AI.state === 'loading') { b.className = 'ai-mode'; b.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>'; b.title = 'جارٍ الاتصال...'; }
+        else if (aiIsLive()) { b.className = 'ai-mode live'; b.innerHTML = '<i class="fas fa-bolt"></i> Gemini'; b.title = 'مدعوم بـ Gemini عبر Firebase AI Logic'; }
+        else if (AI.state === 'off' || AI.lastOk === false) { b.className = 'ai-mode local'; b.innerHTML = '<i class="fas fa-microchip"></i> المساعد المحلي'; b.title = AI.reason || 'يجيب من بيانات المنصة'; }
+        else { b.className = 'ai-mode'; b.innerHTML = '<i class="fas fa-bolt"></i> Gemini'; b.title = 'جاهز'; }
+        b.onclick = () => { const s2 = document.getElementById('ai-status'); if (s2) s2.hidden = !s2.hidden || !AI.reason; };
+    }
+    if (st) {
+        const show = !!AI.reason && !AI.busy && (AI.state === 'off' || AI.lastOk === false);
+        st.hidden = !show;
+        if (show) st.innerHTML = `<i class="fas fa-triangle-exclamation"></i><div><b>يجيبك الآن المساعد المحلي</b><span>${esc(AI.reason)}</span><small dir="ltr">${esc((AI.lastKind || '') + ' · ' + String(AI.lastError || '').slice(0, 90))}</small></div><button class="btn btn-outline btn-small" onclick="aiRetry()"><i class="fas fa-rotate"></i> أعد المحاولة</button>`;
+    }
+}
+
+// إعادة محاولة الاتصال بـ Gemini (بعد إيقاف الـ VPN مثلاً)
+async function aiRetry() {
+    AI.pauseUntil = 0;
+    AI.reason = '';
+    AI.lastOk = undefined;
+    if (AI.state === 'off') AI.state = AI.mod ? 'ready' : 'idle';
+    updateAiBadge();
+    try {
+        await aiGenerate('رد بكلمة واحدة: مرحبا', { maxTokens: 20 });
+        showToast('✅ Gemini متصل');
+    } catch (e) {
+        showToast('ℹ️ ' + (AI.reason || 'تعذّر الاتصال بـ Gemini'), 'info');
+    }
 }
 
 // ---------- سياق المنصة للنموذج ----------

@@ -36,7 +36,7 @@ const NL_INTENTS_RAW = {
     price:      ['شحال', 'بشحال', 'بقداش', 'قداش', 'الثمن', 'ثمن', 'السعر', 'سعر', 'دراهم', 'سومه', 'السومه', 'تكلف', 'تكلفه', 'غالي', 'رخيص', 'مجاني', 'بلاش', 'باطل', ' prix', 'combien', 'chhal', 'ch7al', 'b9adech', 'bchhal', 'tarif', 'gratuit', ' cher', 'dinar', 'دينار', ' دج'],
     hours:      ['وقتاش', 'واقتاش', 'اوقات', 'مواعيد', 'توقيت', 'يحل', 'تحل', 'يحلو', 'تحلو', 'يفتح', 'تفتح', 'يفتحو', 'يغلق', 'تغلق', 'يسكر', 'تسكر', 'يسكرو', 'يسدو', 'يبلعو', 'تبلع', 'horaire', 'heure', 'ouvert', 'ferme', 'wa9tach', 'wektach', 'waktach', 'mfta7', 'ma7loul'],
     openNow:    ['مفتوح', 'محلول', 'محلوله', 'مفتوحه', 'حال درك', 'حاله درك', 'ouvert maintenant', 'maintenant', ' درك', ' دروك', ' ضرك', ' الان', ' توا ', ' dorka', ' drok', ' doka'],
-    events:     ['فعالي', 'نشاط', 'انشطه', 'نشاطات', 'برنامج', ' حفل', 'حفله', 'مهرجان', 'مسابق', 'ورشه', 'ورشات', 'تظاهر', 'سهره', 'خرجه', 'رحله', 'رحلات', 'جوله', 'activit', 'evenement', ' event', 'programme', 'festival', 'concours', 'atelier', 'soiree', 'sortie', 'excursion', 'واش كاين', 'شكاين', 'chkayen', 'wach kayen', 'واش كاين جديد', 'واش صاري', 'وين نخرج', 'نخرج'],
+    events:     ['فعالي', 'نشاط', 'انشطه', 'نشاطات', 'برنامج', ' حفل', 'حفله', 'مهرجان', 'مسابق', 'ورشه', 'ورشات', 'تظاهر', 'سهره', 'خرجه', 'رحله', 'رحلات', 'جوله', 'activit', 'evenement', ' event', 'programme', 'festival', 'concours', 'atelier', 'soiree', 'sortie', 'excursion', 'واش كاين', 'شكاين', 'chkayen', 'wach kayen', 'واش كاين جديد', 'واش صاري', 'واش صاير', 'وين نخرج', 'نخرج', 'كشما', 'كش ما', 'كاش ما', 'كاشما', 'كاش حاجه', 'كاين حاجه', 'كاين شي', 'شي حاجه', 'حاجه جديده', 'شنو كاين', 'اش كاين', 'quoi de neuf', 'kach ma kayen', 'kachma', 'kayen chi', 'ach kayen', 'chi haja'],
     volunteer:  ['تطوع', 'متطوع', 'نتطوع', 'تطوعي', 'بينيفول', 'benevol', 'volont', 'volunteer', 'نعاون', 'نساعد الناس', 'نخدم بلاش', 'n3awen', 'naawen', 'خدمه تطوعيه'],
     charity:    ['خيري', 'خيريه', 'تبرع', 'نتبرع', 'صدقه', ' قفه', 'فطور الصايم', 'مطعم الرحمه', 'اطعام', 'ايتام', 'يتامى', 'مسنين', 'الشيوخ', 'المرضى', 'don du sang', 'donner du sang', 'charit', 'caritat', 'sadaqa', 'kofa', ' الدم', ' بالدم'],
     clubs:      ['نادي', 'نوادي', 'النادي', 'انخراط', 'ننخرط', 'نخرط', 'نسجل في', 'نتسجل', 'نتعلم', 'دروس', 'دورس', 'تكوين', ' دوره', 'كورس', ' club', 'inscri', 'nsajel', ' cours', 'formation', 'apprendre', 'nt3alem', 'ntaalem', 'نقرا ', 'حصص', 'حصه'],
@@ -521,6 +521,7 @@ function nlAnswer(raw) {
 
     if (!intent) {
         if (p.cat) intent = 'catInfo';
+        else if (p.time && !p.nights && !p.persons && !['booking', 'volunteer'].includes(nlCtx.intent)) intent = 'events';
         else if ((p.wilaya || p.time || p.nights || p.persons || p.type) && nlCtx.intent && !['greet', 'thanks', 'bye', 'who', 'about'].includes(nlCtx.intent)) intent = nlCtx.intent;
         else if (facility) intent = 'facility';
         else if (p.wilaya) intent = 'wilayaSummary';

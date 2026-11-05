@@ -1,11 +1,11 @@
 // مواهب داري: عامل الخدمة (Service Worker) لتشغيل التطبيق دون اتصال
 // الواجهة والمكتبات تُحفظ في الجهاز، وبيانات Firebase لا تُخزَّن هنا (تبقى مباشرة وآمنة).
 // غيّر الرقم مع ?v= في index.html عند كل تحديث
-const CACHE = 'mawaheb-dari-2026110504';
+const CACHE = 'mawaheb-dari-2026110505';
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
-  './css/features.css?v=2026110504', './js/talents.js?v=2026110504', './js/stars.js?v=2026110504', './js/messenger.js?v=2026110504',
-  './js/ai-brain.js?v=2026110504', './js/ai.js?v=2026110504', './js/dashboard.js?v=2026110504', './js/app.js?v=2026110504',
+  './css/features.css?v=2026110505', './js/talents.js?v=2026110505', './js/stars.js?v=2026110505', './js/messenger.js?v=2026110505',
+  './js/ai-brain.js?v=2026110505', './js/ai.js?v=2026110505', './js/dashboard.js?v=2026110505', './js/app.js?v=2026110505',
   './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'
 ];
 const LIVE = /firebaseio\.com|firebasedatabase\.app|identitytoolkit|securetoken|firebasevertexai|firebaseinstallations|googleapis\.com\/(?!css)|firebasestorage|tile\.openstreetmap|arcgisonline/;
