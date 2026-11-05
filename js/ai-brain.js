@@ -124,11 +124,11 @@ function nlNumBefore(t, unit) {
 }
 function nlCounts(t) {
     let nights = nlNumBefore(t, 'ليالي|ليال|ليلات|ليله|ايام|يوم|nuits?|jours?|nights?|days?');
-    if (!nights && /(ليلتين|يومين|deux nuits)/.test(t)) nights = 2;
+    if (!nights && /(ليلتين|يومين|deux nuits|lilatin|liltin|lilten|leltin|youmin|yomin)/.test(t)) nights = 2;
     if (!nights && /(سمانه|اسبوع|semaine)/.test(t) && /(نبات|حجز|اقامه|nbat|reserv|سرير)/.test(t)) nights = 7;
     if (!nights && / (ليله|nuit) /.test(t)) nights = 1;
     let persons = nlNumBefore(t, 'اشخاص|شخص|انفار|نفار|افراد|personnes?|pers|صحاب|اصحاب|اصدقاء|ناس|people');
-    if (!persons && /(شخصين|انا وصاحبي|انا وصديقي|انا وختي|انا وخويا|moi et mon|nous deux|جوج ناس|زوج ناس)/.test(t)) persons = 2;
+    if (!persons && /(شخصين|انا وصاحبي|انا وصديقي|انا وختي|انا وخويا|moi et mon|moi et ma|nous deux|جوج ناس|زوج ناس|ana w sahbi|ana w sa7bi|ana w khouya|ana w khoya|ana w okhti|ana w sahbti|ana wsahbi|zouj nas|jouj nas)/.test(t)) persons = 2;
     if (!persons && / (وحدي|بوحدي|seul|seule|wahdi) /.test(t)) persons = 1;
     if (!persons) {
         const nightUnit = '(?:ليالي|ليال|ليلات|ليله|ايام|يوم|nuits?|jours?|nights?)';
