@@ -4,6 +4,19 @@
    الذكاء الاصطناعي، لوحة القيادة، بوابة دور الشباب وتطبيق الشباب
    ===================================================================== */
 
+/* ---------- أداء الرسم على الهواتف ----------
+   النوافذ المخفية لا تُرسم إطلاقاً (كانت كل نافذة مخفية تحمل تأثير ضبابية بملء الشاشة،
+   فتتجاوز ذاكرة الرسم في الهاتف وتظهر الصفحة فارغة أو بمربعات سوداء). */
+.modal:not(.active) { display: none !important; }
+.modal.active { animation: modal-in 0.22s ease both; }
+.modal.active .modal-content { animation: sheet-in 0.28s ease both; }
+.modal-content, .modal.active .modal-content { transform: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+@keyframes modal-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sheet-in { from { transform: translateY(40px); opacity: 0.6; } to { transform: none; opacity: 1; } }
+.card, .header, .fac-type, .tal-cat, .role-overlay, .auth-container { backdrop-filter: none; -webkit-backdrop-filter: none; }
+body { background-attachment: scroll; }
+@media (max-width: 1023px) { .modal { backdrop-filter: none; -webkit-backdrop-filter: none; } }
+
 /* ---------- عام ---------- */
 .legacy { display: none !important; }
 .row-actions { display: flex; gap: 8px; margin-top: 14px; align-items: center; }
@@ -441,10 +454,8 @@
 }
 .ai-card:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(139, 92, 246, 0.2); }
 .ai-orb { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 19px; flex-shrink: 0;
-    background: conic-gradient(from 200deg, #8b5cf6, #ec4899, #f4b41b, #10b981, #3b82f6, #8b5cf6); box-shadow: 0 0 22px rgba(139, 92, 246, 0.45); animation: orb 6s linear infinite; }
-.ai-orb i { animation: orb 6s linear infinite reverse; }
+    background: conic-gradient(from 200deg, #8b5cf6, #ec4899, #f4b41b, #10b981, #3b82f6, #8b5cf6); box-shadow: 0 0 18px rgba(139, 92, 246, 0.4); }
 .ai-orb.sm { width: 30px; height: 30px; font-size: 13px; }
-@keyframes orb { to { transform: rotate(360deg); } }
 .ai-card-txt { flex: 1; min-width: 0; display: grid; gap: 2px; }
 .ai-card-txt b { font-size: 0.98rem; }
 .ai-card-txt span { color: var(--text-muted); font-size: 0.8rem; line-height: 1.5; }
