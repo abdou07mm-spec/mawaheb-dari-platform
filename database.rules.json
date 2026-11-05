@@ -2,11 +2,15 @@
   "rules": {
     ".read": false,
     ".write": false,
-
     "users": {
       ".read": "auth != null",
       ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
-      ".indexOn": ["role", "points", "adminRequest"],
+      ".indexOn": [
+        "role",
+        "points",
+        "stars",
+        "adminRequest"
+      ],
       "$uid": {
         ".write": "auth != null && auth.uid === $uid",
         "role": {
@@ -14,51 +18,53 @@
         }
       }
     },
-
     "places": {
       ".read": true,
       ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'"
     },
-
     "events": {
       ".read": "auth != null",
       ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
       "$eventId": {
         ".write": "auth != null && !data.exists() && newData.child('createdBy').val() === auth.uid && newData.child('status').val() === 'pending'",
         "participants": {
-          "$uid": { ".write": "auth != null && auth.uid === $uid" }
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid"
+          }
         },
         "attendees": {
-          "$uid": { ".write": "auth != null && auth.uid === $uid" }
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid"
+          }
         }
       }
     },
-
     "photos": {
       ".read": "auth != null",
       ".write": "auth != null"
     },
-
     "notifications": {
       ".read": "auth != null && ((query.orderByChild === 'userId' && query.equalTo === auth.uid) || root.child('users').child(auth.uid).child('role').val() === 'admin')",
       ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
-      ".indexOn": ["userId"],
+      ".indexOn": [
+        "userId"
+      ],
       "$id": {
         ".read": "auth != null && data.child('userId').val() === auth.uid",
         ".write": "auth != null && newData.exists() && (!data.exists() || (data.child('userId').val() === auth.uid && newData.child('userId').val() === auth.uid))"
       }
     },
-
     "bookings": {
       ".read": "auth != null && ((query.orderByChild === 'userId' && query.equalTo === auth.uid) || root.child('users').child(auth.uid).child('role').val() === 'admin')",
       ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
-      ".indexOn": ["userId"],
+      ".indexOn": [
+        "userId"
+      ],
       "$id": {
         ".read": "auth != null && data.child('userId').val() === auth.uid",
         ".write": "auth != null && newData.child('userId').val() === auth.uid && ((!data.exists() && newData.child('status').val() === 'pending') || (data.child('userId').val() === auth.uid && newData.child('status').val() === 'cancelled'))"
       }
     },
-
     "occupancy": {
       ".read": "auth != null",
       ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
@@ -68,14 +74,123 @@
         }
       }
     },
-
     "memberships": {
       ".read": "auth != null && ((query.orderByChild === 'userId' && query.equalTo === auth.uid) || root.child('users').child(auth.uid).child('role').val() === 'admin')",
       ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
-      ".indexOn": ["userId"],
+      ".indexOn": [
+        "userId"
+      ],
       "$id": {
         ".read": "auth != null && data.child('userId').val() === auth.uid",
         ".write": "auth != null && !data.exists() && newData.child('userId').val() === auth.uid && newData.child('status').val() === 'pending'"
+      }
+    },
+    "talents": {
+      ".read": true,
+      ".indexOn": [
+        "uid"
+      ],
+      "$id": {
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (!data.exists() && newData.child('uid').val() === auth.uid && newData.child('status').val() === 'pending') || (data.child('uid').val() === auth.uid && !newData.exists()))",
+        "likes": {
+          ".write": "auth != null && data.exists()",
+          ".validate": "newData.isNumber() && newData.val() >= 0 && (!data.exists() || newData.val() === data.val() + 1 || newData.val() === data.val() - 1)"
+        },
+        "likedBy": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid",
+            ".validate": "newData.val() === true"
+          }
+        }
+      }
+    },
+    "certificates": {
+      ".read": true,
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".indexOn": [
+        "uid",
+        "eventId"
+      ]
+    },
+    "checkins": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'"
+    },
+    "passports": {
+      ".read": true,
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid",
+        "name": {
+          ".validate": "newData.isString() && newData.val().length <= 80"
+        },
+        "wilaya": {
+          ".validate": "newData.isString()"
+        },
+        "bio": {
+          ".validate": "newData.isString() && newData.val().length <= 400"
+        },
+        "talents": {
+          ".validate": "newData.isString() && newData.val().length <= 300"
+        },
+        "photoURL": {
+          ".validate": "newData.isString()"
+        },
+        "quiz": {
+          ".validate": "newData.isString()"
+        },
+        "since": {
+          ".validate": "newData.isString()"
+        },
+        "updatedAt": {
+          ".validate": "newData.isString()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "charity": {
+      ".read": "auth != null && ((query.orderByChild === 'uid' && query.equalTo === auth.uid) || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".indexOn": [
+        "uid"
+      ],
+      "$id": {
+        ".read": "auth != null && data.child('uid').val() === auth.uid",
+        ".write": "auth != null && !data.exists() && newData.child('uid').val() === auth.uid && newData.child('status').val() === 'pending'"
+      }
+    },
+    "rewards": {
+      ".read": true,
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$id": {
+        "entries": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && data.parent().parent().child('status').val() === 'open'",
+            ".validate": "newData.child('stars').isNumber()"
+          }
+        }
+      }
+    },
+    "conversations": {
+      ".read": "auth != null && ((query.orderByChild === 'uid' && query.equalTo === auth.uid) || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".indexOn": [
+        "uid",
+        "placeId"
+      ],
+      "$cid": {
+        ".read": "auth != null && data.child('uid').val() === auth.uid",
+        ".write": "auth != null && $cid.beginsWith(auth.uid + '_') && newData.child('uid').val() === auth.uid && (!data.exists() || data.child('uid').val() === auth.uid)"
+      }
+    },
+    "messages": {
+      "$cid": {
+        ".read": "auth != null && (root.child('conversations').child($cid).child('uid').val() === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        "$mid": {
+          ".write": "auth != null && !data.exists() && newData.child('from').val() === auth.uid && ((newData.child('side').val() === 'user' && root.child('conversations').child($cid).child('uid').val() === auth.uid) || (newData.child('side').val() === 'house' && root.child('users').child(auth.uid).child('role').val() === 'admin'))",
+          ".validate": "newData.child('text').isString() && newData.child('text').val().length <= 1000"
+        }
       }
     }
   }

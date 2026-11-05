@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="author" content="آية عابر">
     <title>مواهب داري - منصة دور الشباب والتطوع</title>
-    <meta name="description" content="مواهب داري: منصة موجهة لشباب الجزائر، تضم دليل دور الشباب في كل الولايات، حجز بيوت الشباب، الفعاليات والنوادي والتطوع.">
+    <meta name="description" content="مواهب داري: بوابة رقمية لدور الشباب في الجزائر وتطبيق للشباب: دليل 58 ولاية، حجز بيوت الشباب، الفعاليات، التطوع والأعمال الخيرية، معرض المواهب، جواز المواهب، النجوم والمكافآت، المراسلة، ومساعد ذكي.">
     <meta name="theme-color" content="#0a5c3e">
     <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -2341,6 +2341,9 @@
         .language-selector, .social-login, .settings-item:has(#settings-language) { display: none !important; }
         .chips-inline { display: inline-flex; gap: 6px; flex-wrap: wrap; }
     </style>
+    <link rel="stylesheet" href="css/features.css?v=20261105">
+    <!-- وضع الواجهة (تطبيق الشباب أو بوابة دور الشباب) قبل رسم الصفحة -->
+    <script src="js/app.js?v=20261105"></script>
 </head>
 <body>
 
@@ -2356,23 +2359,176 @@
     </div>
 </div>
 
-<!-- شاشة اختيار الدور -->
+<!-- بوابة دور الشباب: واجهة الموقع للمؤسسات والمسيّرين -->
+<div id="portal-screen">
+    <header class="pt-bar">
+        <div class="pt-brand"><img src="icons/icon.svg" alt=""><span><b>مواهب</b> داري</span><small>بوابة دور الشباب</small></div>
+        <nav class="pt-links">
+            <a href="#pt-features" onclick="event.preventDefault(); document.getElementById('pt-features').scrollIntoView({behavior:'smooth'})">المزايا</a>
+            <a href="#pt-app" onclick="event.preventDefault(); document.getElementById('pt-app').scrollIntoView({behavior:'smooth'})">تطبيق الشباب</a>
+            <a href="#pt-verify-box" onclick="event.preventDefault(); document.getElementById('pt-verify-box').scrollIntoView({behavior:'smooth'})">التحقق من شهادة</a>
+        </nav>
+        <div class="pt-bar-actions">
+            <button class="btn btn-outline btn-small pt-app-btn" onclick="openYouthApp()"><i class="fas fa-mobile-screen-button"></i> <span>تطبيق الشباب</span></button>
+            <button class="btn btn-primary btn-small" onclick="portalStaffLogin()"><i class="fas fa-right-to-bracket"></i> دخول المسيّرين</button>
+        </div>
+    </header>
+
+    <section class="pt-hero">
+        <div class="pt-hero-txt">
+            <span class="pt-kicker"><i class="fas fa-building-columns"></i> لدور وبيوت الشباب في الولايات الـ58</span>
+            <h1>لوحة رقمية واحدة لتسيير دار الشباب، وتطبيق يقرّبها من كل شاب</h1>
+            <p>الحجوزات وتذاكر QR، الفعاليات وتسجيل الحضور بالمسح، الشهادات الموثّقة، المراسلة مع الشباب، ملفات الأعضاء، النجوم والسحوبات، وتحليلات بالذكاء الاصطناعي.</p>
+            <div class="pt-cta">
+                <button class="btn hero-btn" onclick="portalStaffLogin()"><i class="fas fa-gauge-high"></i> دخول لوحة القيادة</button>
+                <button class="btn hero-btn ghost" onclick="openYouthApp()"><i class="fas fa-mobile-screen-button"></i> جرّب تطبيق الشباب</button>
+            </div>
+            <button class="pt-mini-link" onclick="portalStaffSignup()"><i class="fas fa-user-plus"></i> مسيّر جديد؟ أنشئ حساباً واطلب صلاحية المسيّر</button>
+            <div class="pt-stats" id="pt-stats"></div>
+        </div>
+        <div class="pt-hero-visual" aria-hidden="true">
+            <div class="mock-dash">
+                <div class="md-top"><span></span><span></span><span></span><b>لوحة القيادة</b></div>
+                <div class="md-kpis">
+                    <div style="--c:#f59e0b"><i class="fas fa-inbox"></i><small>الطلبات</small></div>
+                    <div style="--c:#3b82f6"><i class="fas fa-bed"></i><small>النزلاء</small></div>
+                    <div style="--c:#10b981"><i class="fas fa-calendar-check"></i><small>الفعاليات</small></div>
+                    <div style="--c:#8b5cf6"><i class="fas fa-comments"></i><small>الرسائل</small></div>
+                </div>
+                <div class="md-row">
+                    <div class="md-bars"><i style="height:40%"></i><i style="height:65%"></i><i style="height:50%"></i><i style="height:82%"></i><i style="height:70%"></i><i style="height:95%"></i></div>
+                    <div class="md-ins">
+                        <p><i class="fas fa-wand-magic-sparkles"></i> التقرير الذكي</p>
+                        <span></span><span></span><span class="short"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="mock-phone">
+                <div class="mp-notch"></div>
+                <div class="mp-head"><b><span>مواهب</span> داري</b><em><i class="fas fa-star"></i> 34</em></div>
+                <div class="mp-hero"><small>أهلاً سارة 👋</small><b>دارك الثانية في انتظارك</b></div>
+                <div class="mp-grid">
+                    <i class="fas fa-house-chimney-user" style="--c:#10b981"></i><i class="fas fa-bed" style="--c:#3b82f6"></i><i class="fas fa-hand-holding-heart" style="--c:#f97316"></i>
+                    <i class="fas fa-palette" style="--c:#ec4899"></i><i class="fas fa-gift" style="--c:#f4b41b"></i><i class="fas fa-comments" style="--c:#8b5cf6"></i>
+                </div>
+                <div class="mp-ai"><i class="fas fa-wand-magic-sparkles"></i> مساعد داري الذكي</div>
+                <div class="mp-nav"><i class="fas fa-home"></i><i class="fas fa-house-chimney-user"></i><i class="fas fa-hand-holding-heart"></i><i class="fas fa-palette"></i><i class="fas fa-id-card"></i></div>
+            </div>
+        </div>
+    </section>
+
+    <div id="pt-impact" class="pt-impact"></div>
+
+    <section class="pt-section" id="pt-features">
+        <p class="pt-kicker">ما تحصل عليه دار الشباب</p>
+        <h2>كل ما يحتاجه المسيّر في مكان واحد</h2>
+        <div class="pt-grid">
+            <div class="pt-feat" style="--c:#0ea5e9"><i class="fas fa-gauge-high"></i><b>لوحة قيادة وتنبيهات</b><p>مؤشرات اليوم، وتنبيهات تقترح الإجراء: طلب متأخر، فعالية بلا شهادات، نقص في المتطوعين.</p></div>
+            <div class="pt-feat" style="--c:#3b82f6"><i class="fas fa-bed"></i><b>الحجوزات وتذاكر QR</b><p>تأكيد أو رفض الحجز، حساب الأسرّة المتاحة، وتسجيل وصول النزيل بمسح التذكرة.</p></div>
+            <div class="pt-feat" style="--c:#10b981"><i class="fas fa-user-check"></i><b>الحضور بالمسح</b><p>امسح بطاقة الشاب عند الدخول، ثم أصدر الشهادات لكل الحاضرين بضغطة واحدة.</p></div>
+            <div class="pt-feat" style="--c:#f4b41b"><i class="fas fa-certificate"></i><b>شهادات موثّقة</b><p>كل شهادة برمز تحقق وQR، يتحقق منها أي أحد من هذه البوابة.</p></div>
+            <div class="pt-feat" style="--c:#8b5cf6"><i class="fas fa-comments"></i><b>المراسلة مع الشباب</b><p>صندوق رسائل لكل دار، ردود جاهزة، رسائل جماعية للأعضاء، واقتراح ردود بالذكاء الاصطناعي.</p></div>
+            <div class="pt-feat" style="--c:#ec4899"><i class="fas fa-users-viewfinder"></i><b>ملفات الأعضاء</b><p>ملف لكل عضو يجمع مشاركاته وتطوعه وأعماله الخيرية ونجومه، مع منح شهادات التقدير.</p></div>
+            <div class="pt-feat" style="--c:#f97316"><i class="fas fa-gift"></i><b>النجوم والسحوبات</b><p>مكافآت بحد أدنى من النجوم، وسحب موزون حسب النجوم الموثّقة، ببذرة منشورة قابلة للتحقق.</p></div>
+            <div class="pt-feat" style="--c:#ef4444"><i class="fas fa-wand-magic-sparkles"></i><b>ذكاء اصطناعي</b><p>تقرير أسبوعي ذكي، كتابة إعلانات الفعاليات، ومساعد للشباب يجيبهم من بيانات دارك.</p></div>
+        </div>
+    </section>
+
+    <section class="pt-section pt-split">
+        <p class="pt-kicker">قسمة واضحة</p>
+        <h2>الموقع لدور الشباب، والتطبيق للشباب</h2>
+        <div class="pt-two">
+            <div class="pt-side site">
+                <h3><i class="fas fa-desktop"></i> الموقع: بوابة دور الشباب</h3>
+                <ul>
+                    <li>لوحة القيادة والتقرير الذكي</li>
+                    <li>مراجعة الحجوزات والانخراطات والمواهب والأعمال الخيرية</li>
+                    <li>برمجة الفعاليات، الحضور بالمسح وإصدار الشهادات</li>
+                    <li>صندوق الرسائل والرسائل الجماعية</li>
+                    <li>ملفات الأعضاء ومنح الشهادات</li>
+                    <li>المكافآت والسحوبات الشفافة</li>
+                    <li>تسيير المرافق والمستخدمين</li>
+                </ul>
+            </div>
+            <div class="pt-side app">
+                <h3><i class="fas fa-mobile-screen-button"></i> التطبيق: للشباب والجمهور</h3>
+                <ul>
+                    <li>دليل وخريطة دور الشباب في 58 ولاية</li>
+                    <li>الحجز في بيوت الشباب بتذكرة QR</li>
+                    <li>الفعاليات وفرص التطوع والأعمال الخيرية</li>
+                    <li>معرض المواهب واختبار «اكتشف موهبتك»</li>
+                    <li>جواز المواهب: ملف بشهادات موثّقة</li>
+                    <li>النجوم والمكافآت ومراسلة دور الشباب</li>
+                    <li>مساعد ذكي بالصوت، ويعمل دون اتصال بعد التثبيت</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="pt-section pt-app" id="pt-app">
+        <div class="pt-app-txt">
+            <p class="pt-kicker">تطبيق الشباب</p>
+            <h2>حمّله على الهاتف في ثوانٍ</h2>
+            <p>تطبيق ويب تقدّمي يُثبَّت من المتصفح مباشرة على أندرويد وآيفون، دون متجر ودون مساحة كبيرة، ويفتح دون اتصال.</p>
+            <div class="pt-cta">
+                <button class="btn btn-primary" onclick="openYouthApp()"><i class="fas fa-arrow-up-right-from-square"></i> افتح التطبيق</button>
+                <button class="btn btn-outline" onclick="installApp()"><i class="fas fa-download"></i> تثبيت على الجهاز</button>
+            </div>
+        </div>
+        <div class="pt-qr-card">
+            <div id="pt-qr"></div>
+            <b>امسح الرمز بهاتفك</b>
+            <small dir="ltr" id="pt-app-link"></small>
+        </div>
+    </section>
+
+    <section class="pt-section">
+        <p class="pt-kicker">الانطلاق</p>
+        <h2>ثلاث خطوات لتنطلق دارك</h2>
+        <div class="steps pt-steps">
+            <div class="step"><span>1</span>أنشئ حساب المسيّر، ويؤكده مسيّر حالي</div>
+            <div class="step"><span>2</span>أضف معلومات الدار: الأوقات، النوادي، السعة والأسعار</div>
+            <div class="step"><span>3</span>برمج الفعاليات وشارك رابط التطبيق مع شباب ولايتك</div>
+        </div>
+    </section>
+
+    <section class="pt-section pt-verify" id="pt-verify-box">
+        <div>
+            <p class="pt-kicker">للجامعات وأصحاب العمل</p>
+            <h2>تحقّق من شهادة</h2>
+            <p>أدخل رمز التحقق المكتوب أسفل الشهادة (مثل MDXXXXXXXX) أو امسح رمزها.</p>
+        </div>
+        <div class="pt-verify-form">
+            <input type="text" id="pt-verify" placeholder="رمز التحقق" dir="ltr" onkeydown="if(event.key==='Enter') portalVerify()">
+            <button class="btn btn-primary" onclick="portalVerify()"><i class="fas fa-shield-halved"></i> تحقّق</button>
+            <button class="link-btn" onclick="openPassportView('demo')"><i class="fas fa-id-card"></i> شاهد جواز مواهب نموذجياً</button>
+        </div>
+    </section>
+
+    <footer class="pt-foot">
+        <div class="pt-brand"><img src="icons/icon.svg" alt=""><span><b>مواهب</b> داري</span></div>
+        <p>منصة دور الشباب في الجزائر · إعداد: <b>آية عابر</b></p>
+    </footer>
+</div>
+
+<!-- شاشة الترحيب في تطبيق الشباب -->
 <div id="role-screen">
     <div class="role-overlay">
         <div class="role-brand"><span>مواهب</span> داري</div>
-        <p class="role-tag">منصة دور الشباب في الجزائر: الدليل، الحجز، الفعاليات والتطوع</p>
-        <h1>مرحباً بك 👋</h1>
-        <p>اختر نوع المستخدم</p>
-        
+        <p class="role-tag">تطبيق شباب الجزائر: دور الشباب، الحجز، الفعاليات، التطوع والمواهب</p>
+        <div class="welcome-feats">
+            <div><i class="fas fa-house-chimney-user"></i><span>دور وبيوت الشباب في 58 ولاية، والحجز بتذكرة QR</span></div>
+            <div><i class="fas fa-star"></i><span>شارك وتطوّع واجمع النجوم لتربح مكافآت قيّمة</span></div>
+            <div><i class="fas fa-id-card"></i><span>جواز مواهب بشهادات موثّقة تشاركه مع الجامعة وصاحب العمل</span></div>
+            <div><i class="fas fa-wand-magic-sparkles"></i><span>مساعد ذكي تسأله بالكتابة أو بصوتك</span></div>
+        </div>
         <button class="role-btn volunteer" onclick="selectRole('volunteer')">
-            <i class="fas fa-user-graduate"></i> متطوع - شاب موهوب
-        </button>
-        <button class="role-btn admin" onclick="selectRole('admin')">
-            <i class="fas fa-user-tie"></i> مدير - مسير دار شباب
+            <i class="fas fa-user-plus"></i> أنشئ حسابك أو سجّل الدخول
         </button>
         <button class="role-btn guest" onclick="enterGuest()">
-            <i class="fas fa-eye"></i> تصفح المنصة كزائر
+            <i class="fas fa-eye"></i> تصفح التطبيق كزائر
         </button>
+        <button class="role-link" onclick="openPortal()"><i class="fas fa-building-columns"></i> مسيّر دار شباب؟ ادخل من بوابة دور الشباب</button>
         <p class="role-credit">إعداد: <b>آية عابر</b></p>
     </div>
 </div>
@@ -2583,6 +2739,11 @@
             <div class="logo"><span>مواهب</span> داري</div>
             <div class="header-icons">
                 <button class="guest-login" onclick="askLogin()"><i class="fas fa-right-to-bracket"></i> دخول</button>
+                <button class="star-pill" onclick="switchTab('rewards')" title="نجومي ومكافآتي"><i class="fas fa-star"></i> <b class="js-my-stars">0</b></button>
+                <div class="notification-badge msg-badge">
+                    <i class="fas fa-comment-dots" onclick="switchTab('messages')" title="الرسائل"></i>
+                    <span class="badge" id="msg-count" style="display:none;">0</span>
+                </div>
                 <i class="fas fa-plus-circle" onclick="showAddEventModal()" title="إضافة فعالية جديدة"></i>
                 <div class="language-selector">
                     <select id="lang-select" onchange="changeLanguage(this.value)">
@@ -2619,9 +2780,20 @@
                 <div class="hero-text">
                     <p class="hero-hello">أهلاً بك، <span id="hero-name">صديقنا</span> 👋</p>
                     <h2>دارك الثانية في انتظارك</h2>
-                    <p class="hero-sub">اكتشف دور الشباب في ولايتك وفي كل ولايات الوطن، احجز إقامتك في بيوت الشباب، وشارك في الفعاليات والنوادي.</p>
+                    <p class="hero-sub">اكتشف موهبتك، تطوّع في مجتمعك، واحجز في دور وبيوت الشباب في كل ولايات الوطن.</p>
+                    <div class="hero-cta">
+                        <button class="btn hero-btn" onclick="openQuiz()"><i class="fas fa-compass"></i> اكتشف موهبتك</button>
+                        <button class="btn hero-btn ghost" onclick="switchTab('volunteer')"><i class="fas fa-hand-holding-heart"></i> تطوع الآن</button>
+                    </div>
                 </div>
                 <div class="hero-stats" id="hero-stats"></div>
+            </div>
+
+            <!-- المساعد الذكي -->
+            <div class="ai-card" onclick="openAssistant()">
+                <span class="ai-orb"><i class="fas fa-wand-magic-sparkles"></i></span>
+                <div class="ai-card-txt"><b>مساعد داري الذكي</b><span>اسألني: «نادي رسم في سطيف؟» أو «بيت شباب في وهران»</span></div>
+                <button class="icon-btn" onclick="event.stopPropagation(); openAssistant(); setTimeout(() => aiVoice('ai-input', document.getElementById('ai-mic')), 350)" title="اسأل بصوتك"><i class="fas fa-microphone"></i></button>
             </div>
 
             <!-- الوصول السريع -->
@@ -2638,17 +2810,25 @@
                     <span class="qi-icon" style="--c:#f4b41b"><i class="fas fa-calendar-days"></i></span>
                     <span>الفعاليات</span>
                 </button>
-                <button class="quick-item" onclick="openClubsDirectory()">
-                    <span class="qi-icon" style="--c:#ec4899"><i class="fas fa-masks-theater"></i></span>
-                    <span>النوادي والورشات</span>
+                <button class="quick-item" onclick="switchTab('volunteer')">
+                    <span class="qi-icon" style="--c:#f97316"><i class="fas fa-hand-holding-heart"></i></span>
+                    <span>فرص التطوع</span>
                 </button>
-                <button class="quick-item" onclick="switchTab('leaderboard')">
-                    <span class="qi-icon" style="--c:#8b5cf6"><i class="fas fa-trophy"></i></span>
-                    <span>لوحة الشرف</span>
+                <button class="quick-item" onclick="switchTab('talents')">
+                    <span class="qi-icon" style="--c:#ec4899"><i class="fas fa-palette"></i></span>
+                    <span>معرض المواهب</span>
                 </button>
-                <button class="quick-item" onclick="showAddEventModal()">
-                    <span class="qi-icon" style="--c:#f97316"><i class="fas fa-calendar-plus"></i></span>
-                    <span>اقترح فعالية</span>
+                <button class="quick-item" onclick="openQuiz()">
+                    <span class="qi-icon" style="--c:#8b5cf6"><i class="fas fa-compass"></i></span>
+                    <span>اكتشف موهبتك</span>
+                </button>
+                <button class="quick-item" onclick="switchTab('rewards')">
+                    <span class="qi-icon" style="--c:#eab308"><i class="fas fa-gift"></i></span>
+                    <span>المكافآت</span>
+                </button>
+                <button class="quick-item" onclick="switchTab('messages')">
+                    <span class="qi-icon" style="--c:#06b6d4"><i class="fas fa-comments"></i></span>
+                    <span>الرسائل</span>
                 </button>
             </div>
 
@@ -2670,8 +2850,35 @@
                 <div id="home-upcoming" class="h-scroll"></div>
             </div>
 
+            <!-- مواهب مميزة -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-star"></i> مواهب من شباب الجزائر</h3>
+                    <button class="link-btn" onclick="switchTab('talents')">المعرض <i class="fas fa-chevron-left"></i></button>
+                </div>
+                <div id="home-talents" class="h-scroll"></div>
+            </div>
+
+            <!-- فرص تطوع -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-hand-holding-heart"></i> فرص تطوع قريبة</h3>
+                    <button class="link-btn" onclick="switchTab('volunteer')">كل الفرص <i class="fas fa-chevron-left"></i></button>
+                </div>
+                <div id="home-vol" class="mini-list"></div>
+            </div>
+
+            <!-- النجوم والمكافآت -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-gift"></i> النجوم والمكافآت</h3>
+                    <button class="link-btn" onclick="switchTab('rewards')">كل المكافآت <i class="fas fa-chevron-left"></i></button>
+                </div>
+                <div id="home-rewards"></div>
+            </div>
+
             <!-- الفلاتر -->
-            <div class="filter-tabs">
+            <div class="filter-tabs legacy">
                 <span class="filter-tab active" onclick="filterContent('all')">الكل</span>
                 <span class="filter-tab" onclick="filterContent('events')">فعاليات</span>
                 <span class="filter-tab" onclick="filterContent('places')">أماكن</span>
@@ -2682,7 +2889,7 @@
             <!-- الخريطة -->
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-map-marked-alt"></i> الخريطة التفاعلية</h3>
+                    <h3 class="card-title"><i class="fas fa-map-marked-alt"></i> خريطة كل الأماكن</h3>
                     <div class="map-controls">
                         <button class="map-btn" onclick="getUserLocation()">
                             <i class="fas fa-location-arrow"></i> موقعي
@@ -2697,7 +2904,7 @@
             </div>
 
             <!-- الفعاليات القادمة -->
-            <div class="card">
+            <div class="card legacy">
                 <div class="card-header">
                     <h3 class="card-title"><i class="fas fa-hand-holding-heart"></i> فرص التطوع والفعاليات</h3>
                 </div>
@@ -2844,9 +3051,10 @@
         <section id="admin-bookings" class="section">
             <div class="page-head">
                 <div>
-                    <h2><i class="fas fa-clipboard-list"></i> الحجوزات والانخراطات</h2>
-                    <p>راجع الطلبات وأكّدها بنقرة واحدة</p>
+                    <h2><i class="fas fa-clipboard-list"></i> الطلبات</h2>
+                    <p>الحجوزات والانخراطات والمواهب والأعمال الخيرية المنتظرة للمراجعة</p>
                 </div>
+                <button class="btn btn-primary btn-small" onclick="openScanner()"><i class="fas fa-qrcode"></i> مسح رمز</button>
             </div>
 
             <div id="adm-users-notice"></div>
@@ -2856,6 +3064,8 @@
                 <div class="seg seg-wide" id="adm-seg">
                     <button class="active" data-v="bookings" onclick="setAdminReqView('bookings')"><i class="fas fa-bed"></i> الحجوزات</button>
                     <button data-v="clubs" onclick="setAdminReqView('clubs')"><i class="fas fa-masks-theater"></i> الانخراطات</button>
+                    <button data-v="talents" onclick="setAdminReqView('talents')"><i class="fas fa-palette"></i> المواهب</button>
+                    <button data-v="charity" onclick="setAdminReqView('charity')"><i class="fas fa-hand-holding-dollar"></i> الخيري</button>
                 </div>
                 <div class="filter-tabs" id="adm-filter-tabs"></div>
                 <div class="search-mini">
@@ -2863,6 +3073,183 @@
                     <input type="text" id="adm-search" placeholder="ابحث بالاسم، الهاتف أو رمز الحجز..." oninput="renderAdminRequests()">
                 </div>
                 <div id="adm-list" class="req-list"></div>
+            </div>
+        </section>
+
+        <!-- صفحة التطوع -->
+        <section id="volunteer" class="section">
+            <div class="page-head">
+                <div>
+                    <h2><i class="fas fa-hand-holding-heart"></i> التطوع</h2>
+                    <p>ساهم في مجتمعك، واجمع ساعات تطوع موثّقة وشهادات تُضاف إلى جواز مواهبك</p>
+                </div>
+            </div>
+            <div class="vol-hero" id="vol-hero"></div>
+            <div class="steps vol-steps">
+                <div class="step"><span>1</span>سجّل في فرصة تطوع</div>
+                <div class="step"><span>2</span>احضر وأظهر بطاقتك</div>
+                <div class="step"><span>3</span>استلم شهادتك الموثّقة</div>
+                <div class="step"><span>4</span>تُضاف إلى جواز مواهبك</div>
+            </div>
+            <div class="quiz-cta charity-cta">
+                <div class="quiz-cta-ico"><i class="fas fa-hand-holding-dollar"></i></div>
+                <div class="quiz-cta-txt"><b>قمت بعمل خيري؟</b><span>تبرع بالدم، قفة رمضان، تشجير، زيارة مسنين... سجّله لتؤكده الدار فتصلك شهادة و3 نجوم</span></div>
+                <button class="btn btn-primary btn-small" onclick="openCharityForm()">سجّل عملاً خيرياً</button>
+            </div>
+            <div class="card vol-opps">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-bullhorn"></i> فرص التطوع</h3>
+                    <button class="link-btn" onclick="switchTab('events-page')">كل الفعاليات <i class="fas fa-chevron-left"></i></button>
+                </div>
+                <div id="vol-list" class="ev-list"></div>
+            </div>
+            <div class="card vol-heroes">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-trophy"></i> أبطال التطوع</h3>
+                    <button class="link-btn" onclick="switchTab('leaderboard')">لوحة الشرف <i class="fas fa-chevron-left"></i></button>
+                </div>
+                <div id="vol-top" class="mini-list"></div>
+            </div>
+        </section>
+
+        <!-- صفحة معرض المواهب -->
+        <section id="talents" class="section">
+            <div class="page-head">
+                <div>
+                    <h2><i class="fas fa-palette"></i> معرض المواهب</h2>
+                    <p>أعمال شباب الجزائر في الفن والتقنية والرياضة والإبداع</p>
+                </div>
+                <button class="btn btn-primary btn-small" onclick="openAddTalent()"><i class="fas fa-plus"></i> اعرض موهبتك</button>
+            </div>
+            <div class="quiz-cta">
+                <div class="quiz-cta-ico"><i class="fas fa-compass"></i></div>
+                <div class="quiz-cta-txt"><b>لم تكتشف موهبتك بعد؟</b><span>ست أسئلة قصيرة تقترح عليك النوادي والفعاليات الأنسب لك</span></div>
+                <button class="btn btn-primary btn-small" onclick="openQuiz()">ابدأ الاختبار</button>
+            </div>
+            <div class="filter-tabs" id="tal-cat-tabs"></div>
+            <div id="tal-grid" class="tal-grid"></div>
+        </section>
+
+        <!-- لوحة القيادة (للمسيّرين) -->
+        <section id="dashboard" class="section">
+            <div class="dash-hero">
+                <div>
+                    <p class="hero-hello" id="dash-hello">مرحباً</p>
+                    <h2>لوحة قيادة دور الشباب</h2>
+                    <p class="hero-sub">الطلبات والفعاليات والأعضاء في نظرة واحدة، مع اقتراحات للإجراءات المطلوبة.</p>
+                </div>
+                <div class="dash-actions">
+                    <button class="btn hero-btn" onclick="openScanner()"><i class="fas fa-qrcode"></i> مسح رمز</button>
+                    <button class="btn hero-btn ghost" onclick="showAddEventModal()"><i class="fas fa-calendar-plus"></i> فعالية</button>
+                    <button class="btn hero-btn ghost" onclick="openRewardForm()"><i class="fas fa-gift"></i> مكافأة</button>
+                    <button class="btn hero-btn ghost" onclick="openBroadcast()"><i class="fas fa-bullhorn"></i> رسالة جماعية</button>
+                </div>
+            </div>
+            <div class="stat-grid kpis" id="dash-kpis"></div>
+            <div class="card dash-ins">
+                <div class="card-header"><h3 class="card-title"><i class="fas fa-lightbulb"></i> يحتاج انتباهك</h3></div>
+                <div id="dash-insights" class="insights"></div>
+            </div>
+            <div class="card dash-ai">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-wand-magic-sparkles"></i> التقرير الذكي</h3>
+                    <button class="btn btn-primary btn-small" onclick="aiDashboardReport(this)"><i class="fas fa-wand-magic-sparkles"></i> حلّل الآن</button>
+                </div>
+                <div id="dash-report"></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h3 class="card-title"><i class="fas fa-chart-column"></i> الشهادات الصادرة</h3><small class="muted">آخر 6 أشهر</small></div>
+                <div id="dash-chart-certs"></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h3 class="card-title"><i class="fas fa-palette"></i> اهتمامات الشباب</h3><small class="muted">المواهب ونتائج الاختبار</small></div>
+                <div id="dash-chart-talents"></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h3 class="card-title"><i class="fas fa-hand-holding-heart"></i> الأثر المجتمعي</h3></div>
+                <div id="dash-impact"></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h3 class="card-title"><i class="fas fa-calendar-check"></i> الفعاليات القادمة</h3><button class="link-btn" onclick="switchTab('admin-events')">إدارة <i class="fas fa-chevron-left"></i></button></div>
+                <div id="dash-upcoming" class="mini-list"></div>
+            </div>
+            <div class="quick-grid dash-links">
+                <button class="quick-item" onclick="switchTab('members')"><span class="qi-icon" style="--c:#ec4899"><i class="fas fa-users"></i></span><span>الأعضاء</span></button>
+                <button class="quick-item" onclick="switchTab('rewards')"><span class="qi-icon" style="--c:#f4b41b"><i class="fas fa-gift"></i></span><span>المكافآت</span></button>
+                <button class="quick-item" onclick="switchTab('houses')"><span class="qi-icon" style="--c:#10b981"><i class="fas fa-house-chimney-user"></i></span><span>المرافق</span></button>
+                <button class="quick-item" onclick="switchTab('talents')"><span class="qi-icon" style="--c:#8b5cf6"><i class="fas fa-palette"></i></span><span>المواهب</span></button>
+                <button class="quick-item" onclick="switchTab('home')"><span class="qi-icon" style="--c:#3b82f6"><i class="fas fa-mobile-screen-button"></i></span><span>واجهة الشباب</span></button>
+                <button class="quick-item" onclick="switchTab('settings')"><span class="qi-icon" style="--c:#94a3b8"><i class="fas fa-cog"></i></span><span>الإعدادات</span></button>
+            </div>
+        </section>
+
+        <!-- الرسائل -->
+        <section id="messages" class="section">
+            <div class="card guest-card">
+                <i class="fas fa-comments"></i>
+                <h3>راسل دور الشباب</h3>
+                <p>سجّل الدخول لتسأل أي دار شباب عن النوادي والإقامة والفعاليات، وتصلك الردود هنا.</p>
+                <button class="btn btn-primary" onclick="askLogin()"><i class="fas fa-right-to-bracket"></i> تسجيل الدخول أو إنشاء حساب</button>
+            </div>
+            <div class="page-head">
+                <div>
+                    <h2><i class="fas fa-comments"></i> <span id="msg-title">الرسائل</span></h2>
+                    <p id="msg-sub">تواصل مباشرة مع دور وبيوت الشباب</p>
+                </div>
+                <button class="btn btn-primary btn-small" onclick="openNewChat()"><i class="fas fa-pen-to-square"></i> <span id="msg-new-lbl">محادثة جديدة</span></button>
+            </div>
+            <div id="msg-admin-tools" class="msg-tools" style="display:none">
+                <div class="wilaya-pick"><i class="fas fa-house-chimney-user"></i><select id="msg-place" onchange="msgPlaceFilter=this.value; renderConvList()"></select></div>
+            </div>
+            <div class="msg-layout" id="msg-layout">
+                <div class="msg-side"><div id="conv-list" class="conv-list"></div></div>
+                <div class="msg-main" id="chat-main"></div>
+            </div>
+        </section>
+
+        <!-- النجوم والمكافآت -->
+        <section id="rewards" class="section">
+            <div class="page-head">
+                <div>
+                    <h2><i class="fas fa-gift"></i> النجوم والمكافآت</h2>
+                    <p>كلما زادت نجومك الموثّقة زادت فرصتك في السحوبات، والمكافآت الأثمن تتطلب مستوى أعلى</p>
+                </div>
+                <button class="btn btn-primary btn-small" id="rw-add" onclick="openRewardForm()" style="display:none"><i class="fas fa-plus"></i> مكافأة جديدة</button>
+            </div>
+            <div id="rw-me" class="rw-me"></div>
+            <div class="card rw-open">
+                <div class="card-header"><h3 class="card-title"><i class="fas fa-ticket"></i> سحوبات مفتوحة</h3></div>
+                <div id="rw-list" class="rw-grid"></div>
+            </div>
+            <div class="card rw-rules-card">
+                <div class="card-header"><h3 class="card-title"><i class="fas fa-star"></i> كيف أجمع النجوم؟</h3></div>
+                <div id="rw-rules"></div>
+            </div>
+            <div class="card rw-past">
+                <div class="card-header"><h3 class="card-title"><i class="fas fa-trophy"></i> سحوبات سابقة</h3></div>
+                <div id="rw-done" class="rw-grid"></div>
+            </div>
+        </section>
+
+        <!-- أعضاء دور الشباب (للمسيّرين) -->
+        <section id="members" class="section">
+            <div class="page-head">
+                <div>
+                    <h2><i class="fas fa-users"></i> أعضاء دور الشباب</h2>
+                    <p>ملف لكل عضو: مشاركاته وتطوعه وأعماله الخيرية ونجومه، مع المراسلة ومنح الشهادات</p>
+                </div>
+            </div>
+            <div class="stat-grid" id="mb-stats"></div>
+            <div class="card">
+                <div class="mb-tools">
+                    <div class="search-mini"><i class="fas fa-magnifying-glass"></i><input type="text" id="mb-search" placeholder="ابحث بالاسم أو الهاتف أو الموهبة..." oninput="membersFilter.q=this.value; renderMembers()"></div>
+                    <div class="wilaya-pick"><i class="fas fa-house-chimney-user"></i><select id="mb-place" onchange="membersFilter.place=this.value; renderMembers()"></select></div>
+                    <div class="wilaya-pick"><i class="fas fa-arrow-down-wide-short"></i><select id="mb-sort" onchange="membersFilter.sort=this.value; renderMembers()">
+                        <option value="stars">الأكثر نجوماً</option><option value="hours">الأكثر تطوعاً</option><option value="charity">الأكثر عطاءً</option><option value="newest">الأحدث</option>
+                    </select></div>
+                </div>
+                <div class="filter-tabs" id="mb-tier-tabs"></div>
+                <div id="mb-list" class="member-list"></div>
             </div>
         </section>
 
@@ -2916,12 +3303,14 @@
         <section id="profile" class="section">
             <div class="card guest-card">
                 <i class="fas fa-user-lock"></i>
-                <h3>ملفك الشخصي</h3>
-                <p>أنشئ حساباً مجانياً لتحجز في بيوت الشباب، وتنخرط في النوادي، وتجمع نقاط التطوع.</p>
+                <h3>جواز المواهب</h3>
+                <p>أنشئ حساباً مجانياً لتحصل على جواز مواهب يجمع شهاداتك الموثّقة وساعات تطوعك وأعمالك، برابط ورمز QR تشاركه مع الجامعة أو صاحب العمل.</p>
                 <button class="btn btn-primary" onclick="askLogin()"><i class="fas fa-right-to-bracket"></i> تسجيل الدخول أو إنشاء حساب</button>
+                <button class="btn btn-outline" style="margin-top:10px" onclick="openPassportView('demo')"><i class="fas fa-eye"></i> شاهد جوازاً نموذجياً</button>
             </div>
-            <div class="card">
-                <div class="profile-header">
+            <div class="card passport-card">
+                <div class="pp-cover"><span class="pp-label"><i class="fas fa-id-card"></i> جواز المواهب</span></div>
+                <div class="pp-head">
                     <div class="profile-avatar">
                         <img id="profile-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=default" alt="الصورة الشخصية">
                         <div class="edit-avatar" onclick="document.getElementById('avatar-input').click()">
@@ -2929,65 +3318,66 @@
                         </div>
                     </div>
                     <input type="file" id="avatar-input" accept="image/*" style="display: none;" onchange="changeAvatar(event)">
-                    
-                    <h2 id="display-name">مستخدم جديد</h2>
-                    <p id="display-bio" style="color: var(--text-muted); margin-top: 5px;">متطوع في منصة مواهب داري</p>
+                    <div class="pp-id">
+                        <h2 id="display-name">مستخدم جديد</h2>
+                        <p class="pp-sub"><i class="fas fa-location-dot"></i> <span id="display-wilaya">غير محدد</span> · عضو منذ <span id="display-member"></span></p>
+                    </div>
                 </div>
+                <p id="display-bio" class="pp-bio">متطوع في منصة مواهب داري</p>
+                <div id="display-talents" class="pp-talents"></div>
 
                 <div class="profile-stats">
                     <div class="stat-item">
-                        <div class="stat-value" id="stat-events">0</div>
-                        <div class="stat-label">فعاليات</div>
+                        <div class="stat-value" id="stat-hours">0</div>
+                        <div class="stat-label">ساعات تطوع موثّقة</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value" id="stat-hours">0</div>
-                        <div class="stat-label">ساعات</div>
+                        <div class="stat-value" id="stat-events">0</div>
+                        <div class="stat-label">شهادات</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="stat-points">0</div>
-                        <div class="stat-label">نقاط</div>
+                        <div class="stat-label">نجوم</div>
                     </div>
                 </div>
 
-                <div class="info-grid">
-                    <div class="info-row">
-                        <div class="info-icon"><i class="fas fa-phone"></i></div>
-                        <div>
-                            <div class="info-label">رقم الهاتف</div>
-                            <div class="info-value" id="display-phone">غير محدد</div>
-                        </div>
-                    </div>
-                    
-                    <div class="info-row">
-                        <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
-                        <div>
-                            <div class="info-label">الولاية</div>
-                            <div class="info-value" id="display-wilaya">غير محدد</div>
-                        </div>
-                    </div>
+                <div id="my-tier" onclick="switchTab('rewards')"></div>
 
-                    <div class="info-row">
-                        <div class="info-icon"><i class="fas fa-star"></i></div>
-                        <div>
-                            <div class="info-label">المواهب</div>
-                            <div id="display-talents"></div>
-                        </div>
-                    </div>
+                <h4 class="sub-title"><i class="fas fa-award"></i> شاراتي</h4>
+                <div id="my-badges" class="badges"></div>
 
-                    <div class="info-row">
-                        <div class="info-icon"><i class="fas fa-calendar-alt"></i></div>
-                        <div>
-                            <div class="info-label">عضو منذ</div>
-                            <div class="info-value" id="display-member"></div>
-                        </div>
-                    </div>
+                <div class="pp-actions">
+                    <button class="btn btn-primary" onclick="openIdCard()"><i class="fas fa-qrcode"></i> بطاقتي</button>
+                    <button class="btn btn-outline" onclick="shareMyPassport()"><i class="fas fa-share-nodes"></i> مشاركة جوازي</button>
+                    <button class="btn btn-outline" onclick="toggleEditForm()"><i class="fas fa-edit"></i> تعديل</button>
                 </div>
+                <p class="pp-private"><i class="fas fa-phone"></i> <span id="display-phone">غير محدد</span> <small>· لا يظهر في الجواز العام</small></p>
+            </div>
 
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button class="btn btn-primary" onclick="toggleEditForm()" style="flex: 1;">
-                        <i class="fas fa-edit"></i> تعديل الملف
-                    </button>
+            <!-- شهاداتي -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-certificate"></i> مشاركاتي وتطوعي وأعمالي الخيرية</h3>
                 </div>
+                <div id="my-certs"></div>
+            </div>
+
+            <!-- أعمالي الخيرية -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-hand-holding-dollar"></i> طلبات الأعمال الخيرية</h3>
+                    <button class="link-btn" onclick="openCharityForm()"><i class="fas fa-plus"></i> سجّل عملاً خيرياً</button>
+                </div>
+                <div id="my-charity" class="req-list"></div>
+            </div>
+
+            <!-- مواهبي -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-palette"></i> مواهبي المعروضة</h3>
+                    <button class="link-btn" onclick="openAddTalent()"><i class="fas fa-plus"></i> اعرض موهبة</button>
+                </div>
+                <div id="my-talents" class="tal-grid compact"></div>
             </div>
 
             <!-- نشاطي في دور الشباب -->
@@ -3281,6 +3671,42 @@
                     </div>
                 </div>
 
+                <!-- التطبيق والحساب -->
+                <div class="settings-section">
+                    <h4>📲 التطبيق والحساب</h4>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <h5>تثبيت التطبيق</h5>
+                            <p>أضف مواهب داري إلى الشاشة الرئيسية ليعمل كتطبيق، حتى دون اتصال</p>
+                        </div>
+                        <div class="settings-item-action"><button class="btn btn-primary btn-small" onclick="installApp()"><i class="fas fa-download"></i> تثبيت</button></div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <h5>الواجهتان</h5>
+                            <p>بوابة دور الشباب للمسيّرين، وتطبيق الشباب للجمهور</p>
+                        </div>
+                        <div class="settings-item-action row-actions">
+                            <a class="btn btn-outline btn-small" href="?mode=portal"><i class="fas fa-building-columns"></i> البوابة</a>
+                            <a class="btn btn-outline btn-small" href="app/"><i class="fas fa-mobile-screen-button"></i> التطبيق</a>
+                        </div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <h5>الذكاء الاصطناعي</h5>
+                            <p>Gemini عبر Firebase AI Logic دون أي مفتاح في الكود، ومساعد محلي من بيانات المنصة إن لم يكن مفعلاً</p>
+                        </div>
+                        <div class="settings-item-action"><button class="btn btn-outline btn-small" onclick="openAssistant()"><i class="fas fa-wand-magic-sparkles"></i> جرّب</button></div>
+                    </div>
+                    <div class="settings-item user-only">
+                        <div class="settings-item-info">
+                            <h5>تسجيل الخروج</h5>
+                            <p>الخروج من هذا الحساب على هذا الجهاز</p>
+                        </div>
+                        <div class="settings-item-action"><button class="btn btn-danger btn-small" onclick="logout()"><i class="fas fa-right-from-bracket"></i> خروج</button></div>
+                    </div>
+                </div>
+
                 <!-- المنطقة الحمراء (للمدير فقط) -->
                 <div class="danger-zone" id="admin-danger-zone" style="display: none;">
                     <h5>⚠️ منطقة الخطر (للمدير فقط)</h5>
@@ -3318,7 +3744,7 @@
                 <!-- حول المنصة -->
                 <div class="settings-section about-box">
                     <h4>ℹ️ حول المنصة</h4>
-                    <p><b>مواهب داري</b>: منصة رقمية تجمع شباب الجزائر بدور الشباب وخدماتها، من الدليل والحجز المسبق إلى الفعاليات والنوادي والتطوع.</p>
+                    <p><b>مواهب داري</b>: بوابة رقمية لدور الشباب وتطبيق لشباب الجزائر، من الدليل والحجز المسبق إلى الفعاليات والتطوع والأعمال الخيرية، جواز المواهب، النجوم والمكافآت، المراسلة والمساعد الذكي.</p>
                     <p class="about-credit">إعداد: <b>آية عابر</b></p>
                 </div>
 
@@ -3338,14 +3764,27 @@
         <div class="nav-item" data-tab="houses" onclick="switchTab('houses')">
             <i class="fas fa-house-chimney-user"></i><span>دور الشباب</span>
         </div>
-        <div class="nav-item" data-tab="booking" onclick="switchTab('booking')">
+        <div class="nav-item desk-only nd" data-tab="booking" onclick="switchTab('booking')">
             <i class="fas fa-bed"></i><span>الحجز</span>
         </div>
-        <div class="nav-item" data-tab="events-page" onclick="switchTab('events-page')">
+        <div class="nav-item desk-only nd" data-tab="events-page" onclick="switchTab('events-page')">
             <i class="fas fa-calendar-days"></i><span>الفعاليات</span>
         </div>
+        <div class="nav-item desk-only nd" data-tab="messages" onclick="switchTab('messages')">
+            <i class="fas fa-comments"></i><span>الرسائل</span>
+            <span class="badge" id="nav-msg-count" style="display:none;">0</span>
+        </div>
+        <div class="nav-item desk-only nd" data-tab="rewards" onclick="switchTab('rewards')">
+            <i class="fas fa-gift"></i><span>المكافآت</span>
+        </div>
+        <div class="nav-item" data-tab="volunteer" onclick="switchTab('volunteer')">
+            <i class="fas fa-hand-holding-heart"></i><span>التطوع</span>
+        </div>
+        <div class="nav-item" data-tab="talents" onclick="switchTab('talents')">
+            <i class="fas fa-palette"></i><span>المواهب</span>
+        </div>
         <div class="nav-item" data-tab="profile" onclick="switchTab('profile')">
-            <i class="fas fa-user"></i><span>ملفي</span>
+            <i class="fas fa-id-card"></i><span>جوازي</span>
         </div>
         <div class="nav-item desk-only" data-tab="notifications" onclick="switchTab('notifications')">
             <i class="fas fa-bell"></i><span>الإشعارات</span>
@@ -3414,7 +3853,7 @@
         </div>
         
         <div class="edit-field">
-            <label>وصف الفعالية</label>
+            <label>وصف الفعالية <button type="button" class="ai-inline" onclick="aiWriteEvent(this)"><i class="fas fa-wand-magic-sparkles"></i> اكتب بالذكاء الاصطناعي</button></label>
             <textarea id="eventDescription" rows="3" placeholder="وصف الفعالية"></textarea>
         </div>
         
@@ -3432,6 +3871,11 @@
         <div class="edit-field">
             <label>عدد المتطوعين المطلوب</label>
             <input type="number" id="eventVolunteers" value="5" min="1">
+        </div>
+
+        <div class="edit-field">
+            <label>ساعات التطوع الموثّقة لكل متطوع</label>
+            <input type="number" id="eventHours" value="3" min="1" max="24">
         </div>
         
         <div class="edit-field">
@@ -3801,12 +4245,291 @@
     </div>
 </div>
 
+<!-- بطاقتي الشخصية (رمز QR لتسجيل الحضور) -->
+<div id="idcardModal" class="modal" onclick="if (event.target === this) closeModal('idcardModal')">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-qrcode"></i> بطاقتي</h3>
+            <button class="close-modal" onclick="closeModal('idcardModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="idcard-body"></div>
+    </div>
+</div>
+
+<!-- عرض شهادة -->
+<div id="certModal" class="modal" onclick="if (event.target === this) closeModal('certModal')">
+    <div class="modal-content sheet wide">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-certificate"></i> الشهادة</h3>
+            <button class="close-modal" onclick="closeModal('certModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="cert-print"></div>
+        <div class="row-actions">
+            <button class="btn btn-primary" onclick="printCertificate()"><i class="fas fa-print"></i> طباعة / حفظ PDF</button>
+            <button class="btn btn-outline" onclick="shareCertificate()"><i class="fas fa-share-nodes"></i> مشاركة رابط التحقق</button>
+        </div>
+    </div>
+</div>
+
+<!-- اختبار اكتشف موهبتك -->
+<div id="quizModal" class="modal" onclick="if (event.target === this) closeModal('quizModal')">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-compass"></i> اكتشف موهبتك</h3>
+            <button class="close-modal" onclick="closeModal('quizModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="quiz-body"></div>
+    </div>
+</div>
+
+<!-- عرض موهبة جديدة -->
+<div id="addTalentModal" class="modal" onclick="if (event.target === this) closeModal('addTalentModal')">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-palette"></i> اعرض موهبتك</h3>
+            <button class="close-modal" onclick="closeModal('addTalentModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="edit-field">
+            <label>عنوان العمل</label>
+            <input type="text" id="tl-title" maxlength="80" placeholder="مثال: لوحة مائية لحي القصبة">
+        </div>
+        <div class="edit-field">
+            <label>المجال</label>
+            <select id="tl-cat"></select>
+        </div>
+        <div class="edit-field">
+            <label>وصف قصير <button type="button" class="ai-inline" onclick="aiImproveTalent(this)"><i class="fas fa-wand-magic-sparkles"></i> ساعدني في الكتابة</button></label>
+            <textarea id="tl-desc" rows="3" maxlength="400" placeholder="حدّثنا عن عملك وكيف أنجزته..."></textarea>
+        </div>
+        <div class="edit-field">
+            <label>صورة العمل (اختياري، 5 ميغابايت على الأكثر)</label>
+            <input type="file" id="tl-file" accept="image/*">
+        </div>
+        <div class="edit-field">
+            <label>أو رابط (يوتيوب، ساوندكلاود، GitHub...)</label>
+            <input type="url" id="tl-link" placeholder="https://" dir="ltr">
+        </div>
+        <label class="check-line">
+            <input type="checkbox" id="tl-agree">
+            <span>أؤكد أن العمل من إنتاجي ويحترم قيم المجتمع، وأعلم أنه يُنشر بعد مراجعة الإدارة.</span>
+        </label>
+        <div class="row-actions">
+            <button class="btn-save" id="tl-submit" onclick="submitTalent()" style="flex:2;"><i class="fas fa-paper-plane"></i> إرسال للمراجعة</button>
+            <button class="btn btn-outline" onclick="closeModal('addTalentModal')" style="flex:1;">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<!-- تفاصيل موهبة -->
+<div id="talentModal" class="modal" onclick="if (event.target === this) closeModal('talentModal')">
+    <div class="modal-content sheet">
+        <div id="talent-detail"></div>
+    </div>
+</div>
+
+<!-- الحضور والشهادات (للمدير) -->
+<div id="attendModal" class="modal" onclick="if (event.target === this) closeModal('attendModal')">
+    <div class="modal-content sheet wide">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-user-check"></i> الحضور والشهادات</h3>
+            <button class="close-modal" onclick="closeModal('attendModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="attend-body"></div>
+    </div>
+</div>
+
+<!-- ماسح رمز QR (للمدير) -->
+<div id="scanModal" class="modal" onclick="if (event.target === this) stopScanner()">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-qrcode"></i> مسح رمز</h3>
+            <button class="close-modal" onclick="stopScanner()"><i class="fas fa-times"></i></button>
+        </div>
+        <p class="muted" id="scan-context"></p>
+        <div class="scan-box">
+            <video id="scan-video" playsinline muted></video>
+            <div class="scan-frame"></div>
+            <canvas id="scan-canvas" hidden></canvas>
+        </div>
+        <div id="scan-status" class="scan-status">وجّه الكاميرا نحو بطاقة الشاب أو تذكرة الحجز</div>
+        <div id="scan-result"></div>
+    </div>
+</div>
+
+<!-- الجواز العام وصفحة التحقق من الشهادة (روابط ?passport= و ?verify=) -->
+<div id="publicView" class="public-view">
+    <div class="pv-bar">
+        <div class="pv-brand"><span>مواهب</span> داري</div>
+        <button class="btn btn-primary btn-small" onclick="closePublicView()"><i class="fas fa-arrow-right-to-bracket"></i> افتح المنصة</button>
+    </div>
+    <div id="public-body" class="pv-body"></div>
+    <p class="pv-foot">منصة مواهب داري · إعداد: آية عابر</p>
+</div>
+
+<!-- مكافأة جديدة / تعديل (للمسيّر) -->
+<div id="rewardFormModal" class="modal" onclick="if (event.target === this) closeModal('rewardFormModal')">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-gift"></i> <span id="rw-form-title">مكافأة جديدة</span></h3>
+            <button class="close-modal" onclick="closeModal('rewardFormModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="edit-field"><label>اسم المكافأة</label><input type="text" id="rwf-title" maxlength="80" placeholder="مثال: إقامة مجانية لليلتين في بيت الشباب"></div>
+        <div class="form-2">
+            <div class="edit-field"><label>النوع</label><select id="rwf-kind"></select></div>
+            <div class="edit-field"><label>القيمة (اختياري)</label><input type="text" id="rwf-value" maxlength="60" placeholder="مثال: ليلتان لشخصين"></div>
+        </div>
+        <div class="edit-field"><label>وصف</label><textarea id="rwf-desc" rows="2" maxlength="300" placeholder="شروط الاستلام، الجهة المانحة..."></textarea></div>
+        <div class="form-3">
+            <div class="edit-field"><label>الحد الأدنى من النجوم</label><input type="number" id="rwf-min" min="0" max="500" value="10"></div>
+            <div class="edit-field"><label>عدد الفائزين</label><input type="number" id="rwf-winners" min="1" max="20" value="1"></div>
+            <div class="edit-field"><label>تاريخ السحب</label><input type="date" id="rwf-date"></div>
+        </div>
+        <div class="edit-field"><label>الدار المانحة</label><select id="rwf-place"></select></div>
+        <p class="muted small"><i class="fas fa-scale-balanced"></i> عند السحب تُعاد حساب نجوم كل مشارك من شهاداته الموثّقة، وكل نجمة تساوي فرصة.</p>
+        <div class="row-actions">
+            <button class="btn-save" onclick="saveReward()" style="flex:2;"><i class="fas fa-check"></i> حفظ وفتح السحب</button>
+            <button class="btn btn-danger" id="rwf-delete" onclick="deleteReward()"><i class="fas fa-trash"></i></button>
+        </div>
+    </div>
+</div>
+
+<!-- السحب ونزاهته -->
+<div id="drawModal" class="modal" onclick="if (event.target === this) closeModal('drawModal')">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-shuffle"></i> السحب</h3>
+            <button class="close-modal" onclick="closeModal('drawModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="draw-body"></div>
+    </div>
+</div>
+
+<!-- تسجيل عمل خيري -->
+<div id="charityModal" class="modal" onclick="if (event.target === this) closeModal('charityModal')">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-hand-holding-dollar"></i> سجّل عملاً خيرياً</h3>
+            <button class="close-modal" onclick="closeModal('charityModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <p class="muted small" style="margin-bottom:12px">تؤكد دار الشباب العمل، فتصلك شهادة عمل خيري موثّقة و3 نجوم في جوازك.</p>
+        <div class="form-2">
+            <div class="edit-field"><label>نوع العمل</label><select id="ch-kind"></select></div>
+            <div class="edit-field"><label>التاريخ</label><input type="date" id="ch-date"></div>
+        </div>
+        <div class="edit-field"><label>عنوان قصير (اختياري)</label><input type="text" id="ch-title" maxlength="80" placeholder="مثال: حملة التبرع بالدم في الحي"></div>
+        <div class="edit-field"><label>دار الشباب التي تؤكد العمل</label><select id="ch-place"></select></div>
+        <div class="edit-field"><label>ماذا فعلت؟</label><textarea id="ch-desc" rows="3" maxlength="400" placeholder="صف مساهمتك باختصار..."></textarea></div>
+        <div class="edit-field"><label>صورة إثبات (اختياري)</label><input type="file" id="ch-file" accept="image/*"></div>
+        <div class="row-actions">
+            <button class="btn-save" onclick="submitCharity()" style="flex:2;"><i class="fas fa-paper-plane"></i> إرسال للتأكيد</button>
+            <button class="btn btn-outline" onclick="closeModal('charityModal')" style="flex:1;">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<!-- ملف العضو (للمسيّر) -->
+<div id="memberModal" class="modal" onclick="if (event.target === this) closeModal('memberModal')">
+    <div class="modal-content sheet wide">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-id-card"></i> ملف العضو</h3>
+            <button class="close-modal" onclick="closeModal('memberModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="member-body"></div>
+    </div>
+</div>
+
+<!-- منح شهادة (للمسيّر) -->
+<div id="grantCertModal" class="modal" onclick="if (event.target === this) closeModal('grantCertModal')">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-award"></i> منح شهادة لـ <span id="gc-name"></span></h3>
+            <button class="close-modal" onclick="closeModal('grantCertModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <input type="hidden" id="gc-uid">
+        <div class="form-2">
+            <div class="edit-field"><label>نوع الشهادة</label><select id="gc-type" onchange="toggleGrantHours()"></select></div>
+            <div class="edit-field"><label>التاريخ</label><input type="date" id="gc-date"></div>
+        </div>
+        <div class="edit-field"><label>النشاط</label><input type="text" id="gc-title" maxlength="80" placeholder="مثال: تنشيط المخيم الصيفي"></div>
+        <div class="edit-field" id="gc-hours-wrap"><label>ساعات التطوع</label><input type="number" id="gc-hours" min="1" max="24" value="3"></div>
+        <div class="edit-field"><label>الدار المانحة</label><select id="gc-place"></select></div>
+        <button class="btn-save" onclick="grantCertificate()"><i class="fas fa-certificate"></i> إصدار الشهادة</button>
+    </div>
+</div>
+
+<!-- محادثة جديدة (للشاب) -->
+<div id="newChatModal" class="modal" onclick="if (event.target === this) closeModal('newChatModal')">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-pen-to-square"></i> محادثة جديدة</h3>
+            <button class="close-modal" onclick="closeModal('newChatModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="edit-field"><label>إلى</label><select id="nc-place"></select></div>
+        <div class="edit-field"><label>رسالتك</label><textarea id="nc-text" rows="3" maxlength="1000" placeholder="اكتب سؤالك..."></textarea></div>
+        <div class="chat-chips" id="nc-quick"></div>
+        <button class="btn-save" onclick="startNewChat()"><i class="fas fa-paper-plane"></i> إرسال</button>
+    </div>
+</div>
+
+<!-- رسالة جماعية (للمسيّر) -->
+<div id="broadcastModal" class="modal" onclick="if (event.target === this) closeModal('broadcastModal')">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-bullhorn"></i> رسالة جماعية لأعضاء دار</h3>
+            <button class="close-modal" onclick="closeModal('broadcastModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="edit-field"><label>الدار</label><select id="bc-place" onchange="updateBroadcastCount()"></select></div>
+        <p class="muted small" id="bc-count"></p>
+        <div class="edit-field"><label>الرسالة</label><textarea id="bc-text" rows="4" maxlength="1000" placeholder="مثال: نحتاج 5 متطوعين لحملة التشجير يوم السبت، سجّلوا من صفحة التطوع."></textarea></div>
+        <button class="btn-save" onclick="sendBroadcast()"><i class="fas fa-paper-plane"></i> إرسال للجميع</button>
+    </div>
+</div>
+
+<!-- مساعد داري الذكي -->
+<div id="aiModal" class="modal" onclick="if (event.target === this) closeModal('aiModal')">
+    <div class="modal-content sheet ai-sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><span class="ai-orb sm"><i class="fas fa-wand-magic-sparkles"></i></span> مساعد داري <span id="ai-mode" class="ai-mode"></span></h3>
+            <button class="close-modal" onclick="closeModal('aiModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="ai-msgs" class="chat-msgs ai-msgs"></div>
+        <div id="ai-sugg" class="chat-chips"></div>
+        <div class="chat-input">
+            <button class="icon-btn mic" id="ai-mic" onclick="aiVoice('ai-input', this)" title="اسأل بصوتك"><i class="fas fa-microphone"></i></button>
+            <textarea id="ai-input" rows="1" maxlength="500" placeholder="اسأل عن دار شباب، نادٍ، حجز، تطوع..." onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); aiSend();}"></textarea>
+            <button class="send-btn" onclick="aiSend()" title="إرسال"><i class="fas fa-paper-plane"></i></button>
+        </div>
+        <p class="ai-note"><i class="fas fa-shield-halved"></i> لا تشارك كلمات المرور أو معلومات حساسة. تحقّق من المواعيد المهمة مع الدار.</p>
+    </div>
+</div>
+
+<!-- تثبيت التطبيق -->
+<div id="installModal" class="modal" onclick="if (event.target === this) closeModal('installModal')">
+    <div class="modal-content sheet">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-mobile-screen-button"></i> ثبّت تطبيق مواهب داري</h3>
+            <button class="close-modal" onclick="closeModal('installModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="install-body"></div>
+    </div>
+</div>
+
+<!-- زر المساعد الذكي -->
+<button id="ai-fab" class="ai-fab" onclick="openAssistant()" title="مساعد داري الذكي"><i class="fas fa-wand-magic-sparkles"></i><span>اسألني</span></button>
+<div class="offline-bar"><i class="fas fa-wifi"></i> أنت دون اتصال: تُعرض آخر نسخة محفوظة من التطبيق</div>
+
 <!-- مؤشر التحميل -->
 <div class="loading-overlay" id="loading-overlay">
     <div class="loading-spinner"></div>
 </div>
 
 <!-- Firebase -->
+<!-- وحدات المنصة (دوال فقط، تُستدعى من السكربت الرئيسي) -->
+<script src="js/talents.js?v=20261105"></script>
+<script src="js/stars.js?v=20261105"></script>
+<script src="js/messenger.js?v=20261105"></script>
+<script src="js/ai.js?v=20261105"></script>
+<script src="js/dashboard.js?v=20261105"></script>
 <script>
     // ==================== تهيئة Firebase ====================
     const firebaseConfig = {
@@ -3886,6 +4609,10 @@
         initMap();
         loadSettings();
         initYouthFeatures();
+        initTalentFeatures();
+        loadRewards();
+        initAppShell();
+        if (!currentUser) showEntryScreen();
 
         const savedLang = localStorage.getItem('preferredLang');
         if (savedLang) changeLanguage(savedLang);
@@ -3896,7 +4623,8 @@
         if (user) {
             guestMode = false;
             document.body.classList.remove('is-guest');
-            document.getElementById('role-screen').style.display = 'none';
+            document.body.classList.add('is-user');
+            hideEntryScreens();
             document.getElementById('auth-screen').classList.remove('active');
             document.getElementById('app').classList.add('ready');
             // الخريطة أُنشئت والتطبيق مخفي، لذا نعيد حساب أبعادها بعد الإظهار
@@ -3930,31 +4658,47 @@
                         const adminNav = document.getElementById('admin-nav');
                         adminNav.style.display = 'flex';
                         adminNav.innerHTML = `
-                            <div class="nav-item active" data-tab="home" onclick="switchTab('home')">
-                                <i class="fas fa-home"></i><span>الرئيسية</span>
-                            </div>
-                            <div class="nav-item" data-tab="admin-events" onclick="switchTab('admin-events')">
-                                <i class="fas fa-tasks"></i><span>الفعاليات</span>
-                                <span class="badge" id="admin-pending-badge" style="display:none;">0</span>
+                            <div class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+                                <i class="fas fa-gauge-high"></i><span>القيادة</span>
                             </div>
                             <div class="nav-item" data-tab="admin-bookings" onclick="switchTab('admin-bookings')">
                                 <i class="fas fa-clipboard-list"></i><span>الطلبات</span>
                                 <span class="badge" id="admin-requests-badge" style="display:none;">0</span>
                             </div>
-                            <div class="nav-item" data-tab="houses" onclick="switchTab('houses')">
-                                <i class="fas fa-house-chimney-user"></i><span>دور الشباب</span>
+                            <div class="nav-item" data-tab="admin-events" onclick="switchTab('admin-events')">
+                                <i class="fas fa-tasks"></i><span>الفعاليات</span>
+                                <span class="badge" id="admin-pending-badge" style="display:none;">0</span>
                             </div>
-                            <div class="nav-item" data-tab="profile" onclick="switchTab('profile')">
-                                <i class="fas fa-user"></i><span>ملفي</span>
+                            <div class="nav-item" data-tab="messages" onclick="switchTab('messages')">
+                                <i class="fas fa-comments"></i><span>الرسائل</span>
+                                <span class="badge" id="admin-nav-msg-count" style="display:none;">0</span>
+                            </div>
+                            <div class="nav-item" data-tab="members" onclick="switchTab('members')">
+                                <i class="fas fa-users"></i><span>الأعضاء</span>
+                            </div>
+                            <div class="nav-item desk-only" data-tab="rewards" onclick="switchTab('rewards')">
+                                <i class="fas fa-gift"></i><span>المكافآت</span>
+                            </div>
+                            <div class="nav-item desk-only nd" data-tab="houses" onclick="switchTab('houses')">
+                                <i class="fas fa-house-chimney-user"></i><span>المرافق</span>
+                            </div>
+                            <div class="nav-item desk-only nd" data-tab="talents" onclick="switchTab('talents')">
+                                <i class="fas fa-palette"></i><span>معرض المواهب</span>
+                            </div>
+                            <div class="nav-item desk-only nd" data-tab="volunteer" onclick="switchTab('volunteer')">
+                                <i class="fas fa-hand-holding-heart"></i><span>التطوع</span>
+                            </div>
+                            <div class="nav-item desk-only nd" data-tab="home" onclick="switchTab('home')">
+                                <i class="fas fa-mobile-screen-button"></i><span>واجهة الشباب</span>
                             </div>
                             <div class="nav-item desk-only" data-tab="notifications" onclick="switchTab('notifications')">
                                 <i class="fas fa-bell"></i><span>الإشعارات</span>
                                 <span class="badge" id="admin-nav-notification-count" style="display:none;">0</span>
                             </div>
-                            <div class="nav-item desk-only" data-tab="leaderboard" onclick="switchTab('leaderboard')">
+                            <div class="nav-item desk-only nd" data-tab="leaderboard" onclick="switchTab('leaderboard')">
                                 <i class="fas fa-trophy"></i><span>لوحة الشرف</span>
                             </div>
-                            <div class="nav-item desk-only" data-tab="settings" onclick="switchTab('settings')">
+                            <div class="nav-item desk-only nd" data-tab="settings" onclick="switchTab('settings')">
                                 <i class="fas fa-cog"></i><span>الإعدادات</span>
                             </div>
                             <p class="nav-credit">إعداد: <b>آية عابر</b></p>
@@ -3965,6 +4709,8 @@
                         filterAdminEvents('pending');
                         loadAdminYouthData();
                         watchUsersForAdmin();
+                        loadAdminStarsData();
+                        if (document.querySelector('.section.active')?.id === 'home') switchTab('dashboard');
                     } else {
                         document.body.classList.remove('is-admin');
                         document.getElementById('volunteer-nav').style.display = 'flex';
@@ -3976,15 +4722,34 @@
                         }
                     }
                     loginIntent = '';
+                    applyModeForRole(selectedRole);
+                    afterUserReady();
+                    loadMyCharity();
+                    loadConversations();
+                    openHashTab();
                     refreshYouthViews();
+    }
+
+    // روابط مثل ?mode=app#booking (اختصارات التطبيق)
+    function openHashTab() {
+        const id = (location.hash || '').slice(1);
+        if (!id || !/^[a-z-]+$/.test(id) || !document.getElementById(id)?.classList.contains('section')) return;
+        history.replaceState(null, '', location.pathname + location.search);
+        switchTab(id);
+    }
+
+    function logout() {
+        if (!confirm('تسجيل الخروج من هذا الحساب؟')) return;
+        auth.signOut().then(() => location.reload()).catch(err => showToast('❌ ' + err.message, 'error'));
     }
 
     // ==================== تصفح المنصة كزائر ====================
     // كل شيء ظاهر للزائر، والتسجيل يُطلب فقط عند الحجز أو الانخراط أو التطوع أو اقتراح فعالية
     function enterGuest() {
+        if (!isAppMode()) setAppMode('app');
         guestMode = true;
         document.body.classList.add('is-guest');
-        document.getElementById('role-screen').style.display = 'none';
+        hideEntryScreens();
         document.getElementById('auth-screen').classList.remove('active');
         document.getElementById('app').classList.add('ready');
         document.getElementById('volunteer-nav').style.display = 'flex';
@@ -3992,16 +4757,14 @@
         loadEvents();
         loadPlaces();
         switchTab('home');
+        openHashTab();
         setTimeout(() => { if (map) { map.invalidateSize(); if (!userLocated) map.fitBounds(ALGERIA_BOUNDS); } }, 100);
     }
 
     function askLogin(msg) {
         if (msg) showToast(msg, 'info');
         document.querySelectorAll('.modal.active').forEach(m => m.id ? closeModal(m.id) : m.remove());
-        document.getElementById('auth-screen').classList.remove('active');
-        const r = document.getElementById('role-screen');
-        r.style.display = 'flex';
-        r.style.opacity = '1';
+        showEntryScreen();
     }
 
     // ==================== دوال المصادقة ====================
@@ -4013,18 +4776,16 @@
             document.getElementById('role-screen').style.display = 'none';
             document.getElementById('auth-screen').classList.add('active');
             document.getElementById('auth-icon').className = role === 'volunteer' ? 'fas fa-user-graduate' : 'fas fa-user-tie';
-            document.getElementById('auth-title').textContent = role === 'volunteer' ? 'تسجيل دخول المتطوعين' : 'تسجيل دخول المدراء';
+            document.getElementById('auth-title').textContent = role === 'volunteer' ? 'حسابك في تطبيق الشباب' : 'دخول مسيّري دور الشباب';
             document.getElementById('auth-subtitle').textContent = role === 'volunteer'
-                ? 'أهلاً بك في منصة مواهب داري'
-                : 'حسابات المدراء الجديدة تُفعَّل بعد موافقة مدير حالي';
-            document.getElementById('signup-role').value = role === 'volunteer' ? 'متطوع' : 'مدير (يتطلب موافقة الإدارة)';
+                ? 'أهلاً بك في مواهب داري'
+                : 'حسابات المسيّرين الجديدة تُفعَّل بعد موافقة مسيّر حالي';
+            document.getElementById('signup-role').value = role === 'volunteer' ? 'شاب (متطوع)' : 'مسيّر دار شباب (يتطلب الموافقة)';
         }, 500);
     }
 
     function goBackToRole() {
-        document.getElementById('auth-screen').classList.remove('active');
-        document.getElementById('role-screen').style.display = 'flex';
-        document.getElementById('role-screen').style.opacity = '1';
+        showEntryScreen();
     }
 
     function switchAuthTab(tab) {
@@ -4163,7 +4924,7 @@
                 document.getElementById('display-bio').textContent = userData.bio || 'متطوع في منصة مواهب داري';
                 document.getElementById('display-phone').textContent = userData.phone || 'غير محدد';
                 document.getElementById('display-wilaya').textContent = getWilayaName(userData.wilaya);
-                document.getElementById('display-member').textContent = new Date(userData.createdAt).toLocaleDateString('ar-SA');
+                document.getElementById('display-member').textContent = userData.createdAt ? formatDateAr(String(userData.createdAt).slice(0, 10)) + ' ' + String(userData.createdAt).slice(0, 4) : '';
                 
                 document.getElementById('stat-events').textContent = userData.events || 0;
                 document.getElementById('stat-hours').textContent = userData.hours || 0;
@@ -4207,6 +4968,7 @@
             .then(() => {
                 hideLoading();
                 showToast('✅ تم حفظ التعديلات');
+                if (currentUserData) { Object.assign(currentUserData, { name, bio, phone, wilaya, talents }); syncPassport(); }
                 document.getElementById('display-name').textContent = name;
                 document.getElementById('display-bio').textContent = bio;
                 document.getElementById('display-phone').textContent = phone;
@@ -4254,6 +5016,7 @@
             .then(() => {
                 hideLoading();
                 showToast('✅ تم تغيير الصورة الشخصية');
+                if (currentUserData) { currentUserData.photoURL = document.getElementById('profile-avatar').src; syncPassport(); }
             })
             .catch(error => {
                 hideLoading();
@@ -4779,6 +5542,7 @@
             date,
             time,
             volunteers: parseInt(document.getElementById('eventVolunteers').value) || 5,
+            volunteerHours: Math.max(1, Math.min(24, parseInt(document.getElementById('eventHours').value) || 3)),
             placeType: document.getElementById('eventPlaceType').value,
             category: document.getElementById('eventCategory').value || 'culture',
             placeId: document.getElementById('eventFacility').value || '',
@@ -4829,8 +5593,7 @@
             volunteeredAt: new Date().toISOString()
         }).then(() => {
             hideLoading();
-            showToast('✅ تم تسجيل تطوعك');
-            updateUserPoints();
+            showToast('✅ سُجّل تطوعك. احضر وأظهر بطاقتك يوم الفعالية لتصلك الشهادة والنجوم');
             
             if (event.createdBy) {
                 sendNotification(event.createdBy, '👥 متطوع جديد', 
@@ -4881,16 +5644,17 @@
             }">
                 <div style="display: flex; justify-content: space-between;">
                     <div>
-                        <h4>${event.title}</h4>
-                        <p class="event-organizer"><i class="fas fa-user"></i> ${event.createdByName}</p>
-                        <p class="event-meta"><i class="fas fa-calendar"></i> ${event.date} - ${event.time}</p>
-                        <p class="event-meta"><i class="fas fa-map-pin"></i> ${event.address}</p>
-                        <p class="event-meta"><i class="fas fa-phone"></i> ${event.phone || 'غير محدد'}</p>
+                        <h4>${esc(event.title)}</h4>
+                        <p class="event-organizer"><i class="fas fa-user"></i> ${esc(event.createdByName || '')}</p>
+                        <p class="event-meta"><i class="fas fa-calendar"></i> ${esc(event.date)} - ${esc(event.time)}</p>
+                        <p class="event-meta"><i class="fas fa-map-pin"></i> ${esc(event.placeName || event.address || '')}</p>
+                        <p class="event-meta"><i class="fas fa-phone"></i> ${esc(event.phone || 'غير محدد')}</p>
+                        <p class="event-meta"><i class="fas fa-users"></i> ${Object.keys(event.participants || {}).length} متطوع · ${Object.keys(event.attendees || {}).length} حضور</p>
                         <p><span class="event-status status-${event.status}">
                             ${event.status === 'pending' ? '⏳ قيد المراجعة' : 
                               event.status === 'approved' ? '✅ مقبولة' : '❌ مرفوضة'}
                         </span></p>
-                        ${event.rejectReason ? `<p><small>سبب الرفض: ${event.rejectReason}</small></p>` : ''}
+                        ${event.rejectReason ? `<p><small>سبب الرفض: ${esc(event.rejectReason)}</small></p>` : ''}
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 5px;">
                         ${event.status === 'pending' ? `
@@ -4901,6 +5665,10 @@
                                 <i class="fas fa-times"></i> رفض
                             </button>
                         ` : ''}
+                        ${event.status === 'approved' ? `
+                            <button class="btn btn-primary btn-small" onclick="openAttendance('${event.id}')">
+                                <i class="fas fa-user-check"></i> الحضور والشهادات
+                            </button>` : ''}
                         <button class="btn btn-secondary btn-small" onclick="deleteEvent('${event.id}')">
                             <i class="fas fa-trash"></i> حذف
                         </button>
@@ -5185,10 +5953,10 @@
     function loadLeaderboard() {
         if (leaderboardLoaded) return; // المستمع يبقى فعالاً، لا داعي لتكراره
         leaderboardLoaded = true;
-        database.ref('users').orderByChild('points').limitToLast(20).on('value', (snapshot) => {
+        database.ref('users').orderByChild('stars').limitToLast(20).on('value', (snapshot) => {
             const users = [];
             snapshot.forEach(child => { users.push({ id: child.key, ...child.val() }); });
-            users.sort((a, b) => (b.points || 0) - (a.points || 0));
+            users.sort((a, b) => (b.stars || 0) - (a.stars || 0) || (b.hours || 0) - (a.hours || 0));
             
             const container = document.getElementById('leaderboard-container');
             if (!container) return;
@@ -5199,42 +5967,23 @@
             }
             
             container.innerHTML = users.map((user, i) => `
-                <div class="leaderboard-item">
+                <div class="leaderboard-item" onclick="openPassportView('${esc(user.id)}')">
                     <div class="rank ${i < 3 ? ['gold','silver','bronze'][i] : 'default'}">
                         ${i < 3 ? ['🥇','🥈','🥉'][i] : i+1}
                     </div>
                     <div class="user-info">
-                        <div class="user-name">${user.name}</div>
-                        <div class="user-points">${user.points || 0} نقطة</div>
+                        <div class="user-name">${esc(user.name || '')}</div>
+                        <div class="user-points">${tierChip(user.stars || 0)} ${user.hours || 0} ساعة تطوع</div>
                     </div>
+                    ${starsLabel(user.stars || 0)}
                 </div>
             `).join('');
         }, error => { leaderboardLoaded = false; if (currentUser) showToast('❌ خطأ في تحميل لوحة الشرف: ' + error.message, 'error'); });
     }
 
     // ==================== دوال النقاط ====================
-    function updateUserPoints() {
-        database.ref('events').once('value', (snapshot) => {
-            let points = 0;
-            let events = 0;
-            let hours = 0;
-            
-            snapshot.forEach(event => {
-                if (event.val().participants?.[currentUser.uid]) {
-                    events++;
-                    hours += 2;
-                    points += 10;
-                }
-            });
-            
-            database.ref('users/' + currentUser.uid).update({ points, events, hours })
-                .catch(error => console.error('خطأ في تحديث النقاط:', error));
-            
-            document.getElementById('stat-points').textContent = points;
-            document.getElementById('stat-events').textContent = events;
-            document.getElementById('stat-hours').textContent = hours;
-        });
-    }
+    // النقاط والنجوم تُحسب من الشهادات الموثّقة (js/talents.js)
+    function updateUserPoints() { recomputeMyStats(); }
 
     // ==================== دوال الإعدادات ====================
     function showSettings() {
@@ -5390,6 +6139,7 @@
         document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.tab === tabId));
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
+        if (tabId !== 'messages' && typeof chatCtx !== 'undefined' && chatCtx) closeChat();
         if (tabId === 'leaderboard') loadLeaderboard();
         else if (tabId === 'home') {
             updatePlacesList();
@@ -5917,6 +6667,7 @@
     function loadAdminYouthData() {
         if (adminYouthLoaded) return;
         adminYouthLoaded = true;
+        loadAdminStarsData();
         database.ref('bookings').on('value', s => {
             allBookings = snapToList(s).sort(byNewest);
             refreshYouthViews();
@@ -5930,13 +6681,20 @@
     // إعادة رسم ما هو ظاهر فقط
     function refreshYouthViews() {
         const active = document.querySelector('.section.active')?.id;
-        if (active === 'home') renderHomeExtras();
+        if (active === 'home') { renderHomeExtras(); renderHomeTalentVol(); renderHomeRewards(); }
         if (active === 'houses') renderHouses();
         if (active === 'booking') renderBookingPage();
         if (active === 'events-page') renderEventsPage();
         if (active === 'admin-bookings') renderAdminRequests();
-        if (active === 'profile') renderProfileYouth();
+        if (active === 'profile') { renderProfileYouth(); renderMyPassport(); }
+        if (active === 'talents') renderTalents();
+        if (active === 'volunteer') renderVolunteer();
+        if (active === 'rewards') renderRewardsPage();
+        if (active === 'messages') renderMessagesPage();
+        if (active === 'members') renderMembers();
+        if (active === 'dashboard') renderDashboard();
         updateAdminRequestBadge();
+        updateMsgBadges();
     }
 
     // ==================== الصفحة الرئيسية ====================
@@ -6173,6 +6931,7 @@
 
             <div class="fd-actions">
                 ${isBookable(f) ? `<button class="btn btn-primary" onclick="closeModal('facilityModal'); openBookingModal('${f.id}')"><i class="fas fa-bed"></i> احجز الآن</button>` : ''}
+                <button class="btn btn-outline" onclick="openChatWith('${f.id}')"><i class="fas fa-comment-dots"></i> مراسلة</button>
                 <a class="btn btn-outline" href="${directionsUrl(f)}" target="_blank" rel="noopener"><i class="fas fa-diamond-turn-right"></i> الاتجاهات</a>
                 ${f.phone ? `<a class="btn btn-outline" href="tel:${esc(String(f.phone).replace(/\s/g, ''))}"><i class="fas fa-phone"></i> اتصال</a>` : ''}
                 <button class="btn btn-outline" title="مشاركة" onclick="shareFacility('${f.id}')"><i class="fas fa-share-nodes"></i></button>
@@ -6871,11 +7630,16 @@
         renderAdminRequests();
     }
 
+    function adminReqSource() {
+        return { bookings: allBookings, clubs: allMemberships, talents: allTalents, charity: allCharity }[adminReqView] || allBookings;
+    }
     function renderAdminFilterTabs() {
-        const source = adminReqView === 'bookings' ? allBookings : allMemberships;
+        const source = adminReqSource();
         const opts = adminReqView === 'bookings'
             ? [['pending', 'قيد المراجعة'], ['confirmed', 'مؤكدة'], ['rejected', 'مرفوضة'], ['cancelled', 'ملغاة'], ['all', 'الكل']]
-            : [['pending', 'قيد المراجعة'], ['accepted', 'مقبولة'], ['rejected', 'مرفوضة'], ['all', 'الكل']];
+            : adminReqView === 'clubs'
+            ? [['pending', 'قيد المراجعة'], ['accepted', 'مقبولة'], ['rejected', 'مرفوضة'], ['all', 'الكل']]
+            : [['pending', 'قيد المراجعة'], ['approved', adminReqView === 'talents' ? 'منشورة' : 'مؤكدة'], ['rejected', 'مرفوضة'], ['all', 'الكل']];
         document.getElementById('adm-filter-tabs').innerHTML = opts.map(([k, l]) => {
             const n = k === 'all' ? source.length : source.filter(x => x.status === k).length;
             return `<span class="filter-tab ${adminReqFilter === k ? 'active' : ''}" onclick="adminReqFilter='${k}'; renderAdminRequests()">${l} <em>${n}</em></span>`;
@@ -6885,7 +7649,8 @@
     function updateAdminRequestBadge() {
         const badge = document.getElementById('admin-requests-badge');
         if (!badge) return;
-        const n = allBookings.filter(b => b.status === 'pending').length + allMemberships.filter(m => m.status === 'pending').length + pendingAdminRequests().length;
+        const n = allBookings.filter(b => b.status === 'pending').length + allMemberships.filter(m => m.status === 'pending').length + pendingAdminRequests().length
+            + allTalents.filter(t => t.status === 'pending').length + allCharity.filter(c => c.status === 'pending').length;
         badge.textContent = n;
         badge.style.display = n ? 'flex' : 'none';
     }
@@ -6899,7 +7664,7 @@
             [allBookings.filter(b => b.status === 'pending').length, 'حجوزات جديدة', 'fa-hourglass-half', '#f59e0b'],
             [allBookings.filter(b => b.status === 'confirmed' && b.checkOut > t).length, 'حجوزات مؤكدة قادمة', 'fa-circle-check', '#10b981'],
             [guestsToday, 'نزيل اليوم', 'fa-bed', '#3b82f6'],
-            [allMemberships.filter(m => m.status === 'pending').length, 'انخراطات جديدة', 'fa-masks-theater', '#ec4899']
+            [allMemberships.filter(m => m.status === 'pending').length + allTalents.filter(x => x.status === 'pending').length + allCharity.filter(c => c.status === 'pending').length, 'انخراطات ومواهب وأعمال خيرية', 'fa-masks-theater', '#ec4899']
         ];
         const adminReqs = pendingAdminRequests().length;
         document.getElementById('adm-users-notice').innerHTML = adminReqs
@@ -6909,13 +7674,14 @@
 
         renderAdminFilterTabs();
         const q = document.getElementById('adm-search').value.trim().toLowerCase();
-        const source = adminReqView === 'bookings' ? allBookings : allMemberships;
+        const source = adminReqSource();
         const list = source.filter(x =>
             (adminReqFilter === 'all' || x.status === adminReqFilter) &&
-            (!q || [x.userName, x.phone, x.code, x.placeName, x.club].some(v => String(v || '').toLowerCase().includes(q)))
+            (!q || [x.userName, x.phone, x.code, x.placeName, x.club, x.title].some(v => String(v || '').toLowerCase().includes(q)))
         );
+        const card = { bookings: adminBookingCard, clubs: adminMembershipCard, talents: adminTalentCard, charity: adminCharityCard }[adminReqView] || adminBookingCard;
         document.getElementById('adm-list').innerHTML = list.length
-            ? list.map(adminReqView === 'bookings' ? adminBookingCard : adminMembershipCard).join('')
+            ? list.map(card).join('')
             : emptyState('fa-inbox', 'لا توجد طلبات هنا');
     }
 
@@ -7030,7 +7796,8 @@
         const upd = { status, decidedAt: new Date().toISOString() };
         if (reason) upd.rejectReason = reason;
         database.ref('memberships/' + id).update(upd).then(() => {
-            showToast(status === 'accepted' ? '✅ تم قبول الانخراط' : 'تم رفض الطلب', status === 'accepted' ? 'success' : 'info');
+            showToast(status === 'accepted' ? '✅ تم قبول الانخراط وصدرت شهادة الانخراط' : 'تم رفض الطلب', status === 'accepted' ? 'success' : 'info');
+            if (status === 'accepted' && m.userId) issueClubCertificate(m);
             if (m.userId) {
                 sendNotification(m.userId,
                     status === 'accepted' ? '🎉 مرحباً بك في النادي' : '❌ طلب الانخراط لم يُقبل',
@@ -7062,7 +7829,7 @@
             allUsersAdmin = snapToList(s);
             updateAdminRequestBadge();
             if (document.getElementById('usersModal').classList.contains('active')) renderUsersAdmin();
-            if (document.querySelector('.section.active')?.id === 'admin-bookings') renderAdminRequests();
+            refreshYouthViews();
         }, err => console.warn('users:', err.message));
     }
 
